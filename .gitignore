@@ -42,3 +42,9 @@ example
 # generated native folders
 /ios
 /android
+
+# supabase
+supabase/
+
+# generated files
+database.types.ts
