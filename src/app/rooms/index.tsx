@@ -1,10 +1,12 @@
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Button, FlatList, StyleSheet, Text, View } from 'react-native';
+import { Button, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { supabase } from '@/lib/supabase';
+import { Room } from './types';
 
-export default function Rooms() {
-    const [rooms, setRooms] = useState([])
+export default function RoomsScreen() {
+    const [rooms, setRooms] = useState<Room[] | null>(null)
 
     async function getRooms() {
         const { data } = await supabase.from('rooms').select()
@@ -16,13 +18,11 @@ export default function Rooms() {
     }, [])
 
     async function createRoom() {
-        const { data, error } = await supabase.from('rooms').insert({ name: 'New Room 2' }).select()
+        router.navigate(`/rooms/new`);
+    }
 
-        if (error) {
-            console.error('Error creating room:', error)
-        } else {
-            setRooms(data)
-        }
+    function navigateToRoomDetails(roomId: number) {
+        router.navigate(`/rooms/${roomId}`);
     }
 
     return (
@@ -31,7 +31,12 @@ export default function Rooms() {
                 data={rooms}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
-                    <Text style={styles.item}>{item.name}</Text>
+                    <Pressable 
+                        style={({ pressed }) => pressed && styles.pressed} 
+                        onPress={() => navigateToRoomDetails(item.id)}
+                    >
+                        <Text style={styles.item}>{item.name}</Text>
+                    </Pressable>
                 )}
             />
             <Button title="Create Room" onPress={createRoom} />
@@ -50,5 +55,8 @@ const styles = StyleSheet.create({
         padding: 16,
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
+    },
+    pressed: {
+        backgroundColor: '#eee',
     },
 });
