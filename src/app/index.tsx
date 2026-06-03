@@ -1,41 +1,8 @@
-import { useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 
-import { supabase } from '../lib/supabase'
-
 export default function Index() {
-  const [rooms, setRooms] = useState([])
-
-  useEffect(() => {
-    getRooms()
-  }, [])
-
-  async function getRooms() {
-    const { data } = await supabase.from('rooms').select()
-    console.log('Rooms data:', data)
-    setRooms(data)
-  }
-
-  async function createRoom() {
-    // const { data, error } = await supabase.from('rooms').insert({ name: 'New Room 2' }).select()
-
-    // if (error) {
-    //   console.error('Error creating room:', error)
-    // } else {
-    //   setRooms(data)
-    // }
-  }
-
   return (
     <View style={styles.container}>
-      {/* <FlatList
-        data={rooms}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <Text style={styles.item}>{item.name}</Text>
-        )}
-      />
-      <Button title="Create Room" onPress={createRoom} /> */}
     </View>
   )
 }
