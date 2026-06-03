@@ -1,5 +1,13 @@
-import { Stack } from "expo-router";
+import { DarkTheme, DefaultTheme, ThemeProvider } from "expo-router";
+import { useColorScheme } from "react-native";
+// import { AnimatedSplashOverlay } from "../../example/src/components/animated-icon";
+import AppTabs from "../components/atoms/app-tabs";
 
-export default function RootLayout() {
-  return <Stack />;
+export default function TabLayout() {
+  const colorScheme = useColorScheme();
+  return (
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <AppTabs />
+    </ThemeProvider>
+  );
 }
