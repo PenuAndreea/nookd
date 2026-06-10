@@ -14,13 +14,17 @@ const route: Route[] = [{
 {
   name: '[id]',
   options: {
-    title: 'Room',
+    title: 'Room details',
+    headerBackVisible: true,
+    headerBackButtonDisplayMode: 'minimal'
   }
 },
 {
   name: 'new',
   options: {
     title: 'Create Room',
+    headerBackVisible: true,
+    headerBackButtonDisplayMode: 'minimal'
   }
 }]
 

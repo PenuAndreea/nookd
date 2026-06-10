@@ -92,5 +92,12 @@ export const FontSizes = {
   large: 20,
 }
 
+export const FontLineHeights = {
+  xSmall: 16,
+  small: 20,
+  medium: 22,
+  large: 34,
+}
+
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
 export const MaxContentWidth = 800;

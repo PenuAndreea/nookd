@@ -1,9 +1,7 @@
-import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 
 import { getRoomsWithDetails, RoomWithDetails } from '@/api/nookd';
-import Button from '@/components/atoms/button';
 import RoomItem from '@/components/organisms/room-item';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
@@ -35,11 +33,6 @@ export default function RoomsScreen() {
         }
     }, [])
 
-
-    function navigateToCreateRoom() {
-        router.navigate(`/rooms/new`);
-    }
-
     return (
         <View style={styles.container}>
             <FlatList
@@ -50,23 +43,18 @@ export default function RoomsScreen() {
                     <RoomItem room={item} />
                 )}
             />
-            <Button
-                floating
-                title="+"
-                size="large"
-                onPress={navigateToCreateRoom}
-            />
         </View>
     )
 }
 
 const useStyles = (colors: any) => StyleSheet.create({
-    listContent: {
-        paddingTop: Spacing.three,
-    },
     container: {
         flex: 1,
+        marginVertical: Spacing.six,
         marginHorizontal: Spacing.three,
         backgroundColor: colors.background,
+    },
+    listContent: {
+        paddingTop: Spacing.three,
     },
 });

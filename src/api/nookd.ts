@@ -121,3 +121,16 @@ export async function getRoomMembersByRoomId(roomId: Room['id']) {
 
     return data ?? []
 }
+
+export async function createRoom(input: Room) {
+    const { data, error } = await supabase
+        .from('rooms')
+        .insert(input)
+        .select()
+
+    if (error) {
+        throw error
+    }
+
+    return data ?? {}
+}

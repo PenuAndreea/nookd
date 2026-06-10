@@ -1,15 +1,18 @@
-import { Tabs } from 'expo-router/tabs';
-import { SymbolView } from 'expo-symbols';
-import { useColorScheme } from 'react-native';
 
-import { Colors, FontWeights } from '../../constants/theme';
+import { router, Stack } from 'expo-router';
+import { BottomTabBar, BottomTabBarProps, Tabs } from 'expo-router/tabs';
+import { SymbolView } from 'expo-symbols';
+import { useColorScheme, View } from 'react-native';
+
+import { Colors } from '../../constants/theme';
+import Button from './button';
 import { Icon } from './icon';
-import Logo from './logo';
 
 type Route = {
   name: string;
   title: string;
   icon: Parameters<typeof SymbolView>[0]["name"];
+  options?: Parameters<typeof Stack.Screen>[0]["options"];
 }
 
 const routes: Route[] = [
@@ -25,19 +28,31 @@ const routes: Route[] = [
   },
 ]
 
+function TabBarWithCreateButton(props: BottomTabBarProps) {
+  return (
+    <View>
+      <BottomTabBar {...props} />
+      <Button
+        floating
+        title="+"
+        size="large"
+        onPress={() => router.navigate('/rooms/new')}
+      />
+    </View>
+  );
+}
+
 export default function AppTabs() {
   const scheme = useColorScheme();
   const colors = Colors[scheme === 'unspecified' ? 'light' : scheme];
 
   return (
     <Tabs
+      tabBar={(props) => <TabBarWithCreateButton {...props} />}
       screenOptions={{
         tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.text,
-        headerStyle: { backgroundColor: colors.background },
-        headerTintColor: colors.text,
-        headerTitleStyle: { fontWeight: FontWeights.semibold },
-        headerLeft: () => <Logo />,
+        headerShown: false
       }}
     >
       {routes.map(({ name, title, icon }) => (
