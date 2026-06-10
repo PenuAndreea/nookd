@@ -1,17 +1,49 @@
 import { useLocalSearchParams } from 'expo-router';
-import { StyleSheet, Text, View } from "react-native";
+import { useEffect, useState } from 'react';
+import { StyleSheet, View } from "react-native";
+
+import { getRoom, Room } from '@/api/nookd';
+import Typography from '@/components/atoms/typography';
+import SessionTimer from '@/components/organisms/session-timer';
 
 
 export default function RoomDetailsScreen() {
     const { id } = useLocalSearchParams();
-    // TODO: get other data about room fetch from supabase using id
+    const [room, setRoom] = useState<Room | undefined>();
+
+    useEffect(() => {
+        async function loadRoom() {
+            try {
+                const data = await getRoom(id.toString())
+
+                setRoom(data)
+            } catch (error) {
+                console.log('Error fetching room:', error)
+            }
+        }
+
+        loadRoom()
+    }, [])
+
+    if (!room) {
+        return <View>
+            <Typography>no room</Typography>
+        </View>
+    }
 
     return (
         <View style={styles.container}>
-            <Text>Room Details: {id}</Text>
-            {/* TODO: Room name */}
-            {/* TODO: Timer */}
-            {/* TODO: Status */}
+            <Typography variant='h2'>Name: {room?.name}</Typography>
+            <Typography>Description: {room?.description}</Typography>
+            <View style={{ alignItems: 'center' }}>
+                <SessionTimer
+                    startedAt={room?.started_at}
+                    durationMinutes={room?.duration_minutes}
+                />
+            </View>
+
+            <Typography>Participants:</Typography>
+
         </View>
     )
 }
@@ -19,8 +51,6 @@ export default function RoomDetailsScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
-        paddingVertical: 150,
         paddingHorizontal: 16,
     },
 })
