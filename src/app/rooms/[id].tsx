@@ -2,7 +2,8 @@ import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { StyleSheet, View } from "react-native";
 
-import { getRoom, Room } from '@/api/nookd';
+import { getRoom, getRoomMembersByRoomId, Room } from '@/api/nookd';
+import Avatar from '@/components/atoms/avatar';
 import Typography from '@/components/atoms/typography';
 import SessionTimer from '@/components/organisms/session-timer';
 
@@ -10,13 +11,16 @@ import SessionTimer from '@/components/organisms/session-timer';
 export default function RoomDetailsScreen() {
     const { id } = useLocalSearchParams();
     const [room, setRoom] = useState<Room | undefined>();
+    const [members, setMembers] = useState();
 
     useEffect(() => {
         async function loadRoom() {
             try {
                 const data = await getRoom(id.toString())
+                const roomMembers = await getRoomMembersByRoomId(id.toString())
 
                 setRoom(data)
+                setMembers(roomMembers)
             } catch (error) {
                 console.log('Error fetching room:', error)
             }
@@ -43,7 +47,12 @@ export default function RoomDetailsScreen() {
             </View>
 
             <Typography>Participants:</Typography>
-
+            {members.map((member) => (
+                <View key={member.profiles.id} style={{ flexDirection: 'row', }}>
+                    <Avatar id={member.profiles.id} size="medium" />
+                    <Typography>{member.profiles.username}</Typography>
+                </View>
+            ))}
         </View>
     )
 }
@@ -51,6 +60,7 @@ export default function RoomDetailsScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#fff',
         paddingHorizontal: 16,
     },
 })
