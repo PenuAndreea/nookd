@@ -2,11 +2,11 @@ import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 
+import { getRooms } from '@/api/nookd';
 import Button from '@/components/atoms/button';
 import RoomItem from '@/components/organisms/room-item';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { supabase } from '@/lib/supabase';
 import { Room } from './types';
 
 
@@ -15,13 +15,13 @@ export default function RoomsScreen() {
     const colors = useTheme();
     const styles = useStyles(colors);
 
-    async function getRooms() {
-        const { data } = await supabase.from('rooms').select()
+    async function loadRooms() {
+        const data = await getRooms()
         setRooms(data)
     }
 
     useEffect(() => {
-        getRooms()
+        loadRooms()
     }, [])
 
     function navigateToCreateRoom() {

@@ -5,19 +5,43 @@ import { useTheme } from '@/hooks/use-theme';
 import { router } from 'expo-router';
 import { Image, StyleSheet, View } from 'react-native';
 
+import { getProfile, getRoomMembersByRoomId } from '@/api/nookd';
+import { useEffect, useState } from 'react';
 import Button from '../atoms/button';
 import Typography from '../atoms/typography';
 import AvatarList from '../molecules/avatar-list';
 
-const BOOK_URI = `https://covers.openlibrary.org/b/isbn/9781786892737-L.jpg?default=false`
-
 export default function RoomItem({ room }: { room: Room }) {
     const colors = useTheme();
     const styles = useStyles(colors);
+    const BOOK_URI = `https://covers.openlibrary.org/b/isbn/${room.isbn}-L.jpg`
 
-    function navigateToRoomDetails(roomId: number) {
+    const [host, setHost] = useState<string | null>(null)
+    const [members, setMembers] = useState<string[] | undefined>(undefined)
+
+    function navigateToRoomDetails(roomId: string) {
         router.navigate(`/rooms/${roomId}`);
     }
+
+    useEffect(() => {
+        async function getHost(id: string) {
+            const myHost = await getProfile(id)
+            setHost(myHost?.username ?? null)
+        }
+
+        if (room.host_id) {
+            getHost(room.host_id)
+        }
+    }, [room.host_id])
+
+    useEffect(() => {
+        async function getRoomMembers() {
+            const myMembers = await getRoomMembersByRoomId(room.id)
+            setMembers(myMembers)
+        }
+
+        getRoomMembers()
+    }, [room.id])
 
     return (
         <View style={styles.container}>
@@ -28,17 +52,17 @@ export default function RoomItem({ room }: { room: Room }) {
             <View style={styles.info}>
                 <View style={{ justifyContent: 'flex-start' }}>
                     <Typography variant="h2">
-                        Rainy Afternoon Reads
+                        {room.name}
                     </Typography>
                     <Typography>
-                        A gentle break
+                        {room.description}
                     </Typography>
                 </View>
                 <View style={styles.participants}>
                     <Typography>
-                        Hosted by Alice
+                        Hosted by: {host}
                     </Typography>
-                    <AvatarList userIds={Array.from({ length: 10 }, (_, index) => index + 1)} />
+                    <AvatarList userIds={members} />
                 </View>
             </View>
             <View style={styles.button}>

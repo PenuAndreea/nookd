@@ -8,7 +8,7 @@ const avatarSizes = {
     large: 32,
 }
 
-export default function Avatar({ id, size }: { id: number; size: keyof typeof avatarSizes }) {
+export default function Avatar({ id, size }: { id: string; size: keyof typeof avatarSizes }) {
     const avatarUrl = `${AVATAR_URL}${id}`;
     const avatarSize = avatarSizes[size] || avatarSizes.medium;
     const colors = useTheme();
