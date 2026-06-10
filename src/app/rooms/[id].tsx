@@ -17,6 +17,7 @@ export default function RoomDetailsScreen() {
         async function loadRoom() {
             try {
                 const data = await getRoom(id.toString())
+                // TODO: transform data to profile
                 const roomMembers = await getRoomMembersByRoomId(id.toString())
 
                 setRoom(data)

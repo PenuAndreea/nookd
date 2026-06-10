@@ -1,5 +1,5 @@
 
-import { RoomWithDetails } from '@/api/nookd';
+import { joinRoom, RoomWithDetails } from '@/api/nookd';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { router } from 'expo-router';
@@ -14,8 +14,18 @@ export default function RoomItem({ room }: { room: RoomWithDetails }) {
     const styles = useStyles(colors);
     const BOOK_URI = `https://covers.openlibrary.org/b/isbn/${room.isbn}-L.jpg`
 
-    function navigateToRoomDetails(roomId: RoomWithDetails['id']) {
-        router.navigate(`/rooms/${roomId}`);
+    async function navigateToRoomDetails(roomId: RoomWithDetails['id']) {
+        try {
+            // Do not add if already in room (user_id)
+            await joinRoom({
+                user_id: '1de8b434-3848-464a-8b31-9f08f262ed11',
+                room_id: roomId
+            })
+        } catch (error) {
+            console.log('Error joining room:', error)
+        } finally {
+            router.navigate(`/rooms/${roomId}`);
+        }
     }
 
     return (

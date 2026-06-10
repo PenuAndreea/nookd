@@ -40,6 +40,7 @@ export default function CreateRoomScreen() {
         setIsSubmitting(true);
 
         await create({
+            id: createRoomId(),
             description: description.trim() || null,
             duration_minutes: Number(durationMinutes) || null,
             host_id: trimmedHostId,

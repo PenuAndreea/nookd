@@ -134,3 +134,16 @@ export async function createRoom(input: Room) {
 
     return data ?? {}
 }
+
+export async function joinRoom(input: RoomMembers) {
+    const { data, error } = await supabase
+        .from('room_members')
+        .insert(input)
+        .select()
+
+    if (error) {
+        throw error
+    }
+
+    return data ?? {}
+}
