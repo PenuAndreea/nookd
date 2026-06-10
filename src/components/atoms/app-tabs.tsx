@@ -1,32 +1,57 @@
-import { NativeTabs } from 'expo-router/unstable-native-tabs';
+import { Tabs } from 'expo-router/tabs';
+import { SymbolView } from 'expo-symbols';
 import { useColorScheme } from 'react-native';
 
-import { Colors } from '../../constants/theme';
+import { Colors, FontWeights } from '../../constants/theme';
+import { Icon } from './icon';
+import Logo from './logo';
+
+type Route = {
+  name: string;
+  title: string;
+  icon: Parameters<typeof SymbolView>[0]["name"];
+}
+
+const routes: Route[] = [
+  {
+    name: 'index',
+    title: 'Home',
+    icon: 'house',
+  },
+  {
+    name: 'rooms',
+    title: 'Rooms',
+    icon: 'apple.books.pages.fill',
+  },
+]
 
 export default function AppTabs() {
   const scheme = useColorScheme();
   const colors = Colors[scheme === 'unspecified' ? 'light' : scheme];
 
   return (
-    <NativeTabs
-      backgroundColor={colors.background}
-      indicatorColor={colors.backgroundElement}
-      labelStyle={{ selected: { color: colors.text } }}>
-      <NativeTabs.Trigger name="index">
-        <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon
-          src={require('@/assets/images/tabIcons/home.png')}
-          renderingMode="template"
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: colors.accent,
+        tabBarInactiveTintColor: colors.text,
+        headerStyle: { backgroundColor: colors.background },
+        headerTintColor: colors.text,
+        headerTitleStyle: { fontWeight: FontWeights.semibold },
+        headerLeft: () => <Logo />,
+      }}
+    >
+      {routes.map(({ name, title, icon }) => (
+        <Tabs.Screen
+          key={name}
+          name={name}
+          options={{
+            title,
+            tabBarIcon: ({ color }) => (
+              <Icon name={icon} color={color} />
+            ),
+          }}
         />
-      </NativeTabs.Trigger>
-
-      <NativeTabs.Trigger name="rooms">
-        <NativeTabs.Trigger.Label>Rooms</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon
-          src={require('@/assets/images/tabIcons/explore.png')}
-          renderingMode="template"
-        />
-      </NativeTabs.Trigger>
-    </NativeTabs>
+      ))}
+    </Tabs>
   );
 }

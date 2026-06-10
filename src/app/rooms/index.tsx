@@ -1,12 +1,19 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Button, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 
+import Button from '@/components/atoms/button';
+import RoomItem from '@/components/organisms/room-item';
+import { Spacing } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
 import { supabase } from '@/lib/supabase';
 import { Room } from './types';
 
+
 export default function RoomsScreen() {
     const [rooms, setRooms] = useState<Room[] | null>(null)
+    const colors = useTheme();
+    const styles = useStyles(colors);
 
     async function getRooms() {
         const { data } = await supabase.from('rooms').select()
@@ -17,46 +24,37 @@ export default function RoomsScreen() {
         getRooms()
     }, [])
 
-    async function createRoom() {
+    function navigateToCreateRoom() {
         router.navigate(`/rooms/new`);
-    }
-
-    function navigateToRoomDetails(roomId: number) {
-        router.navigate(`/rooms/${roomId}`);
     }
 
     return (
         <View style={styles.container}>
             <FlatList
+                contentContainerStyle={styles.listContent}
                 data={rooms}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
-                    <Pressable 
-                        style={({ pressed }) => pressed && styles.pressed} 
-                        onPress={() => navigateToRoomDetails(item.id)}
-                    >
-                        <Text style={styles.item}>{item.name}</Text>
-                    </Pressable>
+                    <RoomItem room={item} />
                 )}
             />
-            <Button title="Create Room" onPress={createRoom} />
+            <Button
+                floating
+                title="+"
+                size="large"
+                onPress={navigateToCreateRoom}
+            />
         </View>
     )
 }
 
-const styles = StyleSheet.create({
+const useStyles = (colors: any) => StyleSheet.create({
+    listContent: {
+        paddingTop: Spacing.three,
+    },
     container: {
         flex: 1,
-        backgroundColor: '#fff',
-        paddingVertical: 150,
-        paddingHorizontal: 16,
-    },
-    item: {
-        padding: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
-    },
-    pressed: {
-        backgroundColor: '#eee',
+        marginHorizontal: Spacing.three,
+        backgroundColor: colors.background,
     },
 });
