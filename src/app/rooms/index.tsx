@@ -2,27 +2,39 @@ import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 
-import { getRooms } from '@/api/nookd';
+import { getRoomsWithDetails, RoomWithDetails } from '@/api/nookd';
 import Button from '@/components/atoms/button';
 import RoomItem from '@/components/organisms/room-item';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { Room } from './types';
-
 
 export default function RoomsScreen() {
-    const [rooms, setRooms] = useState<Room[] | null>(null)
+    const [rooms, setRooms] = useState<RoomWithDetails[] | null>(null)
     const colors = useTheme();
     const styles = useStyles(colors);
 
-    async function loadRooms() {
-        const data = await getRooms()
-        setRooms(data)
-    }
-
     useEffect(() => {
+        let isActive = true;
+
+        async function loadRooms() {
+            try {
+                const data = await getRoomsWithDetails()
+
+                if (!isActive) return;
+
+                setRooms(data)
+            } catch (error) {
+                console.error('Error loading rooms:', error)
+            }
+        }
+
         loadRooms()
+
+        return () => {
+            isActive = false;
+        }
     }, [])
+
 
     function navigateToCreateRoom() {
         router.navigate(`/rooms/new`);

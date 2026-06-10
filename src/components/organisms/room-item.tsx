@@ -1,47 +1,22 @@
 
-import { Room } from '@/app/rooms/types';
+import { RoomWithDetails } from '@/api/nookd';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { router } from 'expo-router';
 import { Image, StyleSheet, View } from 'react-native';
 
-import { getProfile, getRoomMembersByRoomId } from '@/api/nookd';
-import { useEffect, useState } from 'react';
 import Button from '../atoms/button';
 import Typography from '../atoms/typography';
 import AvatarList from '../molecules/avatar-list';
 
-export default function RoomItem({ room }: { room: Room }) {
+export default function RoomItem({ room }: { room: RoomWithDetails }) {
     const colors = useTheme();
     const styles = useStyles(colors);
     const BOOK_URI = `https://covers.openlibrary.org/b/isbn/${room.isbn}-L.jpg`
 
-    const [host, setHost] = useState<string | null>(null)
-    const [members, setMembers] = useState<string[] | undefined>(undefined)
-
-    function navigateToRoomDetails(roomId: string) {
+    function navigateToRoomDetails(roomId: RoomWithDetails['id']) {
         router.navigate(`/rooms/${roomId}`);
     }
-
-    useEffect(() => {
-        async function getHost(id: string) {
-            const myHost = await getProfile(id)
-            setHost(myHost?.username ?? null)
-        }
-
-        if (room.host_id) {
-            getHost(room.host_id)
-        }
-    }, [room.host_id])
-
-    useEffect(() => {
-        async function getRoomMembers() {
-            const myMembers = await getRoomMembersByRoomId(room.id)
-            setMembers(myMembers)
-        }
-
-        getRoomMembers()
-    }, [room.id])
 
     return (
         <View style={styles.container}>
@@ -60,9 +35,9 @@ export default function RoomItem({ room }: { room: Room }) {
                 </View>
                 <View style={styles.participants}>
                     <Typography>
-                        Hosted by: {host}
+                        Hosted by: {room.host?.username}
                     </Typography>
-                    <AvatarList userIds={members} />
+                    <AvatarList userIds={room.members.map((member) => member.user_id)} />
                 </View>
             </View>
             <View style={styles.button}>
