@@ -1,12 +1,13 @@
-import { Fonts, FontSizes, FontWeights } from "@/constants/theme";
+import { FontSizes, FontWeights } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
+import { PlayfairDisplay_800ExtraBold, useFonts } from '@expo-google-fonts/playfair-display';
 import { StyleProp, StyleSheet, Text, TextProps, TextStyle } from "react-native";
 
-type TypographyVariant = "h2" | "body";
+type TypographyVariant = "h1" | "h2" | "body";
 
 type TypographyProps = TextProps & {
     variant?: TypographyVariant;
-    color?: "text" | "textSecondary";
+    color?: "text" | "textSecondary" | "accent";
     style?: StyleProp<TextStyle>;
 };
 
@@ -17,6 +18,12 @@ export default function Typography({
     ...props
 }: TypographyProps) {
     const colors = useTheme();
+
+    const [fontsLoaded] = useFonts({
+        PlayfairDisplay_800ExtraBold
+    });
+
+    if (!fontsLoaded) return null;
 
     return (
         <Text
@@ -33,12 +40,19 @@ export default function Typography({
 
 const styles = StyleSheet.create({
     base: {
-        fontFamily: Fonts?.sans,
+        fontFamily: 'inter',
+    },
+    h1: {
+        fontFamily: 'PlayfairDisplay_800ExtraBold',
+        fontSize: 24,
+        fontWeight: FontWeights.bold,
     },
     h2: {
-        fontSize: FontSizes.medium,
+        fontFamily: 'PlayfairDisplay_800ExtraBold',
         fontWeight: FontWeights.bold,
         lineHeight: 22,
+        marginBottom: 8,
+        fontSize: 16
     },
     body: {
         fontSize: FontSizes.small,

@@ -1,8 +1,9 @@
 
+import { BlurView } from 'expo-blur';
 import { router, Stack } from 'expo-router';
 import { BottomTabBar, BottomTabBarProps, Tabs } from 'expo-router/tabs';
 import { SymbolView } from 'expo-symbols';
-import { useColorScheme, View } from 'react-native';
+import { StyleSheet, useColorScheme, View } from 'react-native';
 
 import { Colors } from '../../constants/theme';
 import Button from './button';
@@ -24,7 +25,7 @@ const routes: Route[] = [
   {
     name: 'rooms',
     title: 'Rooms',
-    icon: 'apple.books.pages.fill',
+    icon: 'person.3.fill',
   },
 ]
 
@@ -34,8 +35,8 @@ function TabBarWithCreateButton(props: BottomTabBarProps) {
       <BottomTabBar {...props} />
       <Button
         floating
-        title="+"
-        size="large"
+        icon="plus"
+        size="medium"
         onPress={() => router.navigate('/rooms/new')}
       />
     </View>
@@ -52,7 +53,10 @@ export default function AppTabs() {
       screenOptions={{
         tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.text,
-        headerShown: false
+        headerShown: false,
+        tabBarBackground: () => (
+          <BlurView tint="light" intensity={100} style={[StyleSheet.absoluteFill, { backgroundColor: colors.background }]} />
+        ),
       }}
     >
       {routes.map(({ name, title, icon }) => (

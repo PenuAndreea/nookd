@@ -12,8 +12,8 @@ export default function AvatarList({ userIds }: { userIds?: string[] }) {
             {userIds?.slice(0, 3).map((userId) => (
                 <Avatar key={userId} id={userId} size="small" />
             ))}
-            {userIds && userIds?.length > 3 && (
-                <Text style={styles.readerCount}>+{userIds?.length - 3} readers</Text>
+            {userIds && userIds?.length > 0 && (
+                <Text style={styles.readerCount}>{userIds?.length} reading</Text>
             )}
         </View>
     )

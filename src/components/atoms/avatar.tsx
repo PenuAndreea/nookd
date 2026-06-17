@@ -3,7 +3,7 @@ import { Image, StyleSheet } from "react-native";
 
 const AVATAR_URL = `https://api.dicebear.com/9.x/lorelei/png?seed=user-`
 const avatarSizes = {
-    small: 20,
+    small: 28,
     medium: 24,
     large: 32,
 }
@@ -29,6 +29,6 @@ const useStyles = (size: number, colors: any) =>
             width: size,
             height: size,
             borderRadius: size / 2,
-            backgroundColor: colors.backgroundElement,
+            backgroundColor: colors.soft,
         },
     })

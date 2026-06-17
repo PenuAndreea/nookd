@@ -3,16 +3,33 @@ import { joinRoom, RoomWithDetails } from '@/api/nookd';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { router } from 'expo-router';
-import { Image, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import Button from '../atoms/button';
 import Typography from '../atoms/typography';
 import AvatarList from '../molecules/avatar-list';
 
+import Chilling from '../../../assets/images/illustrations/Chilling-cuate.svg';
+import KidsReading from '../../../assets/images/illustrations/kids-reading-cuate.svg';
+import ReadingBook from "../../../assets/images/illustrations/reading-book-cuate.svg";
+import StayHome from '../../../assets/images/illustrations/stay-at-home-cuate.svg';
+import StayIn from '../../../assets/images/illustrations/staying-in-cuate.svg';
+import WomanReading from '../../../assets/images/illustrations/woman-reading-cuate.svg';
+
+const ROOM_ILLUSTRATIONS = [KidsReading, ReadingBook, StayHome, StayIn, WomanReading, Chilling]
+
 export default function RoomItem({ room }: { room: RoomWithDetails }) {
     const colors = useTheme();
     const styles = useStyles(colors);
     const BOOK_URI = `https://covers.openlibrary.org/b/isbn/${room.isbn}-L.jpg`
+
+    const hashId = (id: string) =>
+        id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+
+    const getIllustration = (index: number) =>
+        ROOM_ILLUSTRATIONS[index % ROOM_ILLUSTRATIONS.length]
+
+    const Illustration = getIllustration(hashId(room.id))
 
     async function navigateToRoomDetails(roomId: RoomWithDetails['id']) {
         try {
@@ -30,23 +47,19 @@ export default function RoomItem({ room }: { room: RoomWithDetails }) {
 
     return (
         <View style={styles.container}>
-            <Image
-                style={styles.image}
-                source={{ uri: BOOK_URI }}
-            />
+            <View style={{ width: 80, height: 80, backgroundColor: '#F2ECE3', borderRadius: 12, flexWrap: 'wrap' }}>
+                <Illustration height={80} width={80} />
+            </View>
             <View style={styles.info}>
                 <View style={{ justifyContent: 'flex-start' }}>
                     <Typography variant="h2">
                         {room.name}
                     </Typography>
-                    <Typography>
-                        {room.description}
+                    <Typography numberOfLines={2} color="textSecondary">
+                        {room.description} adding some more content here
                     </Typography>
                 </View>
                 <View style={styles.participants}>
-                    <Typography>
-                        Hosted by: {room.host?.username}
-                    </Typography>
                     <AvatarList userIds={room.members.map((member) => member.user_id)} />
                 </View>
             </View>
@@ -71,16 +84,12 @@ const useStyles = (colors: any) => StyleSheet.create({
         borderWidth: 1,
         borderRadius: BorderRadius.medium,
         borderColor: colors.background,
+        boxShadow: ' rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px',
     },
     participants: {
         flex: 1,
         justifyContent: 'flex-end',
         marginTop: Spacing.two
-    },
-    image: {
-        width: 60,
-        aspectRatio: 2 / 3,
-        borderRadius: BorderRadius.small,
     },
     info: {
         flex: 1,
