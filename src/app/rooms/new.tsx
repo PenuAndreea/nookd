@@ -1,8 +1,12 @@
 import { useState } from 'react';
-import { Alert, StyleSheet, TextInput, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 
 import { createRoom } from '@/api/nookd';
 import Button from '@/components/atoms/button';
+import { Header } from '@/components/molecules/header';
+import { LabeledInput } from '@/components/molecules/labeled-input';
+import { DurationPicker, MoodPicker } from '@/components/molecules/picker';
+import { Book, BookSearch } from '@/components/molecules/search-input';
 import { BorderRadius, FontSizes, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { router } from 'expo-router';
@@ -11,12 +15,13 @@ import { Room } from './types';
 export default function CreateRoomScreen() {
     const colors = useTheme();
     const styles = createStyles(colors);
+
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [isbn, setIsbn] = useState('9781786892737');
-    const [hostId, setHostId] = useState('1de8b434-3848-464a-8b31-9f08f262ed11');
-    const [durationMinutes, setDurationMinutes] = useState('60');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [mood, setMood] = useState<string | null>(null);
+    const [duration, setDuration] = useState<string | null>('60');
+    const [book, setBook] = useState<Book | null>(null);
 
     function createRoomId() {
         if (typeof globalThis.crypto?.randomUUID === 'function') {
@@ -42,9 +47,9 @@ export default function CreateRoomScreen() {
         await create({
             id: createRoomId(),
             description: description.trim() || null,
-            duration_minutes: Number(durationMinutes) || null,
-            host_id: trimmedHostId,
-            isbn: Number(isbn) || null,
+            duration_minutes: Number(duration) || null,
+            host_id: '1de8b434-3848-464a-8b31-9f08f262ed11', // the host id from the profile
+            isbn: 9781786892737, // optional
             name: trimmedName || null,
             started_at: new Date().toISOString(),
             status: 'waiting',
@@ -66,56 +71,34 @@ export default function CreateRoomScreen() {
 
     return (
         <View style={styles.container}>
-            <TextInput
-                autoCapitalize="sentences"
-                onChangeText={setName}
-                placeholder="Name"
-                placeholderTextColor={colors.textSecondary}
-                style={styles.input}
-                value={name}
-            />
-            <TextInput
-                multiline
-                onChangeText={setDescription}
-                placeholder="Description"
-                placeholderTextColor={colors.textSecondary}
-                style={[styles.input, styles.textArea]}
-                value={description}
-            />
-            <TextInput
-                inputMode="numeric"
-                keyboardType="number-pad"
-                onChangeText={setIsbn}
-                placeholder="ISBN"
-                placeholderTextColor={colors.textSecondary}
-                style={styles.input}
-                value={isbn}
-            />
-            <TextInput
-                autoCapitalize="none"
-                onChangeText={setHostId}
-                placeholder="Host ID"
-                placeholderTextColor={colors.textSecondary}
-                style={styles.input}
-                value={hostId}
-            />
-            <TextInput
-                inputMode="numeric"
-                keyboardType="number-pad"
-                onChangeText={setDurationMinutes}
-                placeholder="Duration minutes"
-                placeholderTextColor={colors.textSecondary}
-                style={styles.input}
-                value={durationMinutes}
-            />
-            <View style={{ justifyContent: 'center' }}>
-                <Button
-                    size='large'
-                    title={isSubmitting ? 'Creating...' : 'Create room'}
-                    onPress={handleCreateRoom}
+            <Header title="Create Room" showBack />
+            <View style={{ marginHorizontal: 16, gap: 16 }}>
+                <LabeledInput
+                    label="Room name"
+                    placeholder="e.g. Sunday deep work"
+                    value={name}
+                    onChangeText={setName}
                 />
+                <LabeledInput
+                    label="Description"
+                    placeholder="What's the vibe?"
+                    value={description}
+                    onChangeText={setDescription}
+                    multiline
+                    numberOfLines={3}
+                // error="Description is required"
+                />
+                <MoodPicker value={mood} onChange={setMood} />
+                <DurationPicker value={duration} onChange={setDuration} />
+                <BookSearch value={book} onChange={setBook} />
+                <View style={{ justifyContent: 'center' }}>
+                    <Button
+                        size='medium'
+                        title={isSubmitting ? 'Creating...' : 'Create room'}
+                        onPress={handleCreateRoom}
+                    />
+                </View>
             </View>
-
         </View>
     )
 }
@@ -124,9 +107,8 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
     container: {
         flex: 1,
         gap: Spacing.three,
-        backgroundColor: colors.white,
+        backgroundColor: colors.background,
         paddingVertical: Spacing.four,
-        paddingHorizontal: Spacing.three,
     },
     title: {
         color: colors.text,

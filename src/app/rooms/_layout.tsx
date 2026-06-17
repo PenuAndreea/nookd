@@ -5,31 +5,14 @@ type Route = {
   options?: Parameters<typeof Stack.Screen>[0]["options"];
 }
 
-const route: Route[] = [{
-  name: 'index',
-  options: {
-    headerShown: false,
-  }
-},
-{
-  name: '[id]',
-  options: {
-    title: 'Room details',
-    headerBackVisible: true,
-    headerBackButtonDisplayMode: 'minimal'
-  }
-},
-{
-  name: 'new',
-  options: {
-    title: 'Create Room',
-    headerBackVisible: true,
-    headerBackButtonDisplayMode: 'minimal'
+const route: Route[] = [{ name: 'index' }, { name: '[id]' }, {
+  name: 'new', options: {
+    presentation: 'formSheet',
   }
 }]
 
 export default function RoomsLayout() {
-  return <Stack>
+  return <Stack screenOptions={{ headerShown: false }}>
     {route.map(({ name, options }) => (
       <Stack.Screen
         key={name}

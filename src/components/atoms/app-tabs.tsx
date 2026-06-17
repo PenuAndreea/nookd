@@ -65,6 +65,7 @@ export default function AppTabs() {
           name={name}
           options={{
             title,
+            headerShown: false,
             tabBarIcon: ({ color }) => (
               <Icon name={icon} color={color} />
             ),

@@ -9,7 +9,7 @@ import Button from '../atoms/button';
 import Typography from '../atoms/typography';
 import AvatarList from '../molecules/avatar-list';
 
-import Chilling from '../../../assets/images/illustrations/Chilling-cuate.svg';
+import Chilling from '../../../assets/images/illustrations/chilling-cuate.svg';
 import KidsReading from '../../../assets/images/illustrations/kids-reading-cuate.svg';
 import ReadingBook from "../../../assets/images/illustrations/reading-book-cuate.svg";
 import StayHome from '../../../assets/images/illustrations/stay-at-home-cuate.svg';

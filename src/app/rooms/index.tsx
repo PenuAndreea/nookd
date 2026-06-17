@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
 
 import { getRoomsWithDetails, RoomWithDetails } from '@/api/nookd';
 import Typography from '@/components/atoms/typography';
 import RoomItem from '@/components/organisms/room-item';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import KidsReading from "../../../assets/images/illustrations/reading-book-cuate.svg";
 
 export default function RoomsScreen() {
     const [rooms, setRooms] = useState<RoomWithDetails[] | null>(null)
@@ -41,22 +40,17 @@ export default function RoomsScreen() {
 
     return (
         <View style={styles.container}>
-            <View style={{ margin: 8 }}>
+            <View style={{ marginVertical: 8 }}>
                 <Typography variant='h1'>Silent Rooms</Typography>
             </View>
             {loading ?
-                <View style={{ alignItems: 'center' }}>
-                    <KidsReading width={400} height={400} />
-                    <Typography color="textSecondary">Loading...</Typography>
-                </View> :
+                <ActivityIndicator size="large" style={{ justifyContent: 'center', alignSelf: 'center', alignItems: 'center', alignContent: 'center', height: '80%' }} color={colors.accent} /> :
                 <FlatList
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={styles.listContent}
                     data={rooms}
                     keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item }) => (
-                        <RoomItem room={item} />
-                    )}
+                    renderItem={({ item }) => <RoomItem room={item} />}
                 />}
         </View>
     )
