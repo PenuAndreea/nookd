@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, View } from "react-native";
 
 import { getRoom, Room } from '@/api/nookd';
-import Avatar from '@/components/atoms/avatar';
 import Button from '@/components/atoms/button';
 import Typography from '@/components/atoms/typography';
 import SessionTimer from '@/components/organisms/session-timer';
+import { useAuth } from '@/contexts/auth-context';
 import { useRoomPresence } from '@/hooks/use-room-presence';
 
 
@@ -14,10 +14,19 @@ export default function RoomDetailsScreen() {
     const { id } = useLocalSearchParams();
     const [room, setRoom] = useState<Room | undefined>();
 
-    const { members, memberCount, isJoined, elapsedSeconds, leaveRoom } =
-        useRoomPresence(room?.id, '1de8b434-3848-464a-8b31-9f08f262ed11')
+    const { session } = useAuth();
 
-    console.log(members, memberCount, isJoined, elapsedSeconds)
+    const { members, memberCount, isJoined, elapsedSeconds, joinRoom, leaveRoom } =
+        useRoomPresence(room?.id, session?.user.id)
+
+
+    useEffect(() => {
+        if (room?.id && session?.user.id && !isJoined) {
+            joinRoom()
+        }
+    }, [room?.id, session?.user.id])
+
+
     useEffect(() => {
         async function loadRoom() {
             try {
@@ -48,15 +57,6 @@ export default function RoomDetailsScreen() {
                     durationMinutes={room?.duration_minutes}
                 />
             </View>
-
-            <Typography>Participants:</Typography>
-            {members.map((member) => (
-                <View key={member.profiles.id} style={{ flexDirection: 'row', }}>
-                    <Avatar id={member.profiles.id} size="medium" />
-                    <Typography>{member.profiles.username}</Typography>
-                </View>
-            ))}
-
             <View>
                 <Typography>Amount of members: {memberCount}</Typography>
                 <Typography>Are you joined ? {isJoined ? 'yes' : 'no'}</Typography>

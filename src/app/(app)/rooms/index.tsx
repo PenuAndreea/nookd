@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
 
-import { getRoomsWithDetails, RoomWithDetails } from '@/api/nookd';
+import { getRooms, RoomWithDetails } from '@/api/nookd';
 import Typography from '@/components/atoms/typography';
 import RoomItem from '@/components/organisms/room-item';
 import { Spacing } from '@/constants/theme';
@@ -19,7 +19,7 @@ export default function RoomsScreen() {
         async function loadRooms() {
             try {
                 setIsLoading(true)
-                const data = await getRoomsWithDetails()
+                const data = await getRooms()
 
                 if (!isActive) return;
 

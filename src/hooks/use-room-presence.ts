@@ -39,8 +39,12 @@ export function useRoomPresence(roomId: string, userId: string): RoomPresenceSta
     const syncPresence = useCallback(() => {
         const channel = channelRef.current
         if (!channel) return
+        console.log('channel:', channel)
         const state = channel.presenceState<RoomMember>()
+        console.log('raw presence state:', state)
         const flat = Object.values(state).flatMap((entries) => entries.map((e) => e))
+
+        console.log('flat:', flat)
         setMembers(flat)
     }, [])
 
@@ -49,7 +53,11 @@ export function useRoomPresence(roomId: string, userId: string): RoomPresenceSta
 
         const { error: memberError } = await supabase
             .from('room_members')
-            .upsert({ room_id: roomId, user_id: userId, joined_at: new Date().toISOString() })
+            .upsert(
+                { room_id: roomId, user_id: userId, joined_at: new Date().toISOString() },
+                { onConflict: 'room_id,user_id', ignoreDuplicates: true }
+            )
+
         if (memberError) throw memberError
 
         const { data: session, error: sessionError } = await supabase
@@ -66,7 +74,8 @@ export function useRoomPresence(roomId: string, userId: string): RoomPresenceSta
             .on('presence', { event: 'sync' }, syncPresence)
             .on('presence', { event: 'join' }, syncPresence)
             .on('presence', { event: 'leave' }, syncPresence)
-            .subscribe(async (status) => {
+            .subscribe(async (status, err) => {
+                console.log('channel status:', status, err)
                 if (status === 'SUBSCRIBED') {
                     await channel.track({ user_id: userId, online_at: new Date().toISOString() })
                 }

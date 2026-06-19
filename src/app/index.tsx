@@ -1,23 +1,18 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Redirect } from 'expo-router';
+import { ActivityIndicator, View } from 'react-native';
+
+import { useAuth } from '../contexts/auth-context';
 
 export default function Index() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.item}>Welcome to Nookd!</Text>
-    </View>
-  )
-}
+    const { session, loading } = useAuth();
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingVertical: 150,
-    paddingHorizontal: 16,
-  },
-  item: {
-    padding: 16,
-    fontSize: 18,
-    borderBottomColor: '#ccc',
-  },
-})
+    if (loading) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" />
+            </View>
+        );
+    }
+
+    return <Redirect href={session ? '/(app)' : '/(auth)/sign-in'} />;
+}

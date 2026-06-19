@@ -1,16 +1,11 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from "expo-router";
-import { useColorScheme } from "react-native";
+import { Slot } from 'expo-router';
 
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import AppTabs from "../components/atoms/app-tabs";
+import { AuthProvider } from '../contexts/auth-context';
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <AppTabs />
-      </GestureHandlerRootView>
-    </ThemeProvider>
-  );
+export default function RootLayout() {
+    return (
+        <AuthProvider>
+            <Slot />
+        </AuthProvider>
+    );
 }

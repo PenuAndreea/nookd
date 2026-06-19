@@ -8,6 +8,7 @@ import { LabeledInput } from '@/components/molecules/labeled-input';
 import { DurationPicker, MoodPicker } from '@/components/molecules/picker';
 import { Book, BookSearch } from '@/components/molecules/search-input';
 import { BorderRadius, FontSizes, Spacing } from '@/constants/theme';
+import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/hooks/use-theme';
 import { router } from 'expo-router';
 import { Room } from './types';
@@ -23,6 +24,8 @@ export default function CreateRoomScreen() {
     const [duration, setDuration] = useState<string | null>('60');
     const [book, setBook] = useState<Book | null>(null);
 
+    const { session } = useAuth()
+
     async function handleCreateRoom() {
         if (isSubmitting) return;
 
@@ -33,11 +36,10 @@ export default function CreateRoomScreen() {
         await create({
             description: description.trim() || null,
             duration_minutes: Number(duration) || null,
-            host_id: '1de8b434-3848-464a-8b31-9f08f262ed11', // the host id from the profile
-            isbn: 9781786892737, // optional
+            host_id: session?.user.id,
             name: trimmedName || null,
             started_at: new Date().toISOString(),
-            status: 'waiting',
+            // status: 'waiting',
         });
 
         setIsSubmitting(false);
@@ -46,9 +48,10 @@ export default function CreateRoomScreen() {
     async function create(input: Room) {
         try {
             await createRoom(input)
-            router.navigate(`/rooms/${input.id}`);
+            // go back
+            router.back()
         } catch (error) {
-            console.error('Error creating room:', error)
+            console.error('Error creating room:', error, input)
             Alert.alert('Room not created', 'Something went wrong while creating the room.');
         }
 

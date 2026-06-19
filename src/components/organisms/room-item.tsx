@@ -7,9 +7,7 @@ import { StyleSheet, View } from 'react-native';
 
 import Button from '../atoms/button';
 import Typography from '../atoms/typography';
-import AvatarList from '../molecules/avatar-list';
 
-import { useRoomPresence } from '@/hooks/use-room-presence';
 import Chilling from '../../../assets/images/illustrations/chilling-cuate.svg';
 import KidsReading from '../../../assets/images/illustrations/kids-reading-cuate.svg';
 import ReadingBook from "../../../assets/images/illustrations/reading-book-cuate.svg";
@@ -24,8 +22,6 @@ export default function RoomItem({ room }: { room: RoomWithDetails }) {
     const styles = useStyles(colors);
     const BOOK_URI = `https://covers.openlibrary.org/b/isbn/${room.isbn}-L.jpg`
 
-    const { joinRoom } = useRoomPresence(room?.id, '1de8b434-3848-464a-8b31-9f08f262ed11')
-
     const hashId = (id: string) =>
         id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
 
@@ -35,13 +31,7 @@ export default function RoomItem({ room }: { room: RoomWithDetails }) {
     const Illustration = getIllustration(hashId(room?.id))
 
     async function navigateToRoomDetails(roomId: RoomWithDetails['id']) {
-        try {
-            await joinRoom()
-        } catch (error) {
-            console.log('Error joining room:', error)
-        } finally {
-            router.navigate(`/rooms/${roomId}`);
-        }
+        router.navigate(`/rooms/${roomId}`)
     }
 
     return (
@@ -57,9 +47,6 @@ export default function RoomItem({ room }: { room: RoomWithDetails }) {
                     <Typography numberOfLines={2} color="textSecondary">
                         {room.description} adding some more content here
                     </Typography>
-                </View>
-                <View style={styles.participants}>
-                    <AvatarList userIds={room.members.map((member) => member.user_id)} />
                 </View>
             </View>
             <View style={styles.button}>
