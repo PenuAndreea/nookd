@@ -2,26 +2,28 @@ import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { StyleSheet, View } from "react-native";
 
-import { getRoom, getRoomMembersByRoomId, Room } from '@/api/nookd';
+import { getRoom, Room } from '@/api/nookd';
 import Avatar from '@/components/atoms/avatar';
+import Button from '@/components/atoms/button';
 import Typography from '@/components/atoms/typography';
 import SessionTimer from '@/components/organisms/session-timer';
+import { useRoomPresence } from '@/hooks/use-room-presence';
 
 
 export default function RoomDetailsScreen() {
     const { id } = useLocalSearchParams();
     const [room, setRoom] = useState<Room | undefined>();
-    const [members, setMembers] = useState();
 
+    const { members, memberCount, isJoined, elapsedSeconds, leaveRoom } =
+        useRoomPresence(room?.id, '1de8b434-3848-464a-8b31-9f08f262ed11')
+
+    console.log(members, memberCount, isJoined, elapsedSeconds)
     useEffect(() => {
         async function loadRoom() {
             try {
                 const data = await getRoom(id.toString())
-                // TODO: transform data to profile
-                const roomMembers = await getRoomMembersByRoomId(id.toString())
 
                 setRoom(data)
-                setMembers(roomMembers)
             } catch (error) {
                 console.log('Error fetching room:', error)
             }
@@ -54,6 +56,14 @@ export default function RoomDetailsScreen() {
                     <Typography>{member.profiles.username}</Typography>
                 </View>
             ))}
+
+            <View>
+                <Typography>Amount of members: {memberCount}</Typography>
+                <Typography>Are you joined ? {isJoined ? 'yes' : 'no'}</Typography>
+                <Typography>Elapsed seconds: {elapsedSeconds}</Typography>
+            </View>
+
+            <Button title="Leave" size="small" onPress={leaveRoom} />
         </View>
     )
 }

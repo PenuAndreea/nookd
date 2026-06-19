@@ -1,5 +1,5 @@
 
-import { joinRoom, RoomWithDetails } from '@/api/nookd';
+import { RoomWithDetails } from '@/api/nookd';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { router } from 'expo-router';
@@ -9,6 +9,7 @@ import Button from '../atoms/button';
 import Typography from '../atoms/typography';
 import AvatarList from '../molecules/avatar-list';
 
+import { useRoomPresence } from '@/hooks/use-room-presence';
 import Chilling from '../../../assets/images/illustrations/chilling-cuate.svg';
 import KidsReading from '../../../assets/images/illustrations/kids-reading-cuate.svg';
 import ReadingBook from "../../../assets/images/illustrations/reading-book-cuate.svg";
@@ -23,21 +24,19 @@ export default function RoomItem({ room }: { room: RoomWithDetails }) {
     const styles = useStyles(colors);
     const BOOK_URI = `https://covers.openlibrary.org/b/isbn/${room.isbn}-L.jpg`
 
+    const { joinRoom } = useRoomPresence(room?.id, '1de8b434-3848-464a-8b31-9f08f262ed11')
+
     const hashId = (id: string) =>
         id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
 
     const getIllustration = (index: number) =>
         ROOM_ILLUSTRATIONS[index % ROOM_ILLUSTRATIONS.length]
 
-    const Illustration = getIllustration(hashId(room.id))
+    const Illustration = getIllustration(hashId(room?.id))
 
     async function navigateToRoomDetails(roomId: RoomWithDetails['id']) {
         try {
-            // Do not add if already in room (user_id)
-            await joinRoom({
-                user_id: '1de8b434-3848-464a-8b31-9f08f262ed11',
-                room_id: roomId
-            })
+            await joinRoom()
         } catch (error) {
             console.log('Error joining room:', error)
         } finally {
@@ -64,7 +63,7 @@ export default function RoomItem({ room }: { room: RoomWithDetails }) {
                 </View>
             </View>
             <View style={styles.button}>
-                <Button title="Join" size="small" onPress={() => navigateToRoomDetails(room.id)} />
+                <Button title="Join" size="small" onPress={() => navigateToRoomDetails(room?.id)} />
             </View>
         </View>
     )

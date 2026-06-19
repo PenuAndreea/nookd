@@ -23,29 +23,14 @@ export default function CreateRoomScreen() {
     const [duration, setDuration] = useState<string | null>('60');
     const [book, setBook] = useState<Book | null>(null);
 
-    function createRoomId() {
-        if (typeof globalThis.crypto?.randomUUID === 'function') {
-            return globalThis.crypto.randomUUID();
-        }
-
-        return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    }
-
     async function handleCreateRoom() {
         if (isSubmitting) return;
 
-        const trimmedHostId = hostId.trim();
         const trimmedName = name.trim();
-
-        if (!trimmedHostId) {
-            Alert.alert('Host required', 'Enter a host id to create the room.');
-            return;
-        }
 
         setIsSubmitting(true);
 
         await create({
-            id: createRoomId(),
             description: description.trim() || null,
             duration_minutes: Number(duration) || null,
             host_id: '1de8b434-3848-464a-8b31-9f08f262ed11', // the host id from the profile
