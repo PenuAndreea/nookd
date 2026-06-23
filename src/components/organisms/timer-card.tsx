@@ -1,13 +1,13 @@
 import { useTheme } from "@/hooks/use-theme";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Icon } from "../atoms/icon";
 
-export default function TimerCard({ remaining, duration, memberCount }: { remaining: number, duration: number, memberCount: number }) {
+export default function TimerCard({ remaining, duration, memberCount, onPress }: { remaining: number, duration: number, memberCount: number, onPress: () => void }) {
     const progress = duration / remaining
     const colors = useTheme();
 
     return (
-        <View style={styles.timerCard} pointerEvents={'none'}>
+        <Pressable hitSlop={10} onPress={onPress} style={styles.timerCard}>
             <Text style={styles.timerValue}>
                 {remaining === 0 ? '00:00' : remaining}
             </Text>
@@ -28,7 +28,7 @@ export default function TimerCard({ remaining, duration, memberCount }: { remain
                     </Text>
                 </View>
             </View>
-        </View>
+        </Pressable>
     )
 }
 
