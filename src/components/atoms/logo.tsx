@@ -3,7 +3,7 @@ import { Image, View } from "react-native";
 
 const LOGO_SIZE = 32;
 const LOGO_URI = require('../../../assets/images/logo.png');
-const LOGO_ALT = 'Nookd Logo';
+const LOGO_ALT = 'Readfolk Logo';
 const LOGO_BORDER_RADIUS = 8;
 
 export default function Logo() {

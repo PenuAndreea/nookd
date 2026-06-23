@@ -1,17 +1,17 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const MOODS = [
-    { id: 'reading', label: 'Reading', emoji: '📖' },
-    { id: 'writing', label: 'Writing', emoji: '✍️' },
-    { id: 'deep-work', label: 'Deep work', emoji: '💻' },
-    { id: 'chilling', label: 'Chilling', emoji: '🌿' },
+    { id: 'morning', label: 'Morning', emoji: '☀️' },
+    { id: 'golden', label: 'Golden Hour', emoji: '🌅' },
+    { id: 'quiet', label: 'Quiet Company', emoji: '✨' },
+    { id: 'lost', label: 'Lost in a Book', emoji: '📖' }
 ];
 
 const DURATIONS = [
+    { id: '10', label: '10 min' },
+    { id: '15', label: '15 min' },
     { id: '30', label: '30 min' },
     { id: '60', label: '60 min' },
-    { id: '90', label: '90 min' },
-    { id: 'unlimited', label: '∞' },
 ];
 
 interface MoodPickerProps {

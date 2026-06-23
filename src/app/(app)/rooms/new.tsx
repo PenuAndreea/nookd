@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 
-import { createRoom } from '@/api/nookd';
+import { createRoom } from '@/api/readfolk';
 import Button from '@/components/atoms/button';
 import { Header } from '@/components/molecules/header';
 import { LabeledInput } from '@/components/molecules/labeled-input';
@@ -39,7 +39,6 @@ export default function CreateRoomScreen() {
             host_id: session?.user.id,
             name: trimmedName || null,
             started_at: new Date().toISOString(),
-            // status: 'waiting',
         });
 
         setIsSubmitting(false);
@@ -48,7 +47,6 @@ export default function CreateRoomScreen() {
     async function create(input: Room) {
         try {
             await createRoom(input)
-            // go back
             router.back()
         } catch (error) {
             console.error('Error creating room:', error, input)
@@ -74,7 +72,6 @@ export default function CreateRoomScreen() {
                     onChangeText={setDescription}
                     multiline
                     numberOfLines={3}
-                // error="Description is required"
                 />
                 <MoodPicker value={mood} onChange={setMood} />
                 <DurationPicker value={duration} onChange={setDuration} />

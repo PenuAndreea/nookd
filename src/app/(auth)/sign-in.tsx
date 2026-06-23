@@ -33,8 +33,6 @@ export default function SignInScreen() {
         if (error) {
             setError(error);
         }
-        // On success, the (app)/_layout.tsx redirect handles navigation
-        // automatically once the session updates — no router.push needed here.
     };
 
     return (

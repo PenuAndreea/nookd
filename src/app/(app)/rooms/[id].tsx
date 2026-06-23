@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
-import { getRoom, Room } from '@/api/nookd';
+import { getRoom, Room } from '@/api/readfolk';
 import ReadingBook from '@/assets/images/illustrations/themes/Morning_Pages.svg';
 import Button from '@/components/atoms/button';
 import { Header } from '@/components/molecules/header';
@@ -18,7 +18,7 @@ export default function SilentRoomScreen() {
     const { session } = useAuth();
     const colors = useTheme();
 
-    const { members, memberCount, isJoined, elapsedSeconds, leaveRoom } =
+    const { members, memberCount, elapsedSeconds, leaveRoom } =
         useRoomPresence(id, session?.user?.id)
 
     const [room, setRoom] = useState<Room | undefined>();
@@ -42,7 +42,6 @@ export default function SilentRoomScreen() {
     const openDetails = () => {
         bottomSheetRef.current?.snapToIndex(0);
     };
-
 
     const renderBackdrop = useCallback(
         (props: BottomSheetBackdropProps) => (

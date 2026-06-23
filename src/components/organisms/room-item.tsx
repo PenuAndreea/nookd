@@ -1,5 +1,5 @@
 
-import { RoomWithDetails } from '@/api/nookd';
+import { RoomWithDetails } from '@/api/readfolk';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { router } from 'expo-router';

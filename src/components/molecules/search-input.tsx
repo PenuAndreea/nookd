@@ -102,6 +102,7 @@ export const BookSearch = ({ value, onChange }: BookSearchProps) => {
             {results.length > 0 && (
                 <View style={styles.dropdown}>
                     <FlatList
+                        showsVerticalScrollIndicator
                         data={results}
                         keyExtractor={item => item.id}
                         scrollEnabled={false}

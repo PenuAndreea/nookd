@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
 
-import { getRooms, RoomWithDetails } from '@/api/nookd';
+import { getRooms, RoomWithDetails } from '@/api/readfolk';
 import Typography from '@/components/atoms/typography';
 import RoomItem from '@/components/organisms/room-item';
 import { Spacing } from '@/constants/theme';

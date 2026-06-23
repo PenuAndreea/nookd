@@ -1,2 +1,2 @@
-export type { Profile, Room, RoomMembers } from '@/api/nookd';
+export type { Profile, Room, RoomMembers } from '@/api/readfolk';
 
