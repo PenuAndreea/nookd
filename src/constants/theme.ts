@@ -16,7 +16,8 @@ export const Colors = {
     textSecondary: '#3e4c66',
     accent: '#FFC83D',
     white: '#fff',
-    soft: '#E6E1D9'
+    soft: '#E6E1D9',
+    creme: '#FFF7ED'
   },
   dark: {
     text: '#F5F5F7',

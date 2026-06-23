@@ -8,12 +8,12 @@ import { StyleSheet, View } from 'react-native';
 import Button from '../atoms/button';
 import Typography from '../atoms/typography';
 
-import Chilling from '../../../assets/images/illustrations/chilling-cuate.svg';
-import KidsReading from '../../../assets/images/illustrations/kids-reading-cuate.svg';
-import ReadingBook from "../../../assets/images/illustrations/reading-book-cuate.svg";
-import StayHome from '../../../assets/images/illustrations/stay-at-home-cuate.svg';
-import StayIn from '../../../assets/images/illustrations/staying-in-cuate.svg';
-import WomanReading from '../../../assets/images/illustrations/woman-reading-cuate.svg';
+import Chilling from '../../../assets/images/illustrations/cuate/chilling.svg';
+import KidsReading from '../../../assets/images/illustrations/cuate/kids-reading.svg';
+import ReadingBook from "../../../assets/images/illustrations/cuate/reading-book.svg";
+import StayHome from '../../../assets/images/illustrations/cuate/stay-at-home.svg';
+import StayIn from '../../../assets/images/illustrations/cuate/staying-in.svg';
+import WomanReading from '../../../assets/images/illustrations/cuate/woman-reading.svg';
 
 const ROOM_ILLUSTRATIONS = [KidsReading, ReadingBook, StayHome, StayIn, WomanReading, Chilling]
 

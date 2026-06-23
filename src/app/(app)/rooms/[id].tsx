@@ -1,31 +1,25 @@
-import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 import { getRoom, Room } from '@/api/nookd';
-import Button from '@/components/atoms/button';
-import Typography from '@/components/atoms/typography';
-import SessionTimer from '@/components/organisms/session-timer';
+import ReadingBook from '@/assets/images/illustrations/themes/Morning_Pages.svg';
+import { Header } from '@/components/molecules/header';
+import TimerCard from '@/components/organisms/timer-card';
 import { useAuth } from '@/contexts/auth-context';
 import { useRoomPresence } from '@/hooks/use-room-presence';
+import { useTheme } from '@/hooks/use-theme';
+import { useLocalSearchParams } from 'expo-router';
 
-
-export default function RoomDetailsScreen() {
+export default function SilentRoomScreen() {
     const { id } = useLocalSearchParams();
-    const [room, setRoom] = useState<Room | undefined>();
-
     const { session } = useAuth();
+    const colors = useTheme();
 
-    const { members, memberCount, isJoined, elapsedSeconds, joinRoom, leaveRoom } =
-        useRoomPresence(room?.id, session?.user.id)
+    const { members, memberCount, isJoined, elapsedSeconds, leaveRoom } =
+        useRoomPresence(id, session?.user?.id)
 
-
-    useEffect(() => {
-        if (room?.id && session?.user.id && !isJoined) {
-            joinRoom()
-        }
-    }, [room?.id, session?.user.id])
-
+    const [room, setRoom] = useState<Room | undefined>();
 
     useEffect(() => {
         async function loadRoom() {
@@ -37,41 +31,47 @@ export default function RoomDetailsScreen() {
                 console.log('Error fetching room:', error)
             }
         }
-
         loadRoom()
     }, [])
 
-    if (!room) {
-        return <View>
-            <Typography>no room</Typography>
-        </View>
-    }
-
     return (
-        <View style={styles.container}>
-            <Typography variant='h2'>Name: {room?.name}</Typography>
-            <Typography>Description: {room?.description}</Typography>
-            <View style={{ alignItems: 'center' }}>
-                <SessionTimer
-                    startedAt={room?.started_at}
-                    durationMinutes={room?.duration_minutes}
+        <View style={{ flex: 1, backgroundColor: colors.creme }}>
+            <View style={{ marginTop: 60 }} hitSlop={10}>
+                <Header title='' showBack />
+            </View>
+            <View style={{ flex: 1 }}>
+                <Animated.View style={styles.illustration}>
+                    <ReadingBook width='100%' height='100%' />
+                </Animated.View>
+                <TimerCard
+                    remaining={elapsedSeconds}
+                    duration={room?.duration_minutes ?? 0}
+                    memberCount={memberCount}
                 />
             </View>
-            <View>
-                <Typography>Amount of members: {memberCount}</Typography>
-                <Typography>Are you joined ? {isJoined ? 'yes' : 'no'}</Typography>
-                <Typography>Elapsed seconds: {elapsedSeconds}</Typography>
-            </View>
-
-            <Button title="Leave" size="small" onPress={leaveRoom} />
         </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        paddingHorizontal: 16,
+    illustration: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '82%'
     },
-})
+    sheetBackground: {
+        backgroundColor: '#fff',
+        borderTopLeftRadius: 26,
+        borderTopRightRadius: 26,
+        shadowColor: '#263238',
+        shadowOpacity: 0.18,
+        shadowRadius: 40,
+        shadowOffset: {
+            width: 0,
+            height: -10
+        },
+        elevation: 12,
+    },
+});

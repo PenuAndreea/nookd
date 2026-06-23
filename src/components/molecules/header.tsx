@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface HeaderProps {
-    title: string;
+    title?: string;
     showBack?: boolean;
     right?: React.ReactNode;
 }
@@ -25,7 +25,7 @@ export const Header = ({ title, showBack = false, right }: HeaderProps) => {
                 )}
             </View>
 
-            <Text style={styles.title}>{title}</Text>
+            {title && <Text style={styles.title}>{title}</Text>}
 
             <View style={styles.right}>
                 {right ?? null}
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 16,
         paddingVertical: 12,
-        backgroundColor: '#f5f3ef'
+        // backgroundColor: '#f5f3ef'
     },
     left: {
         width: 40,
