@@ -7,6 +7,7 @@ export default function AvatarList({ userIds }: { userIds?: string[] }) {
     const colors = useTheme();
     const styles = useStyles(colors);
 
+    console.log('userIds', userIds)
     return (
         <View style={styles.container}>
             {userIds?.slice(0, 3).map((userId) => (

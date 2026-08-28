@@ -9,8 +9,10 @@ export const IconSizes = {
     large: 32,
 }
 
+export type IconName = Parameters<typeof SymbolView>[0]["name"];
+
 type IconProps = {
-    name: Parameters<typeof SymbolView>[0]["name"];
+    name: IconName;
     size?: number;
     color?: ColorValue;
 }

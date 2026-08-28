@@ -1,10 +1,20 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const MOODS = [
-    { id: 'morning', label: 'Morning', emoji: '☀️' },
-    { id: 'golden', label: 'Golden Hour', emoji: '🌅' },
-    { id: 'quiet', label: 'Quiet Company', emoji: '✨' },
-    { id: 'lost', label: 'Lost in a Book', emoji: '📖' }
+export const VIBES = [
+    { id: 'book_club', label: 'BookClub', emoji: '👥' },
+    { id: 'fantasy', label: 'Fantasy', emoji: '🐉' },
+    { id: 'nonfiction', label: 'Nonfiction', emoji: '📰' },
+    { id: 'quiet_company', label: 'Quiet Company', emoji: '✨' },
+    { id: 'lost_in_a_book', label: 'Lost in a Book', emoji: '📖' },
+];
+
+// Post-session check-in — how the session felt, not the room's ambiance
+// (that's MOODS above). Kept as a separate value set on purpose.
+const SESSION_MOODS = [
+    { id: 'focused', label: 'Focused', emoji: '🎯' },
+    { id: 'cozy', label: 'Cozy', emoji: '🕯️' },
+    { id: 'distracted', label: 'Distracted', emoji: '🌀' },
+    { id: 'restless', label: 'Restless', emoji: '🌊' },
 ];
 
 const DURATIONS = [
@@ -14,33 +24,48 @@ const DURATIONS = [
     { id: '60', label: '60 min' },
 ];
 
-interface MoodPickerProps {
+interface ChipGridProps {
+    label: string;
+    options: { id: string; label: string; emoji?: string }[];
     value: string | null;
     onChange: (id: string) => void;
 }
 
-export const MoodPicker = ({ value, onChange }: MoodPickerProps) => (
+const ChipGrid = ({ label, options, value, onChange }: ChipGridProps) => (
     <View style={styles.wrapper}>
-        <Text style={styles.label}>Mood</Text>
+        <Text style={styles.label}>{label}</Text>
         <View style={styles.moodGrid}>
-            {MOODS.map(mood => {
-                const selected = value === mood.id;
+            {options.map(option => {
+                const selected = value === option.id;
                 return (
                     <TouchableOpacity
-                        key={mood.id}
+                        key={option.id}
                         style={[styles.moodChip, selected && styles.moodChipSelected]}
-                        onPress={() => onChange(mood.id)}
+                        onPress={() => onChange(option.id)}
                         activeOpacity={0.7}
                     >
-                        <Text style={styles.moodEmoji}>{mood.emoji}</Text>
+                        {option.emoji && <Text style={styles.moodEmoji}>{option.emoji}</Text>}
                         <Text style={[styles.moodText, selected && styles.moodTextSelected]}>
-                            {mood.label}
+                            {option.label}
                         </Text>
                     </TouchableOpacity>
                 );
             })}
         </View>
     </View>
+);
+
+interface MoodPickerProps {
+    value: string | null;
+    onChange: (id: string) => void;
+}
+
+export const VibePicker = ({ value, onChange }: MoodPickerProps) => (
+    <ChipGrid label="Vibe" options={VIBES} value={value} onChange={onChange} />
+);
+
+export const SessionMoodPicker = ({ value, onChange }: MoodPickerProps) => (
+    <ChipGrid label="How was this session?" options={SESSION_MOODS} value={value} onChange={onChange} />
 );
 
 interface DurationPickerProps {

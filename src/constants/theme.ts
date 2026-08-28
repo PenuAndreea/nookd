@@ -26,7 +26,9 @@ export const Colors = {
     backgroundSelected: '#2E3135',
     textSecondary: '#B0B4BA',
     accent: '#FFC83D',
-    white: '#fff'
+    white: '#fff',
+    soft: '#2A2D3E',
+    creme: '#22252F'
   },
 } as const;
 

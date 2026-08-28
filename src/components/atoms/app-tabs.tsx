@@ -23,9 +23,9 @@ const routes: Route[] = [
     icon: 'house',
   },
   {
-    name: 'rooms',
-    title: 'Rooms',
-    icon: 'person.3.fill',
+    name: 'books',
+    title: 'Books',
+    icon: 'book.closed',
   },
 ]
 
@@ -37,7 +37,11 @@ function TabBarWithCreateButton(props: BottomTabBarProps) {
         floating
         icon="plus"
         size="medium"
-        onPress={() => router.navigate('/rooms/new')}
+        // create-room is a root-level modal (sibling to the tabs group, see
+        // app/(app)/_layout.tsx), not nested inside any one tab's stack —
+        // so it overlays whatever tab/screen is currently showing, and
+        // dismissing it (swipe or back) always returns there.
+        onPress={() => router.push('/create-room')}
       />
     </View>
   );
@@ -54,6 +58,7 @@ export default function AppTabs() {
         tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.text,
         headerShown: false,
+        popToTopOnBlur: true,
         tabBarBackground: () => (
           <BlurView tint="light" intensity={100} style={[StyleSheet.absoluteFill, { backgroundColor: colors.background }]} />
         ),

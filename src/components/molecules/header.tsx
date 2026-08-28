@@ -1,22 +1,25 @@
 import { useRouter } from 'expo-router';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface HeaderProps {
     title?: string;
     showBack?: boolean;
+    onBack?: () => void;
     right?: React.ReactNode;
 }
 
-export const Header = ({ title, showBack = false, right }: HeaderProps) => {
+export const Header = ({ title, showBack = false, onBack, right }: HeaderProps) => {
     const router = useRouter();
+    const insets = useSafeAreaInsets();
 
     return (
-        <View style={styles.wrapper}>
+        <View style={[styles.wrapper, { paddingTop: insets.top + 12 }]}>
             <View style={styles.left}>
                 {showBack && (
                     <TouchableOpacity
                         style={styles.backButton}
-                        onPress={() => router.back()}
+                        onPress={onBack ?? (() => router.back())}
                         hitSlop={8}
                         activeOpacity={0.7}
                     >
@@ -40,7 +43,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingBottom: 12,
         // backgroundColor: '#f5f3ef'
     },
     left: {
@@ -48,7 +51,7 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
     },
     right: {
-        width: 40,
+        minWidth: 40,
         alignItems: 'flex-end',
     },
     title: {

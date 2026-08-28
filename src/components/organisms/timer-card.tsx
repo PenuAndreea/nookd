@@ -2,14 +2,22 @@ import { useTheme } from "@/hooks/use-theme";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Icon } from "../atoms/icon";
 
-export default function TimerCard({ remaining, duration, memberCount, onPress }: { remaining: number, duration: number, memberCount: number, onPress: () => void }) {
-    const progress = duration / remaining
+function formatDuration(totalSeconds: number) {
+    const minutes = Math.floor(totalSeconds / 60)
+    const seconds = totalSeconds % 60
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+}
+
+export default function TimerCard({ elapsedSeconds, duration, memberCount, onPress }: { elapsedSeconds: number, duration: number, memberCount: number, onPress: () => void }) {
+    const durationSeconds = duration * 60
+    const remainingSeconds = Math.max(durationSeconds - elapsedSeconds, 0)
+    const progress = durationSeconds === 0 ? 0 : Math.min(elapsedSeconds / durationSeconds, 1)
     const colors = useTheme();
 
     return (
         <Pressable hitSlop={10} onPress={onPress} style={styles.timerCard}>
             <Text style={styles.timerValue}>
-                {remaining === 0 ? '00:00' : remaining}
+                {formatDuration(remainingSeconds)}
             </Text>
             <Text style={styles.timerLabel}>
                 Remaining

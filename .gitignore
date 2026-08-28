@@ -43,8 +43,8 @@ example
 /ios
 /android
 
-# supabase
-supabase/
+# supabase (keep migrations/config.toml tracked, ignore local CLI link state)
+supabase/.temp/
 
 # generated files
 database.types.ts

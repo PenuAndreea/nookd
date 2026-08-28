@@ -10,11 +10,15 @@ import {
     View,
 } from 'react-native';
 
+import { searchOpenLibrary } from '@/api/books';
+import { useTheme } from '@/hooks/use-theme';
+
 export interface Book {
-    id: string;
+    openLibraryKey: string;
     title: string;
     author: string;
     thumbnail?: string;
+    pageCount?: number;
 }
 
 interface BookSearchProps {
@@ -23,6 +27,9 @@ interface BookSearchProps {
 }
 
 export const BookSearch = ({ value, onChange }: BookSearchProps) => {
+    const colors = useTheme();
+    const styles = createStyles(colors);
+
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<Book[]>([]);
     const [loading, setLoading] = useState(false);
@@ -36,19 +43,16 @@ export const BookSearch = ({ value, onChange }: BookSearchProps) => {
 
         setLoading(true);
         try {
-            const res = await fetch(
-                `https://openlibrary.org/search.json?q=${encodeURIComponent(text)}&limit=5&fields=key,title,author_name,cover_i`
+            const found = await searchOpenLibrary(text);
+            setResults(
+                found.map((item) => ({
+                    openLibraryKey: item.openLibraryKey,
+                    title: item.title,
+                    author: item.author,
+                    thumbnail: item.coverUrl,
+                    pageCount: item.pageCount,
+                }))
             );
-            const data = await res.json();
-            const books: Book[] = (data.docs ?? []).map((item: any) => ({
-                id: item.key,
-                title: item.title,
-                author: item.author_name?.[0] ?? 'Unknown author',
-                thumbnail: item.cover_i
-                    ? `https://covers.openlibrary.org/b/id/${item.cover_i}-S.jpg`
-                    : undefined,
-            }));
-            setResults(books);
         } catch {
             setResults([]);
         } finally {
@@ -75,7 +79,7 @@ export const BookSearch = ({ value, onChange }: BookSearchProps) => {
             {value ? (
                 <View style={styles.selectedBook}>
                     {value.thumbnail && (
-                        <Image source={{ uri: value.thumbnail }} style={styles.thumbnail} />
+                        <Image source={{ uri: value.thumbnail }} style={styles.thumbnail} resizeMode="contain" />
                     )}
                     <View style={styles.selectedInfo}>
                         <Text style={styles.selectedTitle} numberOfLines={1}>{value.title}</Text>
@@ -95,7 +99,7 @@ export const BookSearch = ({ value, onChange }: BookSearchProps) => {
                         value={query}
                         onChangeText={search}
                     />
-                    {loading && <ActivityIndicator size="small" color="#f0b429" />}
+                    {loading && <ActivityIndicator size="small" color={colors.accent} />}
                 </View>
             )}
 
@@ -104,7 +108,7 @@ export const BookSearch = ({ value, onChange }: BookSearchProps) => {
                     <FlatList
                         showsVerticalScrollIndicator
                         data={results}
-                        keyExtractor={item => item.id}
+                        keyExtractor={item => item.openLibraryKey}
                         scrollEnabled={false}
                         ItemSeparatorComponent={() => <View style={styles.separator} />}
                         renderItem={({ item }) => (
@@ -114,7 +118,7 @@ export const BookSearch = ({ value, onChange }: BookSearchProps) => {
                                 activeOpacity={0.7}
                             >
                                 {item.thumbnail ? (
-                                    <Image source={{ uri: item.thumbnail }} style={styles.resultThumbnail} />
+                                    <Image source={{ uri: item.thumbnail }} style={styles.resultThumbnail} resizeMode="contain" />
                                 ) : (
                                     <View style={styles.resultThumbnailPlaceholder}>
                                         <Text style={{ fontSize: 18 }}>📖</Text>
@@ -133,14 +137,14 @@ export const BookSearch = ({ value, onChange }: BookSearchProps) => {
     );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     wrapper: {
         gap: 6,
     },
     label: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#888',
+        color: colors.textSecondary,
         textTransform: 'uppercase',
         letterSpacing: 0.6,
     },
@@ -148,17 +152,17 @@ const styles = StyleSheet.create({
         fontWeight: '400',
         textTransform: 'none',
         letterSpacing: 0,
-        color: '#bbb',
+        color: colors.textSecondary,
     },
 
     // Search input
     inputWrapper: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#fff',
+        backgroundColor: colors.white,
         borderRadius: 12,
         borderWidth: 0.5,
-        borderColor: '#e0e0e0',
+        borderColor: colors.background,
         paddingHorizontal: 14,
         gap: 10,
     },
@@ -168,16 +172,16 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         fontSize: 15,
-        color: '#1a1a1a',
+        color: colors.text,
         paddingVertical: 13,
     },
 
     // Dropdown results
     dropdown: {
-        backgroundColor: '#fff',
+        backgroundColor: colors.white,
         borderRadius: 12,
         borderWidth: 0.5,
-        borderColor: '#e0e0e0',
+        borderColor: colors.background,
         overflow: 'hidden',
     },
     result: {
@@ -195,7 +199,7 @@ const styles = StyleSheet.create({
         width: 36,
         height: 48,
         borderRadius: 4,
-        backgroundColor: '#f5f4f0',
+        backgroundColor: colors.backgroundElement,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -205,16 +209,16 @@ const styles = StyleSheet.create({
     resultTitle: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#1a1a1a',
+        color: colors.text,
     },
     resultAuthor: {
         fontSize: 13,
-        color: '#888',
+        color: colors.textSecondary,
         marginTop: 2,
     },
     separator: {
         height: 0.5,
-        backgroundColor: '#e0e0e0',
+        backgroundColor: colors.background,
         marginHorizontal: 12,
     },
 
@@ -222,10 +226,10 @@ const styles = StyleSheet.create({
     selectedBook: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#FFF3D6',
+        backgroundColor: colors.backgroundElement,
         borderRadius: 12,
         borderWidth: 1.5,
-        borderColor: '#f0b429',
+        borderColor: colors.accent,
         padding: 12,
         gap: 12,
     },
@@ -240,11 +244,11 @@ const styles = StyleSheet.create({
     selectedTitle: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#5a3a00',
+        color: colors.text,
     },
     selectedAuthor: {
         fontSize: 13,
-        color: '#8a6000',
+        color: colors.textSecondary,
         marginTop: 2,
     },
     clearButton: {
@@ -252,6 +256,6 @@ const styles = StyleSheet.create({
     },
     clearText: {
         fontSize: 14,
-        color: '#8a6000',
+        color: colors.textSecondary,
     },
 });

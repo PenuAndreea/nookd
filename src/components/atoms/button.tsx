@@ -1,7 +1,7 @@
 import { FontLineHeights, FontSizes } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { Pressable, StyleSheet, Text } from "react-native";
-import { Icon } from "./icon";
+import { Icon, IconName } from "./icon";
 
 const ButtonSizes = {
     small: {
@@ -29,7 +29,7 @@ const ButtonSizes = {
 
 type ButtonProps = {
     title?: string;
-    icon?: string;
+    icon?: IconName;
     onPress: () => void;
     floating?: boolean;
     size?: keyof typeof ButtonSizes;
@@ -47,7 +47,7 @@ export default function Button({ title, icon, onPress, floating, size }: ButtonP
                 pressed && styles.pressed,
             ]}
             onPress={onPress}>
-            {icon && <Icon name={icon} />}
+            {icon && <Icon name={icon} color={floating ? colors.accent : colors.text} />}
             {title && <Text style={[styles.buttonText, floating && styles.floatingText]}>{title}</Text>}
         </Pressable>
     );
@@ -57,6 +57,10 @@ export default function Button({ title, icon, onPress, floating, size }: ButtonP
 const createStyles = (colors: ReturnType<typeof useTheme>, size?: keyof typeof ButtonSizes, floating?: boolean) =>
     StyleSheet.create({
         button: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
             backgroundColor: colors.accent,
             paddingHorizontal: ButtonSizes[size || 'medium'].paddingHorizontal,
             paddingVertical: ButtonSizes[size || 'medium'].paddingVertical,

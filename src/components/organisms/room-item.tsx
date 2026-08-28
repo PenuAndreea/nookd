@@ -3,10 +3,10 @@ import { RoomWithDetails } from '@/api/nookd';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { router } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 
-import Button from '../atoms/button';
 import Typography from '../atoms/typography';
+import AvatarList from '../molecules/avatar-list';
 
 import Chilling from '../../../assets/images/illustrations/cuate/chilling.svg';
 import KidsReading from '../../../assets/images/illustrations/cuate/kids-reading.svg';
@@ -20,7 +20,6 @@ const ROOM_ILLUSTRATIONS = [KidsReading, ReadingBook, StayHome, StayIn, WomanRea
 export default function RoomItem({ room }: { room: RoomWithDetails }) {
     const colors = useTheme();
     const styles = useStyles(colors);
-    const BOOK_URI = `https://covers.openlibrary.org/b/isbn/${room.isbn}-L.jpg`
 
     const hashId = (id: string) =>
         id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
@@ -30,14 +29,21 @@ export default function RoomItem({ room }: { room: RoomWithDetails }) {
 
     const Illustration = getIllustration(hashId(room?.id))
 
-    async function navigateToRoomDetails(roomId: RoomWithDetails['id']) {
-        router.navigate(`/rooms/${roomId}`)
+    function navigateToRoomDetails(roomId: RoomWithDetails['id']) {
+        router.push({ pathname: '/room/[id]', params: { id: roomId } })
     }
 
     return (
-        <View style={styles.container}>
-            <View style={{ width: 80, height: 80, backgroundColor: '#F2ECE3', borderRadius: 12, flexWrap: 'wrap' }}>
-                <Illustration height={80} width={80} />
+        <Pressable
+            style={({ pressed }) => [styles.container, pressed && styles.pressed]}
+            onPress={() => navigateToRoomDetails(room?.id)}
+        >
+            <View style={{ width: 80, height: 80, backgroundColor: room.book?.cover_url ? 'transparent' : '#F2ECE3', borderRadius: 12, flexWrap: 'wrap', overflow: 'hidden' }}>
+                {room.book?.cover_url ? (
+                    <Image source={{ uri: room.book.cover_url }} style={{ width: 80, height: 80 }} resizeMode="contain" />
+                ) : (
+                    <Illustration height={80} width={80} />
+                )}
             </View>
             <View style={styles.info}>
                 <View style={{ justifyContent: 'flex-start' }}>
@@ -45,14 +51,17 @@ export default function RoomItem({ room }: { room: RoomWithDetails }) {
                         {room.name}
                     </Typography>
                     <Typography numberOfLines={2} color="textSecondary">
-                        {room.description} adding some more content here
+                        {room.description}
                     </Typography>
+                    {room.book && (
+                        <Typography numberOfLines={1} color="textSecondary" style={{ marginTop: 2 }}>
+                            📖 {room.book.title}
+                        </Typography>
+                    )}
+                    {room?.members && room?.members.length > 0 && <AvatarList userIds={room?.members?.map((member) => member.user_id)} />}
                 </View>
             </View>
-            <View style={styles.button}>
-                <Button title="Join" size="small" onPress={() => navigateToRoomDetails(room?.id)} />
-            </View>
-        </View>
+        </Pressable>
     )
 }
 
@@ -81,7 +90,4 @@ const useStyles = (colors: any) => StyleSheet.create({
         flex: 1,
         marginLeft: Spacing.three
     },
-    button: {
-        justifyContent: 'flex-end'
-    }
 });
