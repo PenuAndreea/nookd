@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 
 import { getOrCreateBook } from '@/api/books';
-import { createRoom, RoomInsert } from '@/api/nookd';
+import { createRoom, RoomInsert } from '@/api/rooms';
 import Button from '@/components/atoms/button';
 import { Header } from '@/components/molecules/header';
 import { LabeledInput } from '@/components/molecules/labeled-input';

@@ -1,4 +1,4 @@
-import { isRoomActive } from '@/api/nookd';
+import { isRoomActive } from '@/api/rooms';
 import { supabase } from '@/lib/supabase';
 
 import type { Tables } from '../../database.types';

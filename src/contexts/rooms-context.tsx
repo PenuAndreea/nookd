@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
-import { getRooms, RoomWithDetails } from '@/api/nookd';
+import { getRooms, RoomWithDetails } from '@/api/rooms';
 import { useAuth } from '@/contexts/auth-context';
 
 type RoomsContextType = {

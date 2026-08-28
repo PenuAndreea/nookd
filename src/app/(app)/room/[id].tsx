@@ -4,7 +4,7 @@ import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import { addToReadingList, getUserBookForBook, getUserBooks, UserBook, updateReadingListEntry, UserBookWithBook } from '@/api/books';
-import { Book, forceLeaveRoom, getRoom, getRoomMembersByRoomId, RoomWithBook, updateReadingSession, updateRoomMemberBook } from '@/api/nookd';
+import { Book, forceLeaveRoom, getRoom, getRoomMembersByRoomId, RoomWithBook, updateReadingSession, updateRoomMemberBook } from '@/api/rooms';
 import ReadingBook from '@/assets/images/illustrations/themes/Morning_Pages.svg';
 import Avatar from '@/components/atoms/avatar';
 import Button from '@/components/atoms/button';

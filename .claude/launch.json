@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "nookd-web",
+      "name": "readfolk-web",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "web"],
       "port": 8081
