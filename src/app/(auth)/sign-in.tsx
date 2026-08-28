@@ -43,6 +43,8 @@ export default function SignInScreen() {
                 style={styles.input}
                 placeholder="Email"
                 autoCapitalize="none"
+                autoCorrect={false}
+                spellCheck={false}
                 keyboardType="email-address"
                 value={email}
                 onChangeText={setEmail}
@@ -50,6 +52,9 @@ export default function SignInScreen() {
             <TextInput
                 style={styles.input}
                 placeholder="Password"
+                autoCapitalize="none"
+                autoCorrect={false}
+                spellCheck={false}
                 secureTextEntry
                 value={password}
                 onChangeText={setPassword}

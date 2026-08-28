@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "readfolk",
-    "slug": "readfolk",
+    "name": "nookd",
+    "slug": "nookd",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo.png",
-    "scheme": "readfolk",
+    "scheme": "nookd",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/images/logo.png",
-      "bundleIdentifier": "com.readfolk.app",
+      "bundleIdentifier": "com.nookd.app",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -20,7 +20,7 @@
         "foregroundImage": "./assets/images/logo.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.readfolk.app"
+      "package": "com.nookd.app"
     },
     "plugins": [
       "expo-router",
@@ -36,7 +36,8 @@
       ],
       "expo-sqlite",
       "expo-font",
-      "expo-image"
+      "expo-image",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

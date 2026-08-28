@@ -43,14 +43,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const signUp = async (email: string, password: string) => {
-        const { error } = await supabase.auth.signUp({ email, password });
+        console.log(JSON.stringify(email), JSON.stringify(password))
+        const { error } = await supabase.auth.signUp({
+            email: email.trim().toLowerCase(),
+            password: password.trim()
+        });
         return { error: error ? error.message : null };
     };
 
     const signIn = async (email: string, password: string) => {
+        console.log(JSON.stringify(email), JSON.stringify(password))
         const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
+            email: email.trim().toLowerCase(),
+            password: password.trim(),
         });
         return { error: error ? error.message : null };
     };

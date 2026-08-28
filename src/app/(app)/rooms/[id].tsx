@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
-import { getRoom, Room } from '@/api/readfolk';
+import { getRoom, Room } from '@/api/nookd';
 import ReadingBook from '@/assets/images/illustrations/themes/Morning_Pages.svg';
 import Button from '@/components/atoms/button';
 import { Header } from '@/components/molecules/header';

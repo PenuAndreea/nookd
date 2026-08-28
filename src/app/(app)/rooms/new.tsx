@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 
-import { createRoom } from '@/api/readfolk';
+import { createRoom, Room } from '@/api/nookd';
 import Button from '@/components/atoms/button';
 import { Header } from '@/components/molecules/header';
 import { LabeledInput } from '@/components/molecules/labeled-input';
@@ -11,7 +11,6 @@ import { BorderRadius, FontSizes, Spacing } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/hooks/use-theme';
 import { router } from 'expo-router';
-import { Room } from './types';
 
 export default function CreateRoomScreen() {
     const colors = useTheme();
