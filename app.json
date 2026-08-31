@@ -8,6 +8,7 @@
     "scheme": "readfolk",
     "userInterfaceStyle": "automatic",
     "ios": {
+      "backgroundColor": "#E6F4FE",
       "icon": "./assets/images/logo.png",
       "bundleIdentifier": "com.readfolk.app",
       "infoPlist": {
@@ -27,17 +28,22 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#f5f3ef",
+          "ios": {
+            "image": "./assets/images/logo.png",
+            "imageResizeMode": "contain"
+          },
           "android": {
             "image": "./assets/images/logo.png",
-            "imageWidth": 76
+            "resizeMode": "contain"
           }
         }
       ],
       "expo-sqlite",
       "expo-font",
       "expo-image",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-status-bar"
     ],
     "experiments": {
       "typedRoutes": true,
