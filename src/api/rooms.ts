@@ -13,7 +13,7 @@ export type RoomWithBook = Room & {
 };
 /** Adds the member list — only the list query selects it. */
 export type RoomWithDetails = RoomWithBook & {
-    members: Pick<RoomMembers, 'user_id'>[];
+    members: Pick<RoomMembers, 'user_id' | 'joined_at'>[];
 };
 export type RoomMemberWithBook = RoomMembers & {
     book: Book | null;
@@ -29,7 +29,7 @@ export function isRoomActive(room: Pick<Room, 'started_at' | 'duration_minutes'>
 export async function getRooms(): Promise<RoomWithDetails[]> {
     const { data, error } = await supabase
         .from('rooms')
-        .select('*, book:books(*), members:room_members(user_id)')
+        .select('*, book:books(*), members:room_members(user_id, joined_at)')
 
     if (error) {
         throw error;
@@ -124,7 +124,7 @@ export async function createRoom(input: RoomInsert): Promise<RoomWithDetails> {
     const { data, error } = await supabase
         .from('rooms')
         .insert(input)
-        .select('*, book:books(*), members:room_members(user_id)')
+        .select('*, book:books(*), members:room_members(user_id, joined_at)')
         .single()
 
     if (error) {

@@ -229,9 +229,8 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         gap: 4,
     },
     title: {
-        fontFamily: 'PlayfairDisplay_800ExtraBold',
+        fontFamily: 'Lora_700Bold',
         fontSize: 20,
-        fontWeight: '700',
         color: colors.text,
     },
     author: {
@@ -297,7 +296,7 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         backgroundColor: colors.white,
         borderRadius: 12,
         borderWidth: 0.5,
-        borderColor: colors.background,
+        borderColor: colors.border,
         paddingHorizontal: 14,
         paddingVertical: 12,
         fontSize: 15,

@@ -6,6 +6,8 @@ const avatarSizes = {
     small: 28,
     medium: 24,
     large: 32,
+    xlarge: 44,
+    xxlarge: 56,
 }
 
 export default function Avatar({ id, size, url }: { id: string; size: keyof typeof avatarSizes, url?: string }) {

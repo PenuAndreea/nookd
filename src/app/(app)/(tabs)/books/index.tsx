@@ -290,9 +290,8 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         gap: Spacing.three,
     },
     title: {
-        fontFamily: 'PlayfairDisplay_800ExtraBold',
+        fontFamily: 'Lora_700Bold',
         fontSize: 24,
-        fontWeight: '700',
         color: colors.text,
     },
     inputWrapper: {
@@ -301,7 +300,7 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         backgroundColor: colors.white,
         borderRadius: BorderRadius.medium,
         borderWidth: 0.5,
-        borderColor: colors.background,
+        borderColor: colors.border,
         paddingHorizontal: 14,
         gap: 10,
     },
@@ -331,7 +330,7 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         backgroundColor: colors.white,
         borderRadius: BorderRadius.medium,
         borderWidth: 0.5,
-        borderColor: colors.background,
+        borderColor: colors.border,
         padding: 12,
         gap: 12,
         marginBottom: Spacing.two,

@@ -2,12 +2,12 @@ import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, Touchabl
 
 import { router } from 'expo-router';
 
+import ReadingNook from '@/assets/images/icons/reading-nook.svg';
 import BookLover from '@/assets/images/illustrations/cuate/book-lover.svg';
-import { Icon } from '@/components/atoms/icon';
-import Typography from '@/components/atoms/typography';
 import { Spacing } from '@/constants/theme';
 import { useRooms } from '@/contexts/rooms-context';
 import { useTheme } from '@/hooks/use-theme';
+import CurrentRoomBanner from './current-room-banner';
 import RoomItem from './room-item';
 
 export default function RoomList() {
@@ -28,15 +28,7 @@ export default function RoomList() {
 
     return (
         <View style={styles.container}>
-            <View style={{ marginVertical: 8 }}>
-                <Typography variant='h1'>Silent Rooms</Typography>
-            </View>
-            {currentRoom && (
-                <View style={styles.currentRoomSection}>
-                    <Text style={styles.sectionLabel}>Current room</Text>
-                    <RoomItem room={currentRoom} />
-                </View>
-            )}
+            {currentRoom && <CurrentRoomBanner room={currentRoom} />}
             {showOtherRooms && <Text style={styles.sectionLabel}>Rooms</Text>}
             {loading ?
                 <ActivityIndicator size="large" style={{ justifyContent: 'center', alignSelf: 'center', alignItems: 'center', alignContent: 'center', height: '80%' }} color={colors.accent} /> :
@@ -64,7 +56,7 @@ export default function RoomList() {
                                     onPress={createRoom}
                                     activeOpacity={0.85}
                                 >
-                                    <Icon name="plus" />
+                                    <ReadingNook width={26} height={26} color={colors.accent} />
                                 </TouchableOpacity>
                             </View>
                         )
@@ -78,14 +70,11 @@ const useStyles = (colors: any) => StyleSheet.create({
     container: {
         flex: 1,
         marginHorizontal: Spacing.three,
+        marginTop: Spacing.four,
         backgroundColor: colors.background,
     },
     listContent: {
         paddingTop: Spacing.three,
-    },
-    currentRoomSection: {
-        marginBottom: Spacing.two,
-        gap: Spacing.two,
     },
     sectionLabel: {
         fontSize: 12,

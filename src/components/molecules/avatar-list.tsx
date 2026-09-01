@@ -3,31 +3,45 @@ import { StyleSheet, Text, View } from "react-native";
 
 import Avatar from "../atoms/avatar";
 
+const SHOWN = 3;
+
 export default function AvatarList({ userIds }: { userIds?: string[] }) {
     const colors = useTheme();
     const styles = useStyles(colors);
 
-    console.log('userIds', userIds)
+    const count = userIds?.length ?? 0;
+    if (count === 0) {
+        return <Text style={styles.readerCount}>No one yet</Text>;
+    }
+
     return (
         <View style={styles.container}>
-            {userIds?.slice(0, 3).map((userId) => (
-                <Avatar key={userId} id={userId} size="small" />
+            {userIds?.slice(0, SHOWN).map((userId, index) => (
+                <View key={userId} style={[styles.avatar, index > 0 && styles.overlapped]}>
+                    <Avatar id={userId} size="small" />
+                </View>
             ))}
-            {userIds && userIds?.length > 0 && (
-                <Text style={styles.readerCount}>{userIds?.length} reading</Text>
-            )}
+            <Text style={styles.readerCount}>{count} reading</Text>
         </View>
     )
 }
 
-const useStyles = (colors: any) => StyleSheet.create({
+const useStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     container: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 4,
+    },
+    avatar: {
+        borderRadius: 999,
+        borderWidth: 2,
+        borderColor: colors.white,
+    },
+    overlapped: {
+        marginLeft: -10,
     },
     readerCount: {
         color: colors.textSecondary,
         marginLeft: 8,
+        fontSize: 13,
     },
 });

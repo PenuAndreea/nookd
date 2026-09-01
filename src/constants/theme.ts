@@ -10,13 +10,18 @@ import { Platform } from 'react-native';
 export const Colors = {
   light: {
     text: '#1A1D2E',
-    background: '#f5f3ef',
+    // Light and close to neutral. The previous #f5f3ef carried a strong yellow
+    // cast that read as dated next to the white cards sitting on it.
+    background: '#F8F8F6',
     backgroundElement: '#F0F0F3',
     backgroundSelected: '#E0E1E6',
     textSecondary: '#3e4c66',
     accent: '#FFC83D',
     white: '#fff',
-    soft: '#E6E1D9',
+    soft: '#EDEBE6',
+    // Card and input edges. Was keyed to `background`, which no longer has
+    // enough contrast against white surfaces now that it is near-neutral.
+    border: '#EAE7E1',
     creme: '#FFF7ED'
   },
   dark: {
@@ -28,6 +33,7 @@ export const Colors = {
     accent: '#FFC83D',
     white: '#fff',
     soft: '#2A2D3E',
+    border: '#33374A',
     creme: '#22252F'
   },
 } as const;

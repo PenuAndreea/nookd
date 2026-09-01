@@ -162,7 +162,7 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         backgroundColor: colors.white,
         borderRadius: 12,
         borderWidth: 0.5,
-        borderColor: colors.background,
+        borderColor: colors.border,
         paddingHorizontal: 14,
         gap: 10,
     },
@@ -181,7 +181,7 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         backgroundColor: colors.white,
         borderRadius: 12,
         borderWidth: 0.5,
-        borderColor: colors.background,
+        borderColor: colors.border,
         overflow: 'hidden',
     },
     result: {

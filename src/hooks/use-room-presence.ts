@@ -11,7 +11,6 @@ export interface RoomPresenceState {
     members: RoomMember[]
     memberCount: number
     isJoined: boolean
-    elapsedSeconds: number
     lastSessionId: string | null
     joinRoom: (bookId?: string | null) => Promise<void>
     leaveRoom: () => Promise<void>
@@ -29,14 +28,11 @@ export interface RoomPresenceState {
 export function useRoomPresence(roomId: string, userId: string | undefined): RoomPresenceState {
     const [members, setMembers] = useState<RoomMember[]>([])
     const [isJoined, setIsJoined] = useState(false)
-    const [elapsedSeconds, setElapsedSeconds] = useState(0)
     const [lastSessionId, setLastSessionId] = useState<string | null>(null)
 
     const channelRef = useRef<RealtimeChannel | null>(null)
     const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null)
-    const tickRef = useRef<ReturnType<typeof setInterval> | null>(null)
     const sessionIdRef = useRef<string | null>(null)
-    const joinedAtRef = useRef<number | null>(null)
     const joiningRef = useRef(false)
 
     const syncPresence = useCallback(() => {
@@ -57,7 +53,11 @@ export function useRoomPresence(roomId: string, userId: string | undefined): Roo
             const { error: memberError } = await supabase
                 .from('room_members')
                 .upsert(
-                    { room_id: roomId, user_id: userId, joined_at: new Date().toISOString(), book_id: bookId ?? null },
+                    // joined_at is deliberately omitted: the column defaults to
+                    // now() on insert, and leaving it out means re-entering a
+                    // room you are already in does not reset when you joined —
+                    // which was restarting the session timer from zero.
+                    { room_id: roomId, user_id: userId, book_id: bookId ?? null },
                     { onConflict: 'room_id,user_id' }
                 )
 
@@ -104,13 +104,6 @@ export function useRoomPresence(roomId: string, userId: string | undefined): Roo
                 }
             }, 30_000)
 
-            joinedAtRef.current = Date.now()
-            tickRef.current = setInterval(() => {
-                if (joinedAtRef.current) {
-                    setElapsedSeconds(Math.floor((Date.now() - joinedAtRef.current) / 1000))
-                }
-            }, 1000)
-
             setIsJoined(true)
         } finally {
             joiningRef.current = false
@@ -119,11 +112,7 @@ export function useRoomPresence(roomId: string, userId: string | undefined): Roo
 
     const leaveRoom = useCallback(async () => {
         if (heartbeatRef.current) clearInterval(heartbeatRef.current)
-        if (tickRef.current) clearInterval(tickRef.current)
         heartbeatRef.current = null
-        tickRef.current = null
-        joinedAtRef.current = null
-        setElapsedSeconds(0)
 
         if (sessionIdRef.current) {
             setLastSessionId(sessionIdRef.current)
@@ -153,9 +142,7 @@ export function useRoomPresence(roomId: string, userId: string | undefined): Roo
     useEffect(() => {
         return () => {
             if (heartbeatRef.current) clearInterval(heartbeatRef.current)
-            if (tickRef.current) clearInterval(tickRef.current)
             heartbeatRef.current = null
-            tickRef.current = null
 
             if (channelRef.current) {
                 supabase.removeChannel(channelRef.current)
@@ -168,7 +155,6 @@ export function useRoomPresence(roomId: string, userId: string | undefined): Roo
         members,
         memberCount: members.length,
         isJoined,
-        elapsedSeconds,
         lastSessionId,
         joinRoom,
         leaveRoom,

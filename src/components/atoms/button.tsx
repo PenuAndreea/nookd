@@ -1,5 +1,6 @@
 import { FontLineHeights, FontSizes } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
+import { ReactNode } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 import { Icon, IconName } from "./icon";
 
@@ -30,12 +31,14 @@ const ButtonSizes = {
 type ButtonProps = {
     title?: string;
     icon?: IconName;
+    /** Custom icon element, used instead of `icon` for artwork SF Symbols can't express. */
+    iconNode?: ReactNode;
     onPress: () => void;
     floating?: boolean;
     size?: keyof typeof ButtonSizes;
 }
 
-export default function Button({ title, icon, onPress, floating, size }: ButtonProps) {
+export default function Button({ title, icon, iconNode, onPress, floating, size }: ButtonProps) {
     const colors = useTheme();
     const styles = createStyles(colors, size, floating);
 
@@ -47,7 +50,7 @@ export default function Button({ title, icon, onPress, floating, size }: ButtonP
                 pressed && styles.pressed,
             ]}
             onPress={onPress}>
-            {icon && <Icon name={icon} color={floating ? colors.accent : colors.text} />}
+            {iconNode ?? (icon && <Icon name={icon} color={floating ? colors.accent : colors.text} />)}
             {title && <Text style={[styles.buttonText, floating && styles.floatingText]}>{title}</Text>}
         </Pressable>
     );

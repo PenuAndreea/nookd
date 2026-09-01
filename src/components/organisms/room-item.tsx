@@ -1,64 +1,74 @@
 
 import { RoomWithDetails } from '@/api/rooms';
 import { BorderRadius, Spacing } from '@/constants/theme';
+import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/hooks/use-theme';
 import { router } from 'expo-router';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
+import Button from '../atoms/button';
+import StatusBadge, { POPULAR_FROM } from '../atoms/status-badge';
 import Typography from '../atoms/typography';
 import AvatarList from '../molecules/avatar-list';
+import RoomThumbnail from '../molecules/room-thumbnail';
 
-import Chilling from '../../../assets/images/illustrations/cuate/chilling.svg';
-import KidsReading from '../../../assets/images/illustrations/cuate/kids-reading.svg';
-import ReadingBook from "../../../assets/images/illustrations/cuate/reading-book.svg";
-import StayHome from '../../../assets/images/illustrations/cuate/stay-at-home.svg';
-import StayIn from '../../../assets/images/illustrations/cuate/staying-in.svg';
-import WomanReading from '../../../assets/images/illustrations/cuate/woman-reading.svg';
-
-const ROOM_ILLUSTRATIONS = [KidsReading, ReadingBook, StayHome, StayIn, WomanReading, Chilling]
 
 export default function RoomItem({ room }: { room: RoomWithDetails }) {
     const colors = useTheme();
     const styles = useStyles(colors);
+    const { session } = useAuth();
+    const userId = session?.user?.id;
 
-    const hashId = (id: string) =>
-        id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+    const memberIds = room.members?.map((member) => member.user_id) ?? []
+    const memberCount = memberIds.length
+    const isMember = userId ? memberIds.includes(userId) : false
+    const isPopular = memberCount >= POPULAR_FROM
 
-    const getIllustration = (index: number) =>
-        ROOM_ILLUSTRATIONS[index % ROOM_ILLUSTRATIONS.length]
+    function openRoom() {
+        router.push({ pathname: '/room/[id]', params: { id: room.id } })
+    }
 
-    const Illustration = getIllustration(hashId(room?.id))
-
-    function navigateToRoomDetails(roomId: RoomWithDetails['id']) {
-        router.push({ pathname: '/room/[id]', params: { id: roomId } })
+    // Joining from here opens the room and lets its existing flow take over —
+    // the "leave your current room?" confirmation and the book picker both live
+    // there, and duplicating them would mean two copies to keep in step.
+    function joinRoom() {
+        router.push({ pathname: '/room/[id]', params: { id: room.id, autojoin: '1' } })
     }
 
     return (
         <Pressable
-            style={({ pressed }) => [styles.container, pressed && styles.pressed]}
-            onPress={() => navigateToRoomDetails(room?.id)}
+            style={({ pressed }) => [
+                styles.container,
+                isPopular && styles.highlighted,
+                pressed && styles.pressed,
+            ]}
+            onPress={openRoom}
         >
-            <View style={{ width: 80, height: 80, backgroundColor: room.book?.cover_url ? 'transparent' : '#F2ECE3', borderRadius: 12, flexWrap: 'wrap', overflow: 'hidden' }}>
-                {room.book?.cover_url ? (
-                    <Image source={{ uri: room.book.cover_url }} style={{ width: 80, height: 80 }} resizeMode="contain" />
-                ) : (
-                    <Illustration height={80} width={80} />
-                )}
-            </View>
+            <RoomThumbnail room={room} stretch />
+
             <View style={styles.info}>
-                <View style={{ justifyContent: 'flex-start' }}>
-                    <Typography variant="h2">
+                <View style={styles.titleRow}>
+                    <Typography variant="h2" numberOfLines={1} style={styles.title}>
                         {room.name}
                     </Typography>
+                    <StatusBadge memberCount={memberCount} />
+                </View>
+
+                {room.description && (
                     <Typography numberOfLines={2} color="textSecondary">
                         {room.description}
                     </Typography>
-                    {room.book && (
-                        <Typography numberOfLines={1} color="textSecondary" style={{ marginTop: 2 }}>
-                            📖 {room.book.title}
-                        </Typography>
-                    )}
-                    {room?.members && room?.members.length > 0 && <AvatarList userIds={room?.members?.map((member) => member.user_id)} />}
+                )}
+
+                {room.book && (
+                    <Typography numberOfLines={1} color="textSecondary" style={{ marginTop: 2 }}>
+                        📖 {room.book.title}
+                    </Typography>
+                )}
+
+                <View style={styles.footerRow}>
+                    <AvatarList userIds={memberIds} />
+                    {!isMember && <Button title="Join" size="small" onPress={joinRoom} />}
                 </View>
             </View>
         </Pressable>
@@ -66,7 +76,7 @@ export default function RoomItem({ room }: { room: RoomWithDetails }) {
 }
 
 
-const useStyles = (colors: any) => StyleSheet.create({
+const useStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     pressed: {
         opacity: 0.92,
         transform: [{ scale: 0.98 }],
@@ -78,16 +88,32 @@ const useStyles = (colors: any) => StyleSheet.create({
         backgroundColor: colors.white,
         borderWidth: 1,
         borderRadius: BorderRadius.medium,
-        borderColor: colors.background,
+        borderColor: colors.border,
         boxShadow: ' rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px',
     },
-    participants: {
-        flex: 1,
-        justifyContent: 'flex-end',
-        marginTop: Spacing.two
+    highlighted: {
+        borderColor: colors.accent,
+        borderWidth: 1.5,
     },
     info: {
         flex: 1,
-        marginLeft: Spacing.three
+        marginLeft: Spacing.three,
+    },
+    titleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: Spacing.two,
+    },
+    title: {
+        flexShrink: 1,
+        marginBottom: 0,
+    },
+    footerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginTop: Spacing.two,
+        gap: Spacing.two,
     },
 });

@@ -5,7 +5,9 @@ import { BottomTabBar, BottomTabBarProps, Tabs } from 'expo-router/tabs';
 import { SymbolView } from 'expo-symbols';
 import { StyleSheet, useColorScheme, View } from 'react-native';
 
+import ReadingNook from '../../../assets/images/icons/reading-nook.svg';
 import { Colors } from '../../constants/theme';
+import { useTheme } from '../../hooks/use-theme';
 import Button from './button';
 import { Icon } from './icon';
 
@@ -30,12 +32,14 @@ const routes: Route[] = [
 ]
 
 function TabBarWithCreateButton(props: BottomTabBarProps) {
+  const colors = useTheme();
+
   return (
     <View>
       <BottomTabBar {...props} />
       <Button
         floating
-        icon="plus"
+        iconNode={<ReadingNook width={27} height={27} color={colors.accent} />}
         size="medium"
         // create-room is a root-level modal (sibling to the tabs group, see
         // app/(app)/_layout.tsx), not nested inside any one tab's stack —

@@ -13,7 +13,7 @@
   },
   "private": true,
   "dependencies": {
-    "@expo-google-fonts/playfair-display": "^0.4.2",
+    "@expo-google-fonts/lora": "^0.4.2",
     "@expo/ui": "~57.0.14",
     "@gorhom/bottom-sheet": "^5.2.14",
     "@supabase/supabase-js": "^2.106.2",

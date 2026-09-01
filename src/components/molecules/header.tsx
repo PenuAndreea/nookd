@@ -14,7 +14,7 @@ export const Header = ({ title, showBack = false, onBack, right }: HeaderProps) 
     const insets = useSafeAreaInsets();
 
     return (
-        <View style={[styles.wrapper, { paddingTop: insets.top + 12 }]}>
+        <View style={[styles.wrapper, { paddingTop: insets.top - 20 }]}>
             <View style={styles.left}>
                 {showBack && (
                     <TouchableOpacity

@@ -129,6 +129,6 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         flex: 1,
         gap: Spacing.three,
         backgroundColor: colors.background,
-        paddingVertical: Spacing.four,
+        // paddingVertical: Spacing.four,
     },
 });

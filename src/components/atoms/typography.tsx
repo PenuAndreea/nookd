@@ -1,6 +1,5 @@
 import { FontSizes, FontWeights } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
-import { PlayfairDisplay_800ExtraBold, useFonts } from '@expo-google-fonts/playfair-display';
 import { StyleProp, StyleSheet, Text, TextProps, TextStyle } from "react-native";
 
 type TypographyVariant = "h1" | "h2" | "body";
@@ -19,17 +18,10 @@ export default function Typography({
 }: TypographyProps) {
     const colors = useTheme();
 
-    const [fontsLoaded] = useFonts({
-        PlayfairDisplay_800ExtraBold
-    });
-
-    if (!fontsLoaded) return null;
-
     return (
         <Text
             {...props}
             style={[
-                styles.base,
                 styles[variant],
                 { color: colors[color] },
                 style,
@@ -38,21 +30,21 @@ export default function Typography({
     );
 }
 
+// Headings use Lora, a screen-first serif: far lower stroke contrast than
+// Playfair, so it stays legible at heading sizes. The family already carries
+// the weight, so no fontWeight here — setting one makes iOS synthesise a
+// second bold on top.
 const styles = StyleSheet.create({
-    base: {
-        fontFamily: 'inter',
-    },
     h1: {
-        fontFamily: 'PlayfairDisplay_800ExtraBold',
-        fontSize: 24,
-        fontWeight: FontWeights.bold,
+        fontFamily: 'Lora_700Bold',
+        fontSize: 26,
+        lineHeight: 32,
     },
     h2: {
-        fontFamily: 'PlayfairDisplay_800ExtraBold',
-        fontWeight: FontWeights.bold,
-        lineHeight: 22,
+        fontFamily: 'Lora_700Bold',
+        fontSize: 17,
+        lineHeight: 23,
         marginBottom: 8,
-        fontSize: 16
     },
     body: {
         fontSize: FontSizes.small,

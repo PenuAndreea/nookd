@@ -55,7 +55,10 @@ export function RoomsProvider({ children }: { children: ReactNode }) {
             return prev.map((room) => {
                 if (room.id !== roomId) return room;
                 if (room.members.some((m) => m.user_id === memberId)) return room;
-                return { ...room, members: [...room.members, { user_id: memberId }] };
+                return {
+                    ...room,
+                    members: [...room.members, { user_id: memberId, joined_at: new Date().toISOString() }],
+                };
             });
         });
     }, []);
