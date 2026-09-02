@@ -12,6 +12,7 @@ import {
 
 import { searchOpenLibrary } from '@/api/books';
 import { useTheme } from '@/hooks/use-theme';
+import { SearchField } from './search-field';
 
 export interface Book {
     openLibraryKey: string;
@@ -90,17 +91,12 @@ export const BookSearch = ({ value, onChange }: BookSearchProps) => {
                     </TouchableOpacity>
                 </View>
             ) : (
-                <View style={styles.inputWrapper}>
-                    <Text style={styles.searchIcon}>🔍</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Search by title or author"
-                        placeholderTextColor="#aaa"
-                        value={query}
-                        onChangeText={search}
-                    />
-                    {loading && <ActivityIndicator size="small" color={colors.accent} />}
-                </View>
+                <SearchField
+                    placeholder="Search by title or author"
+                    value={query}
+                    onChangeText={search}
+                    loading={loading}
+                />
             )}
 
             {results.length > 0 && (
@@ -155,26 +151,6 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         color: colors.textSecondary,
     },
 
-    // Search input
-    inputWrapper: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: colors.white,
-        borderRadius: 12,
-        borderWidth: 0.5,
-        borderColor: colors.border,
-        paddingHorizontal: 14,
-        gap: 10,
-    },
-    searchIcon: {
-        fontSize: 16,
-    },
-    input: {
-        flex: 1,
-        fontSize: 15,
-        color: colors.text,
-        paddingVertical: 13,
-    },
 
     // Dropdown results
     dropdown: {

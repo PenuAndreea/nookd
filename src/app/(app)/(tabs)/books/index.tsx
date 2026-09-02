@@ -24,6 +24,7 @@ import {
     UserBookStatus,
     UserBookWithBook,
 } from '@/api/books';
+import { SearchField } from '@/components/molecules/search-field';
 import BookItem from '@/components/organisms/book-item';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
@@ -136,17 +137,12 @@ export default function BooksScreen() {
         <View style={styles.container}>
             <Text style={styles.title}>Books</Text>
 
-            <View style={styles.inputWrapper}>
-                <Text style={styles.searchIcon}>🔍</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Search by title or author"
-                    placeholderTextColor={colors.textSecondary}
-                    value={query}
-                    onChangeText={search}
-                />
-                {searching && <ActivityIndicator size="small" color={colors.accent} />}
-            </View>
+            <SearchField
+                placeholder="Search by title or author"
+                value={query}
+                onChangeText={search}
+                loading={searching}
+            />
 
             {isSearching ? (
                 <FlatList
@@ -293,25 +289,6 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         fontFamily: 'Lora_700Bold',
         fontSize: 24,
         color: colors.text,
-    },
-    inputWrapper: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: colors.white,
-        borderRadius: BorderRadius.medium,
-        borderWidth: 0.5,
-        borderColor: colors.border,
-        paddingHorizontal: 14,
-        gap: 10,
-    },
-    searchIcon: {
-        fontSize: 16,
-    },
-    input: {
-        flex: 1,
-        fontSize: 15,
-        color: colors.text,
-        paddingVertical: 13,
     },
     listContent: {
         paddingBottom: Spacing.five,

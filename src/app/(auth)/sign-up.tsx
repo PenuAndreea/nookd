@@ -1,19 +1,22 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import {
-    ActivityIndicator,
-    Alert,
-    Button,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
-} from 'react-native';
+import { ActivityIndicator, Alert, Image, StyleSheet, Text, View } from 'react-native';
+
+import logo from '@/assets/images/logo.png';
+import Button from '@/components/atoms/button';
+import Typography from '@/components/atoms/typography';
+import { LabeledInput } from '@/components/molecules/labeled-input';
+import { BorderRadius, Spacing } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
+
 import { useAuth } from '../../contexts/auth-context';
 
 export default function SignUpScreen() {
     const { signUp } = useAuth();
     const router = useRouter();
+    const colors = useTheme();
+    const styles = createStyles(colors);
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -49,19 +52,25 @@ export default function SignUpScreen() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Create account</Text>
+            <Image source={logo} style={styles.logo} />
+            <Typography style={{ alignSelf: 'center' }} variant="h1">Create account</Typography>
 
-            <TextInput
-                style={styles.input}
-                placeholder="Email"
+            <LabeledInput
+                label="Email"
+                placeholder="you@example.com"
                 autoCapitalize="none"
+                autoCorrect={false}
+                spellCheck={false}
                 keyboardType="email-address"
                 value={email}
                 onChangeText={setEmail}
             />
-            <TextInput
-                style={styles.input}
-                placeholder="Password"
+            <LabeledInput
+                label="Password"
+                placeholder="At least 6 characters"
+                autoCapitalize="none"
+                autoCorrect={false}
+                spellCheck={false}
                 secureTextEntry
                 value={password}
                 onChangeText={setPassword}
@@ -70,9 +79,9 @@ export default function SignUpScreen() {
             {error ? <Text style={styles.error}>{error}</Text> : null}
 
             {loading ? (
-                <ActivityIndicator />
+                <ActivityIndicator color={colors.accent} />
             ) : (
-                <Button title="Sign Up" onPress={handleSignUp} />
+                <Button title="Sign up" onPress={handleSignUp} />
             )}
 
             <Text style={styles.link} onPress={() => router.replace('/(auth)/sign-in')}>
@@ -82,16 +91,27 @@ export default function SignUpScreen() {
     );
 }
 
-const styles = StyleSheet.create({
-    container: { flex: 1, justifyContent: 'center', padding: 24 },
-    title: { fontSize: 24, fontWeight: '600', marginBottom: 24 },
-    input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
-        padding: 12,
-        marginBottom: 12,
+const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        padding: Spacing.four,
+        gap: Spacing.three,
+        backgroundColor: colors.background,
     },
-    error: { color: 'red', marginBottom: 12 },
-    link: { marginTop: 16, color: '#007AFF', textAlign: 'center' },
+    logo: {
+        width: 64,
+        height: 64,
+        borderRadius: BorderRadius.medium,
+        alignSelf: 'center',
+    },
+    error: {
+        color: '#e24b4a',
+        fontSize: 13,
+    },
+    link: {
+        marginTop: Spacing.two,
+        color: colors.textSecondary,
+        textAlign: 'center',
+    },
 });

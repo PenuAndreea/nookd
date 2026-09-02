@@ -34,30 +34,37 @@ type ButtonProps = {
     /** Custom icon element, used instead of `icon` for artwork SF Symbols can't express. */
     iconNode?: ReactNode;
     onPress: () => void;
+    /** Circular icon-only button on the dark surface. */
+    round?: boolean;
+    /** A `round` button pinned over the tab bar. */
     floating?: boolean;
     size?: keyof typeof ButtonSizes;
 }
 
-export default function Button({ title, icon, iconNode, onPress, floating, size }: ButtonProps) {
+export default function Button({ title, icon, iconNode, onPress, round, floating, size }: ButtonProps) {
     const colors = useTheme();
-    const styles = createStyles(colors, size, floating);
+    // Floating is a round button that also pins itself over the tab bar, so it
+    // always carries the round treatment too.
+    const isRound = round || floating;
+    const styles = createStyles(colors, size, isRound);
 
     return (
         <Pressable
             style={({ pressed }) => [
                 styles.button,
+                isRound && styles.round,
                 floating && styles.floating,
                 pressed && styles.pressed,
             ]}
             onPress={onPress}>
-            {iconNode ?? (icon && <Icon name={icon} color={floating ? colors.accent : colors.text} />)}
-            {title && <Text style={[styles.buttonText, floating && styles.floatingText]}>{title}</Text>}
+            {iconNode ?? (icon && <Icon name={icon} color={isRound ? colors.accent : colors.text} />)}
+            {title && <Text style={[styles.buttonText, isRound && styles.floatingText]}>{title}</Text>}
         </Pressable>
     );
 }
 
 
-const createStyles = (colors: ReturnType<typeof useTheme>, size?: keyof typeof ButtonSizes, floating?: boolean) =>
+const createStyles = (colors: ReturnType<typeof useTheme>, size?: keyof typeof ButtonSizes, isRound?: boolean) =>
     StyleSheet.create({
         button: {
             flexDirection: 'row',
@@ -73,15 +80,19 @@ const createStyles = (colors: ReturnType<typeof useTheme>, size?: keyof typeof B
             position: 'absolute',
             alignSelf: 'center',
             top: 6,
+        },
+        round: {
             width: 50,
             height: 50,
             borderRadius: 28,
+            paddingHorizontal: 0,
+            paddingVertical: 0,
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: colors.text
         },
         buttonText: {
-            color: floating ? colors.accent : colors.text,
+            color: isRound ? colors.accent : colors.text,
             textAlign: 'center',
             fontWeight: '700',
             fontSize: ButtonSizes[size || 'medium'].fontSize,

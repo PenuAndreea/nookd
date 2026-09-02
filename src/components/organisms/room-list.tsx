@@ -1,9 +1,10 @@
-import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
 
 import { router } from 'expo-router';
 
 import ReadingNook from '@/assets/images/icons/reading-nook.svg';
 import BookLover from '@/assets/images/illustrations/cuate/book-lover.svg';
+import Button from '@/components/atoms/button';
 import { Spacing } from '@/constants/theme';
 import { useRooms } from '@/contexts/rooms-context';
 import { useTheme } from '@/hooks/use-theme';
@@ -51,13 +52,11 @@ export default function RoomList() {
                                 <BookLover width={200} height={200} />
                                 <Text style={styles.emptyText}>No silent rooms yet</Text>
                                 <Text style={styles.emptySubtext}>Create one now</Text>
-                                <TouchableOpacity
-                                    style={styles.createRoundButton}
+                                <Button
+                                    round
+                                    iconNode={<ReadingNook width={26} height={26} color={colors.accent} />}
                                     onPress={createRoom}
-                                    activeOpacity={0.85}
-                                >
-                                    <ReadingNook width={26} height={26} color={colors.accent} />
-                                </TouchableOpacity>
+                                />
                             </View>
                         )
                     }
@@ -71,7 +70,6 @@ const useStyles = (colors: any) => StyleSheet.create({
         flex: 1,
         marginHorizontal: Spacing.three,
         marginTop: Spacing.four,
-        backgroundColor: colors.background,
     },
     listContent: {
         paddingTop: Spacing.three,
@@ -97,13 +95,5 @@ const useStyles = (colors: any) => StyleSheet.create({
         fontSize: 14,
         color: colors.textSecondary,
         marginTop: -Spacing.two,
-    },
-    createRoundButton: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: colors.text,
     },
 });
