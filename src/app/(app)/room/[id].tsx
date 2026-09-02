@@ -331,6 +331,7 @@ export default function SilentRoomScreen() {
                 />
             </View>
 
+            {/* TODO: bottom sheet can be extracted to own component */}
             <BottomSheet
                 ref={bottomSheetRef}
                 index={0}
@@ -361,6 +362,7 @@ export default function SilentRoomScreen() {
                     {memberCount === 0 ? (
                         <Text style={styles.emptyHint}>No one is here yet.</Text>
                     ) : (
+                        // TODO: this should be a horizontal scroll view, not a row that wraps. The wrapping is a temporary fallback for when there are more than 5 readers. Separate component
                         <View style={styles.readerRow}>
                             {members.slice(0, READERS_SHOWN).map((member) => (
                                 <View key={member.user_id} style={styles.readerCell}>
@@ -384,6 +386,7 @@ export default function SilentRoomScreen() {
                     <Text style={[styles.sectionTitle, styles.readingTitle]}>Currently reading</Text>
 
                     {booksInRoom.map(({ book, count }) => (
+                        // TODO: use a proper book card component here, with a link to the book page
                         <View key={book.id} style={styles.bookCard}>
                             {book.cover_url ? (
                                 <Image source={{ uri: book.cover_url }} style={styles.bookCover} />
@@ -407,6 +410,7 @@ export default function SilentRoomScreen() {
                     ))}
 
                     {isJoined && !memberBooks[userId ?? ''] && (
+                        // TODO: this should be a proper button component, not just a touchable text row
                         <TouchableOpacity style={styles.addBookRow} onPress={openReadingPicker}>
                             <Text style={styles.addBookText}>+ Add what you&apos;re reading</Text>
                         </TouchableOpacity>

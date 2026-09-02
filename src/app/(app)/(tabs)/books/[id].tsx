@@ -58,6 +58,7 @@ export default function BookDetailScreen() {
     }, [id, userId]);
 
     useEffect(() => {
+        // TODO: do not call setState directly in useEffect
         load();
     }, [load]);
 
@@ -122,6 +123,7 @@ export default function BookDetailScreen() {
         <ScrollView style={styles.container} contentContainerStyle={styles.content}>
             <Header title="" showBack />
 
+            {/* TODO: extract this to a separate component */}
             <View style={styles.heroRow}>
                 <View style={[styles.cover, book.cover_url && styles.coverNoBackground]}>
                     {book.cover_url ? (
@@ -154,6 +156,7 @@ export default function BookDetailScreen() {
                         {STATUS_OPTIONS.map((option) => {
                             const selected = userBook.status === option.id;
                             return (
+                                // TODO: this should be a proper chip component, not just a touchable text row. Separate component
                                 <TouchableOpacity
                                     key={option.id}
                                     style={[styles.statusChip, selected && styles.statusChipSelected]}
@@ -170,6 +173,7 @@ export default function BookDetailScreen() {
                     </View>
 
                     {userBook.status === 'currently_reading' && (
+                        // TODO: this should be a proper input component, not just a text input. Separate component
                         <View style={styles.pageSection}>
                             <Text style={styles.sectionLabel}>
                                 Current page{book.page_count ? ` (of ${book.page_count})` : ''}

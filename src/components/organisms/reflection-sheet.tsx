@@ -51,6 +51,7 @@ const ReflectionSheet = forwardRef<BottomSheet, ReflectionSheetProps>(
             []
         );
 
+        // TODO: this should be a proper form component, not just a bunch of state variables. Separate component
         async function handleSubmit() {
             setSubmitting(true);
             setError(null);

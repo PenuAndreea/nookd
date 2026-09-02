@@ -33,6 +33,7 @@ export default function CurrentRoomBanner({ room }: { room: RoomWithDetails }) {
         >
             <View style={styles.top}>
                 <View style={styles.info}>
+                    {/* TODO: reuse StatusBadge */}
                     <View style={styles.liveRow}>
                         <View style={styles.liveDot} />
                         <Text style={styles.liveText}>LIVE NOW</Text>
@@ -48,6 +49,7 @@ export default function CurrentRoomBanner({ room }: { room: RoomWithDetails }) {
                 <RoomThumbnail room={room} width={84} />
             </View>
 
+            {/* TODO: use custom button component */}
             <View style={styles.returnButton}>
                 <Text style={styles.returnText}>Return to room  →</Text>
             </View>

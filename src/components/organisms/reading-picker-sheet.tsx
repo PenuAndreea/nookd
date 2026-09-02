@@ -7,6 +7,7 @@ import { forwardRef, useCallback } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { UserBookWithBook } from '@/api/books';
+import { EmptyState } from '@/components/molecules/empty-state';
 import { useTheme } from '@/hooks/use-theme';
 
 interface ReadingPickerSheetProps {
@@ -56,9 +57,10 @@ const ReadingPickerSheet = forwardRef<BottomSheet, ReadingPickerSheetProps>(
                         </View>
                     }
                     ListEmptyComponent={
-                        <Text style={styles.empty}>Your library is empty — nothing to pick from yet.</Text>
+                        <EmptyState title="Your library is empty" subtitle="Nothing to pick from yet." />
                     }
                     renderItem={({ item }) => (
+                        // TODO: this should be a proper list item component, not just a touchable row. Separate component
                         <TouchableOpacity
                             style={styles.bookRow}
                             onPress={() => onSelect(item.book_id)}
@@ -129,12 +131,6 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         paddingTop: 16,
         paddingBottom: 16,
         gap: 4,
-    },
-    empty: {
-        fontSize: 14,
-        color: colors.textSecondary,
-        paddingVertical: 24,
-        textAlign: 'center',
     },
     bookRow: {
         flexDirection: 'row',

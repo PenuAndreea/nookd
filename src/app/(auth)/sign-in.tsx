@@ -11,6 +11,7 @@ import { useTheme } from '@/hooks/use-theme';
 
 import { useAuth } from '../../contexts/auth-context';
 
+// TODO: this is almost identical to sign-up.tsx, extract a common component for both
 export default function SignInScreen() {
     const { signIn } = useAuth();
     const router = useRouter();

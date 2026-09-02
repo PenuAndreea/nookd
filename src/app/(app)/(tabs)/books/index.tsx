@@ -1,14 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
     FlatList,
     Image,
     ScrollView,
     StyleSheet,
     Text,
-    TextInput,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 
 import {
@@ -24,6 +22,7 @@ import {
     UserBookStatus,
     UserBookWithBook,
 } from '@/api/books';
+import { EmptyState } from '@/components/molecules/empty-state';
 import { SearchField } from '@/components/molecules/search-field';
 import BookItem from '@/components/organisms/book-item';
 import { BorderRadius, Spacing } from '@/constants/theme';
@@ -69,6 +68,7 @@ export default function BooksScreen() {
     }, [userId, status]);
 
     useEffect(() => {
+        // TODO: do not call useState directly in useEffect
         loadUserBooks();
     }, [loadUserBooks]);
 
@@ -151,9 +151,10 @@ export default function BooksScreen() {
                     contentContainerStyle={styles.listContent}
                     keyboardShouldPersistTaps="handled"
                     ListEmptyComponent={!searching ? (
-                        <Text style={styles.emptyText}>No books found for &quot;{query}&quot;</Text>
+                        <EmptyState title="No books found" subtitle={`Nothing matched "${query}".`} />
                     ) : null}
                     renderItem={({ item }) => (
+                        // TODO: this should be a proper book card component, not just a touchable row. Separate component
                         <TouchableOpacity
                             style={styles.searchResult}
                             onPress={() => openResult(item)}
@@ -190,6 +191,7 @@ export default function BooksScreen() {
                     keyExtractor={(item) => item.id}
                     contentContainerStyle={styles.listContent}
                     ListHeaderComponent={
+                        // TODO: this should be a proper horizontal scroll view component, not just a vertical list with horizontal scrolls. Separate component
                         <View>
                             {activelyRead.length > 0 && (
                                 <View style={styles.activelyReadSection}>
@@ -217,6 +219,7 @@ export default function BooksScreen() {
                             )}
 
                             {popularBooks.length > 0 && (
+                                // TODO: this should be a proper horizontal scroll view component, not just a vertical list with horizontal scrolls. Separate component
                                 <View style={styles.activelyReadSection}>
                                     <Text style={styles.sectionLabel}>Popular books</Text>
                                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -246,6 +249,7 @@ export default function BooksScreen() {
 
                             <Text style={[styles.sectionLabel, { marginBottom: Spacing.two }]}>My Library</Text>
 
+                            {/* TODO: extract this to a separate component */}
                             <View style={styles.filterRow}>
                                 {STATUS_FILTERS.map((filter) => {
                                     const selected = status === filter.id;
@@ -266,9 +270,7 @@ export default function BooksScreen() {
                         </View>
                     }
                     ListEmptyComponent={!loadingList ? (
-                        <Text style={styles.emptyText}>
-                            Nothing here yet — search above to add a book.
-                        </Text>
+                        <EmptyState title="Nothing here yet" subtitle="Search above to add a book." />
                     ) : null}
                     renderItem={({ item }) => <BookItem userBook={item} />}
                 />
@@ -292,12 +294,6 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
     },
     listContent: {
         paddingBottom: Spacing.five,
-    },
-    emptyText: {
-        color: colors.textSecondary,
-        textAlign: 'center',
-        marginTop: Spacing.five,
-        fontSize: 14,
     },
 
     // Search results

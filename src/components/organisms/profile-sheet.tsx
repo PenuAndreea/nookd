@@ -17,6 +17,7 @@ interface ProfileSheetProps {
     onSignOut: () => void;
 }
 
+// NOTE: this is a temporary component until we have a proper profile screen
 const ProfileSheet = forwardRef<BottomSheet, ProfileSheetProps>(
     ({ userId, email, onSignOut }, ref) => {
         const colors = useTheme();

@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import ReadingNook from '@/assets/images/icons/reading-nook.svg';
 import BookLover from '@/assets/images/illustrations/cuate/book-lover.svg';
 import Button from '@/components/atoms/button';
+import { EmptyState } from '@/components/molecules/empty-state';
 import { Spacing } from '@/constants/theme';
 import { useRooms } from '@/contexts/rooms-context';
 import { useTheme } from '@/hooks/use-theme';
@@ -48,16 +49,18 @@ export default function RoomList() {
                         // but the list itself stays mounted so pull-to-refresh
                         // keeps working.
                         currentRoom ? null : (
-                            <View style={styles.emptyState}>
-                                <BookLover width={200} height={200} />
-                                <Text style={styles.emptyText}>No silent rooms yet</Text>
-                                <Text style={styles.emptySubtext}>Create one now</Text>
-                                <Button
-                                    round
-                                    iconNode={<ReadingNook width={26} height={26} color={colors.accent} />}
-                                    onPress={createRoom}
-                                />
-                            </View>
+                            <EmptyState
+                                illustration={<BookLover width={200} height={200} />}
+                                title="No silent rooms yet"
+                                subtitle="Create one now"
+                                action={
+                                    <Button
+                                        round
+                                        iconNode={<ReadingNook width={26} height={26} color={colors.accent} />}
+                                        onPress={createRoom}
+                                    />
+                                }
+                            />
                         )
                     }
                 />}
@@ -80,20 +83,5 @@ const useStyles = (colors: any) => StyleSheet.create({
         color: colors.textSecondary,
         textTransform: 'uppercase',
         letterSpacing: 0.6,
-    },
-    emptyState: {
-        alignItems: 'center',
-        marginTop: Spacing.six,
-        gap: Spacing.three,
-    },
-    emptyText: {
-        fontSize: 15,
-        fontWeight: '600',
-        color: colors.textSecondary,
-    },
-    emptySubtext: {
-        fontSize: 14,
-        color: colors.textSecondary,
-        marginTop: -Spacing.two,
     },
 });
