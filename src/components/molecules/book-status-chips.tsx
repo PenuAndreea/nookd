@@ -1,14 +1,11 @@
 import { StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { UserBookStatus } from '@/api/books';
 import Chip from '@/components/atoms/chip';
 import { Spacing } from '@/constants/theme';
 
-export const BOOK_STATUS_OPTIONS: { id: UserBookStatus; label: string }[] = [
-    { id: 'want_to_read', label: 'Want to read' },
-    { id: 'currently_reading', label: 'Currently reading' },
-    { id: 'finished', label: 'Finished' },
-];
+export const BOOK_STATUS_IDS: UserBookStatus[] = ['want_to_read', 'currently_reading', 'finished'];
 
 interface BookStatusChipsProps {
     value: UserBookStatus;
@@ -24,15 +21,16 @@ interface BookStatusChipsProps {
  */
 export const BookStatusChips = ({ value, onChange, disabled, equalWidth }: BookStatusChipsProps) => {
     const styles = useStyles();
+    const { t } = useTranslation();
 
     return (
         <View style={[styles.row, equalWidth ? styles.equalWidthRow : styles.wrapRow]}>
-            {BOOK_STATUS_OPTIONS.map((option) => (
+            {BOOK_STATUS_IDS.map((id) => (
                 <Chip
-                    key={option.id}
-                    label={option.label}
-                    selected={value === option.id}
-                    onPress={() => onChange(option.id)}
+                    key={id}
+                    label={t(`books.statusOptions.${id}`)}
+                    selected={value === id}
+                    onPress={() => onChange(id)}
                     disabled={disabled}
                     style={equalWidth && styles.equalWidthChip}
                 />

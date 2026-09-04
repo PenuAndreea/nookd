@@ -5,6 +5,7 @@ import BottomSheet, {
 } from '@gorhom/bottom-sheet';
 import { forwardRef, useCallback } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import Avatar from '@/components/atoms/avatar';
 import Button from '@/components/atoms/button';
@@ -22,6 +23,7 @@ const ProfileSheet = forwardRef<BottomSheet, ProfileSheetProps>(
     ({ userId, email, onSignOut }, ref) => {
         const colors = useTheme();
         const styles = createStyles(colors);
+        const { t } = useTranslation();
 
         const renderBackdrop = useCallback(
             (props: BottomSheetBackdropProps) => (
@@ -57,7 +59,7 @@ const ProfileSheet = forwardRef<BottomSheet, ProfileSheetProps>(
                     </View>
 
                     <Button
-                        title="Sign out"
+                        title={t('profile.signOut')}
                         icon="rectangle.portrait.and.arrow.right"
                         onPress={onSignOut}
                     />

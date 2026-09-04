@@ -5,6 +5,7 @@ import type { RefObject } from 'react';
 
 import { UserBookWithBook } from '@/api/books';
 import { Book, forceLeaveRoom, getRoomMembersByRoomId, RoomWithBook, updateRoomMemberBook } from '@/api/rooms';
+import i18n from '@/i18n';
 import { useRooms } from '@/contexts/rooms-context';
 import { useElapsedSeconds } from '@/hooks/use-elapsed-seconds';
 import { useRoomPresence } from '@/hooks/use-room-presence';
@@ -132,12 +133,14 @@ export function useRoomSession({
 
         if (currentRoom && currentRoom.id !== roomId) {
             Alert.alert(
-                'Leave current room?',
-                `You're already in "${currentRoom.name ?? 'a silent room'}". Leave it and join this room instead?`,
+                i18n.t('rooms.leaveCurrentRoomTitle'),
+                i18n.t('rooms.leaveCurrentRoomMessage', {
+                    roomName: currentRoom.name ?? i18n.t('rooms.leaveCurrentRoomFallbackName'),
+                }),
                 [
-                    { text: 'Cancel', style: 'cancel' },
+                    { text: i18n.t('common.cancel'), style: 'cancel' },
                     {
-                        text: 'Leave & Join',
+                        text: i18n.t('rooms.leaveAndJoin'),
                         style: 'destructive',
                         onPress: () => switchFromCurrentRoom(currentRoom.id),
                     },

@@ -1,31 +1,30 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import Chip from '@/components/atoms/chip';
 import { useTheme } from '@/hooks/use-theme';
 
+// `id` is persisted directly to the database (e.g. `rooms.vibe`) — it must
+// stay stable across locales. Only the display label is translated, via
+// `rooms.vibes.<id>` / `rooms.sessionMoods.<id>` at render time.
 export const VIBES = [
-    { id: 'book_club', label: 'BookClub', emoji: '👥' },
-    { id: 'fantasy', label: 'Fantasy', emoji: '🐉' },
-    { id: 'nonfiction', label: 'Nonfiction', emoji: '📰' },
-    { id: 'quiet_company', label: 'Quiet Company', emoji: '✨' },
-    { id: 'lost_in_a_book', label: 'Lost in a Book', emoji: '📖' },
+    { id: 'book_club', emoji: '👥' },
+    { id: 'fantasy', emoji: '🐉' },
+    { id: 'nonfiction', emoji: '📰' },
+    { id: 'quiet_company', emoji: '✨' },
+    { id: 'lost_in_a_book', emoji: '📖' },
 ];
 
 // Post-session check-in — how the session felt, not the room's ambiance
 // (that's MOODS above). Kept as a separate value set on purpose.
 const SESSION_MOODS = [
-    { id: 'focused', label: 'Focused', emoji: '🎯' },
-    { id: 'cozy', label: 'Cozy', emoji: '🕯️' },
-    { id: 'distracted', label: 'Distracted', emoji: '🌀' },
-    { id: 'restless', label: 'Restless', emoji: '🌊' },
+    { id: 'focused', emoji: '🎯' },
+    { id: 'cozy', emoji: '🕯️' },
+    { id: 'distracted', emoji: '🌀' },
+    { id: 'restless', emoji: '🌊' },
 ];
 
-const DURATIONS = [
-    { id: '10', label: '10 min' },
-    { id: '15', label: '15 min' },
-    { id: '30', label: '30 min' },
-    { id: '60', label: '60 min' },
-];
+const DURATIONS = ['10', '15', '30', '60'];
 
 interface ChipGridProps {
     label: string;
@@ -64,22 +63,28 @@ interface MoodPickerProps {
     onChange: (id: string) => void;
 }
 
-export const VibePicker = ({ value, onChange }: MoodPickerProps) => (
-    <ChipGrid label="Vibe" options={VIBES} value={value} onChange={onChange} twoPerRow />
-);
+export const VibePicker = ({ value, onChange }: MoodPickerProps) => {
+    const { t } = useTranslation();
+    const options = VIBES.map((vibe) => ({ ...vibe, label: t(`rooms.vibes.${vibe.id}`) }));
+    return <ChipGrid label={t('rooms.vibePickerLabel')} options={options} value={value} onChange={onChange} twoPerRow />;
+};
 
-export const SessionMoodPicker = ({ value, onChange }: MoodPickerProps) => (
-    <ChipGrid label="How was this session?" options={SESSION_MOODS} value={value} onChange={onChange} twoPerRow />
-);
+export const SessionMoodPicker = ({ value, onChange }: MoodPickerProps) => {
+    const { t } = useTranslation();
+    const options = SESSION_MOODS.map((mood) => ({ ...mood, label: t(`rooms.sessionMoods.${mood.id}`) }));
+    return <ChipGrid label={t('rooms.sessionMoodPickerLabel')} options={options} value={value} onChange={onChange} twoPerRow />;
+};
 
 interface DurationPickerProps {
     value: string | null;
     onChange: (id: string) => void;
 }
 
-export const DurationPicker = ({ value, onChange }: DurationPickerProps) => (
-    <ChipGrid label="Duration" options={DURATIONS} value={value} onChange={onChange} />
-);
+export const DurationPicker = ({ value, onChange }: DurationPickerProps) => {
+    const { t } = useTranslation();
+    const options = DURATIONS.map((minutes) => ({ id: minutes, label: t('rooms.durationOption', { minutes }) }));
+    return <ChipGrid label={t('rooms.durationPickerLabel')} options={options} value={value} onChange={onChange} />;
+};
 
 const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     wrapper: {

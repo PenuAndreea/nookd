@@ -6,6 +6,7 @@ import BottomSheet, {
 } from '@gorhom/bottom-sheet';
 import { forwardRef, useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { Book } from '@/api/books';
 import Button from '@/components/atoms/button';
@@ -32,6 +33,7 @@ const ReflectionSheet = forwardRef<BottomSheet, ReflectionSheetProps>(
     ({ book, initialPage, onSubmit, onSkip }, ref) => {
         const colors = useTheme();
         const styles = createStyles(colors);
+        const { t } = useTranslation();
 
         const [thoughts, setThoughts] = useState('');
         const [pageInput, setPageInput] = useState(initialPage != null ? String(initialPage) : '');
@@ -65,7 +67,7 @@ const ReflectionSheet = forwardRef<BottomSheet, ReflectionSheetProps>(
                     finished,
                 });
             } catch {
-                setError("Couldn't save — try again, or skip for now.");
+                setError(t('rooms.reflection.saveError'));
             } finally {
                 setSubmitting(false);
             }
@@ -82,14 +84,14 @@ const ReflectionSheet = forwardRef<BottomSheet, ReflectionSheetProps>(
                 handleIndicatorStyle={styles.handleIndicator}
             >
                 <BottomSheetView style={styles.content}>
-                    <Text style={styles.title}>How did that feel?</Text>
+                    <Text style={styles.title}>{t('rooms.reflection.title')}</Text>
                     {book && <Text style={styles.subtitle}>{book.title}</Text>}
 
                     <View style={styles.section}>
-                        <Text style={styles.label}>Thoughts</Text>
+                        <Text style={styles.label}>{t('rooms.reflection.thoughtsLabel')}</Text>
                         <BottomSheetTextInput
                             style={styles.textArea}
-                            placeholder="Anything on your mind about the reading..."
+                            placeholder={t('rooms.reflection.thoughtsPlaceholder')}
                             placeholderTextColor={colors.textSecondary}
                             value={thoughts}
                             onChangeText={setThoughts}
@@ -101,7 +103,9 @@ const ReflectionSheet = forwardRef<BottomSheet, ReflectionSheetProps>(
                     {book && (
                         <View style={styles.section}>
                             <Text style={styles.label}>
-                                Page reached{book.page_count ? ` (of ${book.page_count})` : ''}
+                                {book.page_count
+                                    ? t('rooms.reflection.pageReachedLabelWithTotal', { total: book.page_count })
+                                    : t('rooms.reflection.pageReachedLabel')}
                             </Text>
                             <BottomSheetTextInput
                                 style={styles.pageInput}
@@ -118,7 +122,7 @@ const ReflectionSheet = forwardRef<BottomSheet, ReflectionSheetProps>(
 
                     {book && (
                         <Checkbox
-                            label="I finished this book"
+                            label={t('rooms.reflection.finishedBook')}
                             checked={finished}
                             onPress={() => setFinished(!finished)}
                         />
@@ -128,11 +132,11 @@ const ReflectionSheet = forwardRef<BottomSheet, ReflectionSheetProps>(
 
                     <View style={styles.actions}>
                         <Button
-                            title={submitting ? 'Saving...' : 'Save'}
+                            title={submitting ? t('common.saving') : t('common.save')}
                             onPress={handleSubmit}
                         />
                         <TextButton
-                            title="Skip"
+                            title={t('rooms.reflection.skip')}
                             variant="secondary"
                             onPress={onSkip}
                             disabled={submitting}

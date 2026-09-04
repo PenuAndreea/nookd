@@ -6,6 +6,7 @@ import BottomSheet, {
 import { router } from 'expo-router';
 import { forwardRef, useCallback } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { Book, RoomWithBook } from '@/api/rooms';
 import Button from '@/components/atoms/button';
@@ -42,6 +43,7 @@ const RoomDetailsSheet = forwardRef<BottomSheet, RoomDetailsSheetProps>(
     ({ room, memberCount, members, userId, booksInRoom, isJoined, selfHasBook, onAddBook, onLeaveRoom }, ref) => {
         const colors = useTheme();
         const styles = createStyles(colors);
+        const { t } = useTranslation();
 
         const renderBackdrop = useCallback(
             (props: BottomSheetBackdropProps) => (
@@ -67,11 +69,11 @@ const RoomDetailsSheet = forwardRef<BottomSheet, RoomDetailsSheetProps>(
                 handleIndicatorStyle={styles.handleIndicator}
             >
                 <BottomSheetScrollView contentContainerStyle={styles.content}>
-                    <Text style={styles.peekLabel}>Readers &amp; current book</Text>
+                    <Text style={styles.peekLabel}>{t('rooms.details.peekLabel')}</Text>
 
                     <View style={styles.titleRow}>
                         <Text style={styles.title} numberOfLines={1}>
-                            {room?.name ?? 'Room details'}
+                            {room?.name ?? t('rooms.details.fallbackTitle')}
                         </Text>
                         <StatusBadge memberCount={memberCount} />
                     </View>
@@ -80,17 +82,17 @@ const RoomDetailsSheet = forwardRef<BottomSheet, RoomDetailsSheetProps>(
                     )}
 
                     <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>Readers in the room</Text>
+                        <Text style={styles.sectionTitle}>{t('rooms.details.readersSectionTitle')}</Text>
                         <Text style={styles.sectionCount}>{memberCount}</Text>
                     </View>
 
                     {memberCount === 0 ? (
-                        <Text style={styles.emptyHint}>No one is here yet.</Text>
+                        <Text style={styles.emptyHint}>{t('rooms.details.noOneHereYet')}</Text>
                     ) : (
                         <ReaderList members={members} currentUserId={userId} />
                     )}
 
-                    <Text style={[styles.sectionTitle, styles.readingTitle]}>Currently reading</Text>
+                    <Text style={[styles.sectionTitle, styles.readingTitle]}>{t('rooms.details.currentlyReadingSectionTitle')}</Text>
 
                     {booksInRoom.map(({ book, count }) => (
                         <View key={book.id} style={styles.bookCardWrapper}>
@@ -101,7 +103,7 @@ const RoomDetailsSheet = forwardRef<BottomSheet, RoomDetailsSheetProps>(
                                 belowInfo={
                                     <View style={styles.bookCountPill}>
                                         <Text style={styles.bookCountText}>
-                                            {count} reading this book
+                                            {t('rooms.details.readingThisBook', { count })}
                                         </Text>
                                     </View>
                                 }
@@ -110,17 +112,17 @@ const RoomDetailsSheet = forwardRef<BottomSheet, RoomDetailsSheetProps>(
                     ))}
 
                     {isJoined && !selfHasBook && (
-                        <TextButton title="+ Add what you're reading" onPress={onAddBook} style={styles.addBookText} />
+                        <TextButton title={t('rooms.details.addWhatYoureReading')} onPress={onAddBook} style={styles.addBookText} />
                     )}
 
                     {!isJoined && booksInRoom.length === 0 && (
-                        <Text style={styles.emptyHint}>Nothing yet.</Text>
+                        <Text style={styles.emptyHint}>{t('rooms.details.nothingYet')}</Text>
                     )}
 
                     {isJoined && (
                         <View style={styles.leaveButton}>
                             <Button
-                                title="Leave room"
+                                title={t('rooms.details.leaveRoom')}
                                 icon="rectangle.portrait.and.arrow.right"
                                 onPress={onLeaveRoom}
                             />

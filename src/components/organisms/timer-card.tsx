@@ -1,6 +1,9 @@
 import { useTheme } from "@/hooks/use-theme";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { Icon } from "../atoms/icon";
+
+const MAX_MEMBERS = 10;
 
 function formatDuration(totalSeconds: number) {
     const minutes = Math.floor(totalSeconds / 60)
@@ -17,6 +20,7 @@ export default function TimerCard({ elapsedSeconds, duration, memberCount, onPre
     const progress = durationSeconds === 0 ? 0 : Math.min(elapsedSeconds / durationSeconds, 1)
     const colors = useTheme();
     const styles = createStyles(colors);
+    const { t } = useTranslation();
 
     return (
         <Pressable hitSlop={10} onPress={onPress} style={styles.timerCard}>
@@ -24,7 +28,7 @@ export default function TimerCard({ elapsedSeconds, duration, memberCount, onPre
                 {formatDuration(isOpenEnded ? elapsedSeconds : remainingSeconds)}
             </Text>
             <Text style={styles.timerLabel}>
-                {isOpenEnded ? 'Reading' : 'Remaining'}
+                {isOpenEnded ? t('rooms.timer.reading') : t('rooms.timer.remaining')}
             </Text>
             {isOpenEnded ? (
                 <View style={styles.openSpacer} />
@@ -35,12 +39,12 @@ export default function TimerCard({ elapsedSeconds, duration, memberCount, onPre
             )}
             <View style={styles.timerFooterRow}>
                 <Text style={styles.timerFooterText}>
-                    {isOpenEnded ? 'Always open' : `Goal: ${duration} min`}
+                    {isOpenEnded ? t('rooms.timer.alwaysOpen') : t('rooms.timer.goal', { duration })}
                 </Text>
                 <View style={styles.timerFooterRight}>
                     <Icon name="person.2" color={colors.timerCardText} />
                     <Text style={styles.timerFooterText}>
-                        {memberCount}/{10}
+                        {memberCount}/{MAX_MEMBERS}
                     </Text>
                 </View>
             </View>

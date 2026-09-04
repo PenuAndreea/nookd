@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import {
     addToReadingList,
@@ -30,6 +31,7 @@ export default function BooksScreen() {
     const userId = session?.user?.id;
     const colors = useTheme();
     const styles = createStyles(colors);
+    const { t } = useTranslation();
 
     const [query, setQuery] = useState('');
     const [searchResults, setSearchResults] = useState<OpenLibraryResult[]>([]);
@@ -132,15 +134,15 @@ export default function BooksScreen() {
     const popularBookItems: BookCarouselItem[] = popularBooks.map(({ book, roomCount }) => ({
         key: book.id,
         book,
-        subtitle: `${roomCount} ${roomCount === 1 ? 'room' : 'rooms'}`,
+        subtitle: t('books.popularBooksCount', { count: roomCount }),
     }));
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Books</Text>
+            <Text style={styles.title}>{t('books.title')}</Text>
 
             <SearchField
-                placeholder="Search by title or author"
+                placeholder={t('books.searchPlaceholder')}
                 value={query}
                 onChangeText={search}
                 loading={searching}
@@ -153,7 +155,7 @@ export default function BooksScreen() {
                     contentContainerStyle={styles.listContent}
                     keyboardShouldPersistTaps="handled"
                     ListEmptyComponent={!searching ? (
-                        <EmptyState title="No books found" subtitle={`Nothing matched "${query}".`} />
+                        <EmptyState title={t('books.noBooksFoundTitle')} subtitle={t('books.noBooksFoundSubtitle', { query })} />
                     ) : null}
                     renderItem={({ item }) => (
                         <View style={styles.searchResultSpacing}>
@@ -169,7 +171,7 @@ export default function BooksScreen() {
                                         hitSlop={8}
                                     >
                                         <Text style={styles.addChipText}>
-                                            {addingKey === item.openLibraryKey ? '...' : '+ Add'}
+                                            {addingKey === item.openLibraryKey ? t('books.adding') : t('books.addChip')}
                                         </Text>
                                     </Pressable>
                                 }
@@ -185,23 +187,23 @@ export default function BooksScreen() {
                     ListHeaderComponent={
                         <View>
                             <BookCarousel
-                                title="What others are currently reading"
+                                title={t('books.othersReading')}
                                 items={activelyReadItems}
                                 onPressItem={(bookId) => router.navigate(`/books/${bookId}`)}
                             />
                             <BookCarousel
-                                title="Popular books"
+                                title={t('books.popularBooks')}
                                 items={popularBookItems}
                                 onPressItem={(bookId) => router.navigate(`/books/${bookId}`)}
                             />
 
-                            <Text style={[styles.sectionLabel, { marginBottom: Spacing.two }]}>My Library</Text>
+                            <Text style={[styles.sectionLabel, { marginBottom: Spacing.two }]}>{t('books.myLibrary')}</Text>
 
                             <BookStatusChips value={status} onChange={setStatus} equalWidth />
                         </View>
                     }
                     ListEmptyComponent={!loadingList ? (
-                        <EmptyState title="Nothing here yet" subtitle="Search above to add a book." />
+                        <EmptyState title={t('books.emptyLibraryTitle')} subtitle={t('books.emptyLibrarySubtitle')} />
                     ) : null}
                     renderItem={({ item }) => <BookItem userBook={item} />}
                 />

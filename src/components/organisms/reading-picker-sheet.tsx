@@ -5,6 +5,7 @@ import BottomSheet, {
 } from '@gorhom/bottom-sheet';
 import { forwardRef, useCallback } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { UserBookWithBook } from '@/api/books';
 import TextButton from '@/components/atoms/text-button';
@@ -22,6 +23,7 @@ const ReadingPickerSheet = forwardRef<BottomSheet, ReadingPickerSheetProps>(
     ({ books, onSelect, onSkip }, ref) => {
         const colors = useTheme();
         const styles = createStyles(colors);
+        const { t } = useTranslation();
 
         const renderBackdrop = useCallback(
             (props: BottomSheetBackdropProps) => (
@@ -52,14 +54,14 @@ const ReadingPickerSheet = forwardRef<BottomSheet, ReadingPickerSheetProps>(
                     contentContainerStyle={styles.listContent}
                     ListHeaderComponent={
                         <View style={styles.header}>
-                            <Text style={styles.title}>What are you reading?</Text>
+                            <Text style={styles.title}>{t('rooms.readingPicker.title')}</Text>
                             <Text style={styles.subtitle}>
-                                Optional — shown to others in the room as a nice-to-know, not tracked.
+                                {t('rooms.readingPicker.subtitle')}
                             </Text>
                         </View>
                     }
                     ListEmptyComponent={
-                        <EmptyState title="Your library is empty" subtitle="Nothing to pick from yet." />
+                        <EmptyState title={t('rooms.readingPicker.emptyLibraryTitle')} subtitle={t('rooms.readingPicker.emptyLibrarySubtitle')} />
                     }
                     renderItem={({ item }) => (
                         <View style={styles.bookRowSpacing}>
@@ -69,7 +71,7 @@ const ReadingPickerSheet = forwardRef<BottomSheet, ReadingPickerSheetProps>(
                     ListFooterComponent={
                         <View style={styles.footer}>
                             <TextButton
-                                title="Not reading anything specific"
+                                title={t('rooms.readingPicker.notReadingSpecific')}
                                 variant="secondary"
                                 onPress={onSkip}
                             />

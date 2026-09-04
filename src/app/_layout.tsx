@@ -1,6 +1,7 @@
 import { Lora_700Bold, useFonts } from '@expo-google-fonts/lora';
 import { Slot } from 'expo-router';
 
+import '../i18n';
 import { AuthProvider } from '../contexts/auth-context';
 
 export default function RootLayout() {

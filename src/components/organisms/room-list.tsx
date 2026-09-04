@@ -1,4 +1,5 @@
 import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { router } from 'expo-router';
 
@@ -16,6 +17,7 @@ export default function RoomList() {
     const { rooms, currentRoom, loading, refreshing, refresh } = useRooms();
     const colors = useTheme();
     const styles = useStyles(colors);
+    const { t } = useTranslation();
 
     const otherRooms = rooms?.filter((room) => room.id !== currentRoom?.id) ?? null;
 
@@ -31,7 +33,7 @@ export default function RoomList() {
     return (
         <View style={styles.container}>
             {currentRoom && <CurrentRoomBanner room={currentRoom} />}
-            {showOtherRooms && <Text style={styles.sectionLabel}>Rooms</Text>}
+            {showOtherRooms && <Text style={styles.sectionLabel}>{t('rooms.sectionLabel')}</Text>}
             {loading ?
                 <ActivityIndicator size="large" style={{ justifyContent: 'center', alignSelf: 'center', alignItems: 'center', alignContent: 'center', height: '80%' }} color={colors.accent} /> :
                 <FlatList
@@ -51,8 +53,8 @@ export default function RoomList() {
                         currentRoom ? null : (
                             <EmptyState
                                 illustration={<BookLover width={200} height={200} />}
-                                title="No silent rooms yet"
-                                subtitle="Create one now"
+                                title={t('rooms.emptyTitle')}
+                                subtitle={t('rooms.emptySubtitle')}
                                 action={
                                     <Button
                                         round

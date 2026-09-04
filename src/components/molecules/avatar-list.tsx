@@ -1,5 +1,6 @@
 import { useTheme } from "@/hooks/use-theme";
 import { StyleSheet, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import Avatar from "../atoms/avatar";
 
@@ -8,10 +9,11 @@ const SHOWN = 3;
 export default function AvatarList({ userIds }: { userIds?: string[] }) {
     const colors = useTheme();
     const styles = useStyles(colors);
+    const { t } = useTranslation();
 
     const count = userIds?.length ?? 0;
     if (count === 0) {
-        return <Text style={styles.emptyText}>No one yet</Text>;
+        return <Text style={styles.emptyText}>{t('rooms.noOneYet')}</Text>;
     }
 
     return (
@@ -21,7 +23,7 @@ export default function AvatarList({ userIds }: { userIds?: string[] }) {
                     <Avatar id={userId} size="small" />
                 </View>
             ))}
-            <Text style={styles.readerCount}>{count} reading</Text>
+            <Text style={styles.readerCount}>{t('rooms.reading', { count })}</Text>
         </View>
     )
 }

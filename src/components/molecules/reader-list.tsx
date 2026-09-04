@@ -1,4 +1,5 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import Avatar from '@/components/atoms/avatar';
 import { useTheme } from '@/hooks/use-theme';
@@ -15,6 +16,7 @@ interface ReaderListProps {
 export default function ReaderList({ members, currentUserId }: ReaderListProps) {
     const colors = useTheme();
     const styles = createStyles(colors);
+    const { t } = useTranslation();
 
     const shown = members.slice(0, SHOWN);
     const overflow = members.length - shown.length;
@@ -25,16 +27,16 @@ export default function ReaderList({ members, currentUserId }: ReaderListProps) 
                 <View key={member.user_id} style={styles.cell}>
                     <Avatar id={member.user_id} size="xlarge" />
                     <Text style={styles.name} numberOfLines={1}>
-                        {member.user_id === currentUserId ? 'You' : ''}
+                        {member.user_id === currentUserId ? t('rooms.readerList.you') : ''}
                     </Text>
                 </View>
             ))}
             {overflow > 0 && (
                 <View style={styles.cell}>
                     <View style={styles.moreCircle}>
-                        <Text style={styles.moreText}>+{overflow}</Text>
+                        <Text style={styles.moreText}>{t('rooms.readerList.overflow', { count: overflow })}</Text>
                     </View>
-                    <Text style={styles.name}>More</Text>
+                    <Text style={styles.name}>{t('rooms.readerList.more')}</Text>
                 </View>
             )}
         </ScrollView>

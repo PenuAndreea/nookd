@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import logo from '@/assets/images/logo.png';
 import Button from '@/components/atoms/button';
@@ -29,7 +30,7 @@ interface AuthFormProps {
  */
 export default function AuthForm({
     title,
-    passwordPlaceholder = '••••••••',
+    passwordPlaceholder,
     submitLabel,
     validate,
     onSubmit,
@@ -39,6 +40,7 @@ export default function AuthForm({
 }: AuthFormProps) {
     const colors = useTheme();
     const styles = createStyles(colors);
+    const { t } = useTranslation();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -49,7 +51,7 @@ export default function AuthForm({
         setError(null);
 
         const validationError = validate?.(email, password) ?? (!email || !password
-            ? 'Please enter an email and password.'
+            ? t('auth.validationMissingFields')
             : null);
         if (validationError) {
             setError(validationError);
@@ -69,8 +71,8 @@ export default function AuthForm({
             <Typography style={styles.title} variant="h1">{title}</Typography>
 
             <LabeledInput
-                label="Email"
-                placeholder="you@example.com"
+                label={t('auth.emailLabel')}
+                placeholder={t('auth.emailPlaceholder')}
                 autoCapitalize="none"
                 autoCorrect={false}
                 spellCheck={false}
@@ -79,8 +81,8 @@ export default function AuthForm({
                 onChangeText={setEmail}
             />
             <LabeledInput
-                label="Password"
-                placeholder={passwordPlaceholder}
+                label={t('auth.passwordLabel')}
+                placeholder={passwordPlaceholder ?? t('auth.passwordPlaceholder')}
                 autoCapitalize="none"
                 autoCorrect={false}
                 spellCheck={false}

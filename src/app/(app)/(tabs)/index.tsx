@@ -1,6 +1,7 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useRef } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import logo from '@/assets/images/logo.png';
 import Avatar from '@/components/atoms/avatar';
@@ -13,10 +14,10 @@ import { useAuth } from '@/contexts/auth-context';
 import { useRooms } from '@/contexts/rooms-context';
 import { useTheme } from '@/hooks/use-theme';
 
-function greetingFor(hour: number) {
-  if (hour < 12) return 'Good morning';
-  if (hour < 18) return 'Good afternoon';
-  return 'Good evening';
+function greetingFor(hour: number, t: (key: string) => string) {
+  if (hour < 12) return t('home.greetingMorning');
+  if (hour < 18) return t('home.greetingAfternoon');
+  return t('home.greetingEvening');
 }
 
 // Placeholder: shown to every user until there is a profiles table holding a
@@ -25,13 +26,13 @@ function greetingFor(hour: number) {
 const DISPLAY_NAME = 'Mira';
 
 // "…, 40 minutes in." — only once there is enough elapsed to be worth saying.
-function timeInRoom(joinedAt?: string | null) {
+function timeInRoom(joinedAt: string | null | undefined, t: (key: string, options?: Record<string, unknown>) => string) {
   if (!joinedAt) return null;
   const minutes = Math.floor((Date.now() - Date.parse(joinedAt.replace(/(\.\d{3})\d+/, '$1'))) / 60000);
   if (!Number.isFinite(minutes) || minutes < 1) return null;
   return minutes < 60
-    ? `${minutes} minute${minutes === 1 ? '' : 's'} in`
-    : `${Math.floor(minutes / 60)} hour${minutes < 120 ? '' : 's'} in`;
+    ? t('home.minutesIn', { count: minutes })
+    : t('home.hoursIn', { count: Math.floor(minutes / 60) });
 }
 
 export default function HomeScreen() {
@@ -39,16 +40,20 @@ export default function HomeScreen() {
   const colors = useTheme();
   const styles = useStyles(colors);
   const userId = session?.user.id;
+  const { t } = useTranslation();
 
   const profileSheetRef = useRef<BottomSheet>(null);
 
   const { currentRoom } = useRooms();
   const elapsed = timeInRoom(
-    currentRoom?.members?.find((member) => member.user_id === userId)?.joined_at
+    currentRoom?.members?.find((member) => member.user_id === userId)?.joined_at,
+    t
   );
   const subtitle = currentRoom
-    ? `You left off in ${currentRoom.name ?? 'a room'}${elapsed ? `, ${elapsed}` : ''}.`
-    : 'Find your quiet place to read.';
+    ? (elapsed
+      ? t('home.subtitleReturnTo', { roomName: currentRoom.name ?? t('home.fallbackRoomName'), elapsed })
+      : t('home.subtitleReturnToNoElapsed', { roomName: currentRoom.name ?? t('home.fallbackRoomName') }))
+    : t('home.subtitleDefault');
 
   async function handleSignOut() {
     profileSheetRef.current?.close();
@@ -69,7 +74,7 @@ export default function HomeScreen() {
               onPress={() => profileSheetRef.current?.snapToIndex(0)}
               hitSlop={12}
               accessibilityRole="button"
-              accessibilityLabel="Open profile"
+              accessibilityLabel={t('home.openProfile')}
               style={({ pressed }) => pressed && styles.pressed}
             >
               <View>
@@ -84,7 +89,7 @@ export default function HomeScreen() {
 
       <View style={styles.greeting}>
         <Typography variant="h1">
-          {greetingFor(new Date().getHours())}, {DISPLAY_NAME}
+          {greetingFor(new Date().getHours(), t)}, {DISPLAY_NAME}
         </Typography>
         <Text style={styles.subtitle}>{subtitle}</Text>
       </View>

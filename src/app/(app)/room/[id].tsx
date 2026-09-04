@@ -3,6 +3,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { useRef } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import Animated from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
 
 import Button from '@/components/atoms/button';
 import { Header } from '@/components/molecules/header';
@@ -23,6 +24,7 @@ export default function SilentRoomScreen() {
     const colors = useTheme();
     const isDark = useColorScheme() === 'dark';
     const userId = session?.user?.id;
+    const { t } = useTranslation();
     const roomId = Array.isArray(id) ? id[0] : id;
 
     const bottomSheetRef = useRef<BottomSheet>(null);
@@ -81,7 +83,7 @@ export default function SilentRoomScreen() {
                 title=''
                 showBack
                 right={hasCheckedMembership && !isJoined ? (
-                    <Button title="Join" size="small" onPress={handleJoinPress} />
+                    <Button title={t('rooms.join')} size="small" onPress={handleJoinPress} />
                 ) : undefined}
             />
             <View style={{ flex: 1 }}>

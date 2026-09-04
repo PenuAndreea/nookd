@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import {
     addToReadingList,
@@ -27,6 +28,7 @@ export default function BookDetailScreen() {
     const userId = session?.user?.id;
     const colors = useTheme();
     const styles = createStyles(colors);
+    const { t } = useTranslation();
 
     const [book, setBook] = useState<Book | null>(null);
     const [userBook, setUserBook] = useState<UserBook | null>(null);
@@ -133,10 +135,10 @@ export default function BookDetailScreen() {
             )}
 
             {!userBook ? (
-                <Button title={saving ? 'Adding...' : 'Add to reading list'} onPress={handleAdd} />
+                <Button title={saving ? t('books.addingToReadingList') : t('books.addToReadingList')} onPress={handleAdd} />
             ) : (
                 <View style={styles.listSection}>
-                    <Text style={styles.sectionLabel}>Status</Text>
+                    <Text style={styles.sectionLabel}>{t('books.statusLabel')}</Text>
                     <BookStatusChips
                         value={userBook.status}
                         onChange={handleStatusChange}
@@ -145,12 +147,14 @@ export default function BookDetailScreen() {
 
                     {userBook.status === 'currently_reading' && (
                         <LabeledInput
-                            label={`Current page${book.page_count ? ` (of ${book.page_count})` : ''}`}
+                            label={book.page_count
+                                ? t('books.currentPageLabelWithTotal', { total: book.page_count })
+                                : t('books.currentPageLabel')}
                             value={pageInput}
                             onChangeText={setPageInput}
                             keyboardType="number-pad"
                             placeholder="0"
-                            right={<Button title="Save" size="small" onPress={handleSavePage} />}
+                            right={<Button title={t('common.save')} size="small" onPress={handleSavePage} />}
                         />
                     )}
                 </View>

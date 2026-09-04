@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/hooks/use-theme';
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import Button from '../atoms/button';
 import StatusBadge, { POPULAR_FROM } from '../atoms/status-badge';
@@ -18,6 +19,7 @@ export default function RoomItem({ room }: { room: RoomWithDetails }) {
     const styles = useStyles(colors);
     const { session } = useAuth();
     const userId = session?.user?.id;
+    const { t } = useTranslation();
 
     const memberIds = room.members?.map((member) => member.user_id) ?? []
     const memberCount = memberIds.length
@@ -68,7 +70,7 @@ export default function RoomItem({ room }: { room: RoomWithDetails }) {
 
                 <View style={styles.footerRow}>
                     <AvatarList userIds={memberIds} />
-                    {!isMember && <Button title="Join" size="small" onPress={joinRoom} />}
+                    {!isMember && <Button title={t('rooms.join')} size="small" onPress={joinRoom} />}
                 </View>
             </View>
         </Pressable>

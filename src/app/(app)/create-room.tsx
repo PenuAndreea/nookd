@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { getOrCreateBook } from '@/api/books';
 import { createRoom, RoomInsert } from '@/api/rooms';
@@ -17,6 +18,7 @@ import { router } from 'expo-router';
 export default function CreateRoomScreen() {
     const colors = useTheme();
     const styles = createStyles(colors);
+    const { t } = useTranslation();
 
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
@@ -33,7 +35,7 @@ export default function CreateRoomScreen() {
 
         const hostId = session?.user.id;
         if (!hostId) {
-            Alert.alert('Room not created', 'You need to be signed in to create a room.');
+            Alert.alert(t('rooms.create.notCreatedTitle'), t('rooms.create.notCreatedSignedOut'));
             return;
         }
 
@@ -81,23 +83,23 @@ export default function CreateRoomScreen() {
             router.back()
         } catch (error) {
             console.error('Error creating room:', error, input)
-            Alert.alert('Room not created', 'Something went wrong while creating the room.');
+            Alert.alert(t('rooms.create.notCreatedTitle'), t('rooms.create.notCreatedError'));
         }
     }
 
     return (
         <View style={styles.container}>
-            <Header title="Create Room" showBack />
+            <Header title={t('rooms.create.headerTitle')} showBack />
             <View style={{ marginHorizontal: 16, gap: 16 }}>
                 <LabeledInput
-                    label="Room name"
-                    placeholder="e.g. Sunday deep work"
+                    label={t('rooms.create.nameLabel')}
+                    placeholder={t('rooms.create.namePlaceholder')}
                     value={name}
                     onChangeText={setName}
                 />
                 <LabeledInput
-                    label="Description"
-                    placeholder="What's the vibe?"
+                    label={t('rooms.create.descriptionLabel')}
+                    placeholder={t('rooms.create.descriptionPlaceholder')}
                     value={description}
                     onChangeText={setDescription}
                     multiline
@@ -115,7 +117,7 @@ export default function CreateRoomScreen() {
                 <View style={{ justifyContent: 'center' }}>
                     <Button
                         size='medium'
-                        title={isSubmitting ? 'Creating...' : 'Create room'}
+                        title={isSubmitting ? t('rooms.create.submitting') : t('rooms.create.submit')}
                         onPress={handleCreateRoom}
                     />
                 </View>

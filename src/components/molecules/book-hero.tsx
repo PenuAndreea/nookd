@@ -1,4 +1,5 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
@@ -13,6 +14,7 @@ interface BookHeroProps {
 export default function BookHero({ book, activeRoomCount }: BookHeroProps) {
     const colors = useTheme();
     const styles = createStyles(colors);
+    const { t } = useTranslation();
 
     return (
         <View style={styles.row}>
@@ -28,7 +30,7 @@ export default function BookHero({ book, activeRoomCount }: BookHeroProps) {
                 {book.author && <Text style={styles.author}>{book.author}</Text>}
                 {activeRoomCount > 0 && (
                     <Text style={styles.activeReaders}>
-                        {activeRoomCount} {activeRoomCount === 1 ? 'room is' : 'rooms are'} reading this
+                        {t('books.activeReaders', { count: activeRoomCount })}
                     </Text>
                 )}
             </View>

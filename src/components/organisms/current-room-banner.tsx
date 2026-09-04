@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { RoomWithDetails } from '@/api/rooms';
 import Button from '@/components/atoms/button';
@@ -10,17 +11,19 @@ import RoomThumbnail from '@/components/molecules/room-thumbnail';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
-function vibeLabel(vibe: string | null) {
-    return VIBES.find((v) => v.id === vibe)?.label.toLowerCase() ?? null;
+function vibeLabel(vibe: string | null, t: (key: string) => string) {
+    const found = VIBES.find((v) => v.id === vibe);
+    return found ? t(`rooms.vibes.${found.id}`).toLowerCase() : null;
 }
 
 export default function CurrentRoomBanner({ room }: { room: RoomWithDetails }) {
     const colors = useTheme();
     const styles = useStyles(colors);
+    const { t } = useTranslation();
 
     const count = room.members?.length ?? 0;
-    const vibe = vibeLabel(room.vibe);
-    const meta = [`${count} reading`, vibe].filter(Boolean).join(' · ');
+    const vibe = vibeLabel(room.vibe, t);
+    const meta = [t('rooms.reading', { count }), vibe].filter(Boolean).join(' · ');
 
     function openRoom() {
         router.push({ pathname: '/room/[id]', params: { id: room.id } });
@@ -31,7 +34,7 @@ export default function CurrentRoomBanner({ room }: { room: RoomWithDetails }) {
             style={({ pressed }) => [styles.banner, pressed && styles.pressed]}
             onPress={openRoom}
             accessibilityRole="button"
-            accessibilityLabel={`Return to ${room.name ?? 'your room'}`}
+            accessibilityLabel={t('rooms.returnToRoomAccessibility', { roomName: room.name ?? t('rooms.fallbackRoomName') })}
         >
             <View style={styles.top}>
                 <View style={styles.info}>
@@ -48,7 +51,7 @@ export default function CurrentRoomBanner({ room }: { room: RoomWithDetails }) {
             </View>
 
             <Button
-                title="Return to room  →"
+                title={t('rooms.returnToRoom')}
                 variant="surface"
                 fullWidth
                 size="large"

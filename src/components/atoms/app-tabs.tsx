@@ -4,6 +4,7 @@ import { router, Stack } from 'expo-router';
 import { BottomTabBar, BottomTabBarProps, Tabs } from 'expo-router/tabs';
 import { SymbolView } from 'expo-symbols';
 import { StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import ReadingNook from '../../../assets/images/icons/reading-nook.svg';
 import { useColorScheme } from '../../hooks/use-color-scheme';
@@ -13,7 +14,7 @@ import { Icon } from './icon';
 
 type Route = {
   name: string;
-  title: string;
+  titleKey: string;
   icon: Parameters<typeof SymbolView>[0]["name"];
   options?: Parameters<typeof Stack.Screen>[0]["options"];
 }
@@ -21,12 +22,12 @@ type Route = {
 const routes: Route[] = [
   {
     name: 'index',
-    title: 'Home',
+    titleKey: 'tabs.home',
     icon: 'house',
   },
   {
     name: 'books',
-    title: 'Books',
+    titleKey: 'tabs.books',
     icon: 'book.closed',
   },
 ]
@@ -56,6 +57,7 @@ export default function AppTabs() {
   // Only needed for the blur tint below — colors themselves come from
   // useTheme(), which already normalizes the 'unspecified' scheme to light.
   const isDark = useColorScheme() === 'dark';
+  const { t } = useTranslation();
 
   return (
     <Tabs
@@ -70,12 +72,12 @@ export default function AppTabs() {
         ),
       }}
     >
-      {routes.map(({ name, title, icon }) => (
+      {routes.map(({ name, titleKey, icon }) => (
         <Tabs.Screen
           key={name}
           name={name}
           options={{
-            title,
+            title: t(titleKey),
             headerShown: false,
             tabBarIcon: ({ color }) => (
               <Icon name={icon} color={color} />

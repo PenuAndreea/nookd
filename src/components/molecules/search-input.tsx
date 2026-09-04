@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { searchOpenLibrary } from '@/api/books';
 import { useTheme } from '@/hooks/use-theme';
@@ -28,6 +29,7 @@ interface BookSearchProps {
 export const BookSearch = ({ value, onChange }: BookSearchProps) => {
     const colors = useTheme();
     const styles = createStyles(colors);
+    const { t } = useTranslation();
 
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<Book[]>([]);
@@ -73,7 +75,7 @@ export const BookSearch = ({ value, onChange }: BookSearchProps) => {
 
     return (
         <View style={styles.wrapper}>
-            <Text style={styles.label}>Book <Text style={styles.optional}>(optional)</Text></Text>
+            <Text style={styles.label}>{t('common.book')} <Text style={styles.optional}>({t('common.optional')})</Text></Text>
 
             {value ? (
                 <View style={styles.selectedBook}>
@@ -90,7 +92,7 @@ export const BookSearch = ({ value, onChange }: BookSearchProps) => {
                 </View>
             ) : (
                 <SearchField
-                    placeholder="Search by title or author"
+                    placeholder={t('books.searchPlaceholder')}
                     value={query}
                     onChangeText={search}
                     loading={loading}
