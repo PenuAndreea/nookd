@@ -21,7 +21,7 @@ export const SearchField = ({ loading, ...props }: SearchFieldProps) => {
                 placeholderTextColor={colors.sheetTextSecondary}
                 {...props}
             />
-            {loading && <ActivityIndicator size="small" color={colors.accent} />}
+            {loading && <ActivityIndicator testID="search-field-loading" size="small" color={colors.accent} />}
         </View>
     );
 };

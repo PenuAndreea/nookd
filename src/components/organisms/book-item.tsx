@@ -44,7 +44,7 @@ export default function BookItem({ userBook }: { userBook: UserBookWithBook }) {
                     <Typography numberOfLines={1} color="sheetTextSecondary">{book.author}</Typography>
                 )}
                 {hasProgress && (
-                    <View style={styles.progressTrack}>
+                    <View testID="book-item-progress" style={styles.progressTrack}>
                         <View style={[styles.progressFill, { width: `${Math.round(progress * 100)}%` }]} />
                     </View>
                 )}

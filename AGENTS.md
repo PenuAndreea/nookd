@@ -60,9 +60,37 @@ link in step with `expo` in package.json.
 - New per-item detail screens belong at the root of the navigation stack, not
   inside a tab. The README explains why.
 
+## Testing
+
+- Jest + React Native Testing Library (RNTL 14 — `render`, `renderHook`,
+  `fireEvent`, and `act` are all async: `await` them). Tests live in a
+  colocated `__tests__/` next to the file they cover
+  (`src/hooks/__tests__/use-room-books.test.ts`), not in one top-level test tree.
+- Mock at the module boundary, not the component: `jest.mock('@/api/rooms', ...)`,
+  `jest.mock('@/contexts/rooms-context', ...)`, `jest.mock('expo-router', ...)`.
+  Put `jest.mock(...)` calls after the imports in the same file — Babel hoists
+  them regardless of position, and this keeps `import/first` lint happy.
+- A hook that composes other hooks (e.g. `useRoomSession` wrapping
+  `useRoomBooks`/`useRoomPresence`) gets its own test mocking those hooks
+  directly, on top of — not instead of — testing each inner hook in isolation.
+- `@gorhom/bottom-sheet`, `react-native-reanimated`, `react-native-safe-area-context`,
+  and `.svg`/`.css` imports are stubbed globally via `moduleNameMapper` in
+  `jest.config.js`, backed by the mocks in `test/`. Don't add a per-test
+  `jest.mock()` for any of these — the global one already applies, and read the
+  comment in the relevant `test/*-mock.js` file before touching it; each one
+  works around a specific Babel/CJS interop failure, not a style preference.
+- `screen.getByText(...)` needs real, current copy from `src/i18n/locales/en.ts`
+  — `jest.setup.ts` initializes the actual i18n instance rather than a mock, so
+  a stale string in a test fails the same way a user would notice it.
+- A `testID` added purely so a test can find an element (e.g. a spinner with no
+  visible text) is fine; don't reach for one when a query by text, placeholder,
+  role, or label already works.
+- New pages and components get tests as part of the same change, following the
+  patterns above — not deferred to a separate pass.
+
 ## Before you call it done
 
-- `npm run typecheck` and `npm run lint` both pass.
+- `npm run typecheck`, `npm run lint`, and `npm test` all pass.
 - Any change you can see in the app is verified in the simulator, not reasoned
   about. Reproduce the broken behaviour first, then confirm the fix on screen.
 - No commented-out code, debug colors, or leftover `console.log` in the diff.
