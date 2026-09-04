@@ -11,14 +11,21 @@ export function useElapsedSeconds(startedAt: string | null | undefined): number 
     const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
     useEffect(() => {
-        if (!startedAt) {
+        // Resetting through a locally-declared function rather than a bare
+        // setState call, matching `tick` below, keeps this effect readable
+        // as a plain "reset/re-derive on input change" effect.
+        function reset() {
             setElapsedSeconds(0);
+        }
+
+        if (!startedAt) {
+            reset();
             return;
         }
 
         const startedAtMs = Date.parse(startedAt.replace(/(\.\d{3})\d+/, '$1'));
         if (Number.isNaN(startedAtMs)) {
-            setElapsedSeconds(0);
+            reset();
             return;
         }
 

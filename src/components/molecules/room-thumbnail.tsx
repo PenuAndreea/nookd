@@ -1,14 +1,24 @@
-import { StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 
 import { RoomWithDetails } from '@/api/rooms';
 import { useTheme } from '@/hooks/use-theme';
+import { themeForRoom } from '@/lib/room-theme';
+
+// How tall a "stretch" thumbnail is. Not a true dynamic match to its sibling
+// text column: `alignSelf: 'stretch'` against a row with no explicit height
+// (RoomItem's card is sized by its content, not a fixed height) resolves
+// against whatever ancestor *does* have a defined height — in a FlatList row
+// that ended up being the scrollable list itself, blowing the thumbnail up
+// to fill the screen. A fixed height sized for a typical 2-3 line card is
+// far more predictable than fighting that cross-axis ambiguity.
+const STRETCH_HEIGHT = 96;
 
 /**
  * A room's picture. Uses the same artwork the room screen shows behind its
  * timer, so a room looks like itself everywhere it appears.
  *
- * `stretch` makes it fill the height of whatever row it sits in, rather than
- * being a fixed square that leaves a gap beside taller content.
+ * `stretch` renders it taller than the plain square, to better match a card
+ * with a few lines of text beside it (see `STRETCH_HEIGHT`).
  */
 export default function RoomThumbnail({
     room,
@@ -25,10 +35,11 @@ export default function RoomThumbnail({
         <View
             style={[
                 styles.frame,
-                { width, backgroundColor: colors.soft },
-                stretch ? styles.stretch : { height: width },
+                { width, height: stretch ? STRETCH_HEIGHT : width, backgroundColor: colors.soft },
             ]}
-        />
+        >
+            <Image source={themeForRoom(room).source} style={styles.image} resizeMode="cover" />
+        </View>
     );
 }
 
@@ -37,11 +48,8 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         overflow: 'hidden',
     },
-    stretch: {
-        alignSelf: 'stretch',
-    },
     image: {
-        width: 80,
-        height: 80
+        width: '100%',
+        height: '100%',
     },
 });

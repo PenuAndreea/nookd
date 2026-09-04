@@ -3,10 +3,10 @@ import { BlurView } from 'expo-blur';
 import { router, Stack } from 'expo-router';
 import { BottomTabBar, BottomTabBarProps, Tabs } from 'expo-router/tabs';
 import { SymbolView } from 'expo-symbols';
-import { StyleSheet, useColorScheme, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import ReadingNook from '../../../assets/images/icons/reading-nook.svg';
-import { Colors } from '../../constants/theme';
+import { useColorScheme } from '../../hooks/use-color-scheme';
 import { useTheme } from '../../hooks/use-theme';
 import Button from './button';
 import { Icon } from './icon';
@@ -52,8 +52,10 @@ function TabBarWithCreateButton(props: BottomTabBarProps) {
 }
 
 export default function AppTabs() {
-  const scheme = useColorScheme();
-  const colors = Colors[scheme === 'unspecified' ? 'light' : scheme];
+  const colors = useTheme();
+  // Only needed for the blur tint below — colors themselves come from
+  // useTheme(), which already normalizes the 'unspecified' scheme to light.
+  const isDark = useColorScheme() === 'dark';
 
   return (
     <Tabs
@@ -64,7 +66,7 @@ export default function AppTabs() {
         headerShown: false,
         popToTopOnBlur: true,
         tabBarBackground: () => (
-          <BlurView tint="light" intensity={100} style={[StyleSheet.absoluteFill, { backgroundColor: colors.background }]} />
+          <BlurView tint={isDark ? 'dark' : 'light'} intensity={100} style={[StyleSheet.absoluteFill, { backgroundColor: colors.background }]} />
         ),
       }}
     >

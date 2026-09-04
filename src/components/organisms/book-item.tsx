@@ -33,13 +33,13 @@ export default function BookItem({ userBook }: { userBook: UserBookWithBook }) {
                 {book.cover_url ? (
                     <Image source={{ uri: book.cover_url }} style={styles.coverImage} resizeMode="contain" />
                 ) : (
-                    <Typography style={{ fontSize: 24 }}>📖</Typography>
+                    <Typography color="sheetText" style={{ fontSize: 24 }}>📖</Typography>
                 )}
             </View>
             <View style={styles.info}>
-                <Typography variant="h2" numberOfLines={1}>{book.title}</Typography>
+                <Typography variant="h2" color="sheetText" numberOfLines={1}>{book.title}</Typography>
                 {book.author && (
-                    <Typography numberOfLines={1} color="textSecondary">{book.author}</Typography>
+                    <Typography numberOfLines={1} color="sheetTextSecondary">{book.author}</Typography>
                 )}
                 {hasProgress && (
                     <View style={styles.progressTrack}>
@@ -60,7 +60,7 @@ const useStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
         backgroundColor: colors.white,
         borderWidth: 1,
         borderRadius: BorderRadius.medium,
-        borderColor: colors.background,
+        borderColor: colors.border,
     },
     containerPressed: {
         opacity: 0.7,

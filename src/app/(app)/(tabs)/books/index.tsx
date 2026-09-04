@@ -1,13 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import {
-    FlatList,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
-} from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import {
     addToReadingList,
@@ -22,6 +14,9 @@ import {
     UserBookStatus,
     UserBookWithBook,
 } from '@/api/books';
+import { BookStatusChips } from '@/components/molecules/book-status-chips';
+import BookCarousel, { BookCarouselItem } from '@/components/molecules/book-carousel';
+import BookRow from '@/components/molecules/book-row';
 import { EmptyState } from '@/components/molecules/empty-state';
 import { SearchField } from '@/components/molecules/search-field';
 import BookItem from '@/components/organisms/book-item';
@@ -29,12 +24,6 @@ import { BorderRadius, Spacing } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/hooks/use-theme';
 import { router } from 'expo-router';
-
-const STATUS_FILTERS: { id: UserBookStatus; label: string }[] = [
-    { id: 'want_to_read', label: 'Want to read' },
-    { id: 'currently_reading', label: 'Currently reading' },
-    { id: 'finished', label: 'Finished' },
-];
 
 export default function BooksScreen() {
     const { session } = useAuth();
@@ -68,8 +57,14 @@ export default function BooksScreen() {
     }, [userId, status]);
 
     useEffect(() => {
-        // TODO: do not call useState directly in useEffect
-        loadUserBooks();
+        // Calling the memoized loader through a local wrapper (rather than as
+        // a bare reference) keeps this a plain "refetch on dependency change"
+        // effect the analyzer can see through, instead of an opaque call to
+        // an externally-defined function.
+        function run() {
+            loadUserBooks();
+        }
+        run();
     }, [loadUserBooks]);
 
     useEffect(() => {
@@ -133,6 +128,13 @@ export default function BooksScreen() {
 
     const isSearching = query.length >= 3;
 
+    const activelyReadItems: BookCarouselItem[] = activelyRead.map(({ id, book }) => ({ key: id, book }));
+    const popularBookItems: BookCarouselItem[] = popularBooks.map(({ book, roomCount }) => ({
+        key: book.id,
+        book,
+        subtitle: `${roomCount} ${roomCount === 1 ? 'room' : 'rooms'}`,
+    }));
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Books</Text>
@@ -154,35 +156,25 @@ export default function BooksScreen() {
                         <EmptyState title="No books found" subtitle={`Nothing matched "${query}".`} />
                     ) : null}
                     renderItem={({ item }) => (
-                        // TODO: this should be a proper book card component, not just a touchable row. Separate component
-                        <TouchableOpacity
-                            style={styles.searchResult}
-                            onPress={() => openResult(item)}
-                            disabled={addingKey === item.openLibraryKey}
-                            activeOpacity={0.7}
-                        >
-                            {item.coverUrl ? (
-                                <Image source={{ uri: item.coverUrl }} style={styles.searchResultCover} resizeMode="contain" />
-                            ) : (
-                                <View style={styles.searchResultCoverPlaceholder}>
-                                    <Text style={{ fontSize: 18 }}>📖</Text>
-                                </View>
-                            )}
-                            <View style={styles.searchResultInfo}>
-                                <Text style={styles.searchResultTitle} numberOfLines={1}>{item.title}</Text>
-                                <Text style={styles.searchResultAuthor} numberOfLines={1}>{item.author}</Text>
-                            </View>
-                            <TouchableOpacity
-                                style={styles.addChip}
-                                onPress={() => quickAdd(item)}
+                        <View style={styles.searchResultSpacing}>
+                            <BookRow
+                                book={{ title: item.title, author: item.author, cover_url: item.coverUrl }}
+                                onPress={() => openResult(item)}
                                 disabled={addingKey === item.openLibraryKey}
-                                hitSlop={8}
-                            >
-                                <Text style={styles.addChipText}>
-                                    {addingKey === item.openLibraryKey ? '...' : '+ Add'}
-                                </Text>
-                            </TouchableOpacity>
-                        </TouchableOpacity>
+                                trailing={
+                                    <Pressable
+                                        style={styles.addChip}
+                                        onPress={() => quickAdd(item)}
+                                        disabled={addingKey === item.openLibraryKey}
+                                        hitSlop={8}
+                                    >
+                                        <Text style={styles.addChipText}>
+                                            {addingKey === item.openLibraryKey ? '...' : '+ Add'}
+                                        </Text>
+                                    </Pressable>
+                                }
+                            />
+                        </View>
                     )}
                 />
             ) : (
@@ -191,82 +183,21 @@ export default function BooksScreen() {
                     keyExtractor={(item) => item.id}
                     contentContainerStyle={styles.listContent}
                     ListHeaderComponent={
-                        // TODO: this should be a proper horizontal scroll view component, not just a vertical list with horizontal scrolls. Separate component
                         <View>
-                            {activelyRead.length > 0 && (
-                                <View style={styles.activelyReadSection}>
-                                    <Text style={styles.sectionLabel}>What others are currently reading</Text>
-                                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                                        {activelyRead.map(({ id, book }) => (
-                                            <TouchableOpacity
-                                                key={id}
-                                                style={styles.activelyReadCard}
-                                                onPress={() => router.navigate(`/books/${book.id}`)}
-                                                activeOpacity={0.7}
-                                            >
-                                                {book.cover_url ? (
-                                                    <Image source={{ uri: book.cover_url }} style={styles.activelyReadCover} resizeMode="contain" />
-                                                ) : (
-                                                    <View style={styles.activelyReadCoverPlaceholder}>
-                                                        <Text style={{ fontSize: 20 }}>📖</Text>
-                                                    </View>
-                                                )}
-                                                <Text style={styles.activelyReadTitle} numberOfLines={2}>{book.title}</Text>
-                                            </TouchableOpacity>
-                                        ))}
-                                    </ScrollView>
-                                </View>
-                            )}
-
-                            {popularBooks.length > 0 && (
-                                // TODO: this should be a proper horizontal scroll view component, not just a vertical list with horizontal scrolls. Separate component
-                                <View style={styles.activelyReadSection}>
-                                    <Text style={styles.sectionLabel}>Popular books</Text>
-                                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                                        {popularBooks.map(({ book, roomCount }) => (
-                                            <TouchableOpacity
-                                                key={book.id}
-                                                style={styles.activelyReadCard}
-                                                onPress={() => router.navigate(`/books/${book.id}`)}
-                                                activeOpacity={0.7}
-                                            >
-                                                {book.cover_url ? (
-                                                    <Image source={{ uri: book.cover_url }} style={styles.activelyReadCover} resizeMode="contain" />
-                                                ) : (
-                                                    <View style={styles.activelyReadCoverPlaceholder}>
-                                                        <Text style={{ fontSize: 20 }}>📖</Text>
-                                                    </View>
-                                                )}
-                                                <Text style={styles.activelyReadTitle} numberOfLines={2}>{book.title}</Text>
-                                                <Text style={styles.popularCount}>
-                                                    {roomCount} {roomCount === 1 ? 'room' : 'rooms'}
-                                                </Text>
-                                            </TouchableOpacity>
-                                        ))}
-                                    </ScrollView>
-                                </View>
-                            )}
+                            <BookCarousel
+                                title="What others are currently reading"
+                                items={activelyReadItems}
+                                onPressItem={(bookId) => router.navigate(`/books/${bookId}`)}
+                            />
+                            <BookCarousel
+                                title="Popular books"
+                                items={popularBookItems}
+                                onPressItem={(bookId) => router.navigate(`/books/${bookId}`)}
+                            />
 
                             <Text style={[styles.sectionLabel, { marginBottom: Spacing.two }]}>My Library</Text>
 
-                            {/* TODO: extract this to a separate component */}
-                            <View style={styles.filterRow}>
-                                {STATUS_FILTERS.map((filter) => {
-                                    const selected = status === filter.id;
-                                    return (
-                                        <TouchableOpacity
-                                            key={filter.id}
-                                            style={[styles.filterChip, selected && styles.filterChipSelected]}
-                                            onPress={() => setStatus(filter.id)}
-                                            activeOpacity={0.7}
-                                        >
-                                            <Text style={[styles.filterText, selected && styles.filterTextSelected]}>
-                                                {filter.label}
-                                            </Text>
-                                        </TouchableOpacity>
-                                    );
-                                })}
-                            </View>
+                            <BookStatusChips value={status} onChange={setStatus} equalWidth />
                         </View>
                     }
                     ListEmptyComponent={!loadingList ? (
@@ -295,61 +226,19 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
     listContent: {
         paddingBottom: Spacing.five,
     },
-
-    // Search results
-    searchResult: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: colors.white,
-        borderRadius: BorderRadius.medium,
-        borderWidth: 0.5,
-        borderColor: colors.border,
-        padding: 12,
-        gap: 12,
+    searchResultSpacing: {
         marginBottom: Spacing.two,
     },
-    searchResultCover: {
-        width: 36,
-        height: 48,
-        borderRadius: 4,
-    },
-    searchResultCoverPlaceholder: {
-        width: 36,
-        height: 48,
-        borderRadius: 4,
-        backgroundColor: colors.backgroundElement,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    searchResultInfo: {
-        flex: 1,
-    },
-    searchResultTitle: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: colors.text,
-    },
-    searchResultAuthor: {
-        fontSize: 13,
-        color: colors.textSecondary,
-        marginTop: 2,
-    },
     addChip: {
+        backgroundColor: colors.backgroundElement,
+        borderRadius: BorderRadius.full,
         paddingHorizontal: 10,
         paddingVertical: 6,
-        borderRadius: BorderRadius.full,
-        backgroundColor: colors.backgroundElement,
     },
     addChipText: {
         fontSize: 12,
         fontWeight: '600',
         color: colors.text,
-    },
-
-    // What others are reading
-    activelyReadSection: {
-        marginBottom: Spacing.four,
-        gap: Spacing.two,
     },
     sectionLabel: {
         fontSize: 12,
@@ -357,63 +246,5 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         color: colors.textSecondary,
         textTransform: 'uppercase',
         letterSpacing: 0.6,
-    },
-    activelyReadCard: {
-        width: 88,
-        marginRight: Spacing.three,
-    },
-    activelyReadCover: {
-        width: 88,
-        height: 120,
-        borderRadius: BorderRadius.small,
-    },
-    activelyReadCoverPlaceholder: {
-        width: 88,
-        height: 120,
-        borderRadius: BorderRadius.small,
-        backgroundColor: colors.backgroundElement,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    activelyReadTitle: {
-        fontSize: 12,
-        color: colors.text,
-        marginTop: 4,
-    },
-    popularCount: {
-        fontSize: 11,
-        color: colors.textSecondary,
-        marginTop: 2,
-    },
-
-    // Status filter chips
-    filterRow: {
-        flexDirection: 'row',
-        gap: 8,
-        marginBottom: Spacing.three,
-    },
-    filterChip: {
-        flex: 1,
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        borderWidth: 0.5,
-        borderColor: '#e0e0e0',
-        paddingVertical: 10,
-        paddingHorizontal: 6,
-    },
-    filterChipSelected: {
-        backgroundColor: '#FFF3D6',
-        borderWidth: 1.5,
-        borderColor: '#f0b429',
-    },
-    filterText: {
-        fontSize: 12,
-        fontWeight: '600',
-        color: '#555',
-        textAlign: 'center',
-    },
-    filterTextSelected: {
-        color: '#5a3a00',
     },
 });

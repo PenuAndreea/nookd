@@ -11,7 +11,7 @@ export default function AvatarList({ userIds }: { userIds?: string[] }) {
 
     const count = userIds?.length ?? 0;
     if (count === 0) {
-        return <Text style={styles.readerCount}>No one yet</Text>;
+        return <Text style={styles.emptyText}>No one yet</Text>;
     }
 
     return (
@@ -40,8 +40,14 @@ const useStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
         marginLeft: -10,
     },
     readerCount: {
-        color: colors.textSecondary,
+        // Only ever rendered inside RoomItem's always-white card — needs the
+        // fixed-dark token, not the theme-flipping one.
+        color: colors.sheetTextSecondary,
         marginLeft: 8,
+        fontSize: 13,
+    },
+    emptyText: {
+        color: colors.sheetTextSecondary,
         fontSize: 13,
     },
 });

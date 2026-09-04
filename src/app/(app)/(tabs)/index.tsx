@@ -133,7 +133,7 @@ const useStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: '#3BB273',
+    backgroundColor: colors.presenceOnline,
     borderWidth: 2.5,
     // Matches the page, so the ring reads as a cut-out around the dot.
     borderColor: colors.background,

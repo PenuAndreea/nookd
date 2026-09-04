@@ -2,6 +2,8 @@ import { useRouter } from 'expo-router';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useTheme } from '@/hooks/use-theme';
+
 interface HeaderProps {
     title?: string;
     showBack?: boolean;
@@ -12,6 +14,8 @@ interface HeaderProps {
 export const Header = ({ title, showBack = false, onBack, right }: HeaderProps) => {
     const router = useRouter();
     const insets = useSafeAreaInsets();
+    const colors = useTheme();
+    const styles = createStyles(colors);
 
     return (
         <View style={[styles.wrapper, { paddingTop: insets.top - 20 }]}>
@@ -37,14 +41,13 @@ export const Header = ({ title, showBack = false, onBack, right }: HeaderProps) 
     );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     wrapper: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 16,
         paddingBottom: 12,
-        // backgroundColor: '#f5f3ef'
     },
     left: {
         width: 40,
@@ -57,7 +60,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 17,
         fontWeight: '700',
-        color: '#1a1a1a',
+        color: colors.text,
         flex: 1,
         textAlign: 'center',
     },
@@ -65,15 +68,18 @@ const styles = StyleSheet.create({
         width: 36,
         height: 36,
         borderRadius: 18,
-        backgroundColor: '#fff',
+        backgroundColor: colors.white,
         borderWidth: 0.5,
-        borderColor: '#e0e0e0',
+        borderColor: colors.border,
         alignItems: 'center',
         justifyContent: 'center',
     },
     backArrow: {
         fontSize: 24,
-        color: '#1a1a1a',
+        // The circle behind this is always white (see `backButton`), so the
+        // arrow needs the always-dark `sheetText` token, not `text` — which
+        // turns near-white in dark mode and would vanish on a white circle.
+        color: colors.sheetText,
         lineHeight: 28,
     },
 });

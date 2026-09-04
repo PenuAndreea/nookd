@@ -48,20 +48,20 @@ export default function RoomItem({ room }: { room: RoomWithDetails }) {
 
             <View style={styles.info}>
                 <View style={styles.titleRow}>
-                    <Typography variant="h2" numberOfLines={1} style={styles.title}>
+                    <Typography variant="h2" color="sheetText" numberOfLines={1} style={styles.title}>
                         {room.name}
                     </Typography>
                     <StatusBadge memberCount={memberCount} />
                 </View>
 
                 {room.description && (
-                    <Typography numberOfLines={2} color="textSecondary">
+                    <Typography numberOfLines={2} color="sheetTextSecondary">
                         {room.description}
                     </Typography>
                 )}
 
                 {room.book && (
-                    <Typography numberOfLines={1} color="textSecondary" style={{ marginTop: 2 }}>
+                    <Typography numberOfLines={1} color="sheetTextSecondary" style={{ marginTop: 2 }}>
                         📖 {room.book.title}
                     </Typography>
                 )}

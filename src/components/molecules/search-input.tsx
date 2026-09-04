@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import {
-    ActivityIndicator,
     FlatList,
     Image,
     StyleSheet,
     Text,
-    TextInput,
     TouchableOpacity,
     View,
 } from 'react-native';
@@ -183,13 +181,15 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         flex: 1,
     },
     resultTitle: {
+        // The dropdown is always white — needs the fixed-dark token, not the
+        // theme-flipping one, or it disappears in dark mode.
         fontSize: 14,
         fontWeight: '600',
-        color: colors.text,
+        color: colors.sheetText,
     },
     resultAuthor: {
         fontSize: 13,
-        color: colors.textSecondary,
+        color: colors.sheetTextSecondary,
         marginTop: 2,
     },
     separator: {

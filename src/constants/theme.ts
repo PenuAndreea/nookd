@@ -22,7 +22,58 @@ export const Colors = {
     // Card and input edges. Was keyed to `background`, which no longer has
     // enough contrast against white surfaces now that it is near-neutral.
     border: '#EAE7E1',
-    creme: '#FFF7ED'
+    creme: '#FFF7ED',
+
+    // Destructive / validation messaging (form errors).
+    error: '#e24b4a',
+
+    // Text/icons on any surface that is always literally white regardless of
+    // theme (bottom sheets, cards, inputs, search fields, the header's back
+    // button) — `colors.white` never flips, so text on it cannot use `text`/
+    // `textSecondary` either, or it disappears in dark mode. Same values in
+    // both palettes on purpose (see the dark section).
+    sheetText: '#263238',
+    sheetTextSecondary: '#8a8378',
+    sheetHandle: '#d8d2c4',
+
+    // Selectable chips (vibe/duration/mood pickers, book status filters).
+    chipBackground: '#fff',
+    chipBorder: '#e0e0e0',
+    chipText: '#555',
+    chipSelectedBackground: '#FFF3D6',
+    chipSelectedBorder: '#f0b429',
+    chipSelectedText: '#5a3a00',
+
+    // Room "Popular / Live / Quiet" status badge.
+    statusPopularBg: '#FDF1DC',
+    statusPopularFg: '#8A6008',
+    statusLiveBg: '#E7F4EC',
+    statusLiveFg: '#2F7A4F',
+    statusQuietBg: '#EFEDE9',
+    statusQuietFg: '#7B7369',
+
+    // The amber "current room" banner on Home.
+    bannerBackground: '#FBF0D2',
+    bannerTextSecondary: '#8A7A55',
+
+    // The frosted timer card that floats over a room's (always light, static)
+    // illustration. Deliberately the same near-white/near-black pair in both
+    // modes — like the banner, it does not follow the app theme, since using
+    // dark-mode `text` here would print near-white digits on this light card.
+    timerCardBackground: 'rgba(255,253,250,0.97)',
+    timerCardText: '#1A1D2E',
+    timerCardTrack: '#EDE6D8',
+
+    // Online-presence dot on the Home avatar — same green in both modes,
+    // like `accent`, since "online" is a status colour, not a theme colour.
+    presenceOnline: '#3BB273',
+
+    // The app's fixed dark ink — same value in both modes. Used wherever a
+    // surface is deliberately theme-invariant (the round icon button's dark
+    // circle, text sitting on the always-`accent`-coloured primary button),
+    // since pairing those with the flipping `text` token would turn them
+    // near-white-on-yellow or near-white-on-white in dark mode.
+    ink: '#1A1D2E',
   },
   dark: {
     text: '#F5F5F7',
@@ -34,7 +85,43 @@ export const Colors = {
     white: '#fff',
     soft: '#2A2D3E',
     border: '#33374A',
-    creme: '#22252F'
+    creme: '#22252F',
+
+    error: '#FF6B6A',
+
+    // Same values as light, deliberately not flipped: the surface these sit
+    // on (`white`) is a fixed `#fff` in both modes, so the text on it must
+    // stay fixed-dark too, or it turns near-white-on-white in dark mode.
+    sheetText: '#263238',
+    sheetTextSecondary: '#8a8378',
+    sheetHandle: '#d8d2c4',
+
+    chipBackground: '#242838',
+    chipBorder: '#3A3F52',
+    chipText: '#C7CAD4',
+    chipSelectedBackground: '#3D3116',
+    chipSelectedBorder: '#FFC83D',
+    chipSelectedText: '#FFD873',
+
+    statusPopularBg: '#3D3116',
+    statusPopularFg: '#FFD873',
+    statusLiveBg: '#1D3327',
+    statusLiveFg: '#6FCF97',
+    statusQuietBg: '#2A2D3E',
+    statusQuietFg: '#9EA3B0',
+
+    // The banner keeps its amber identity in dark mode too — a deliberate
+    // "spotlight" card rather than a surface that follows the page theme.
+    bannerBackground: '#3D3116',
+    bannerTextSecondary: '#C7B27A',
+
+    timerCardBackground: 'rgba(255,253,250,0.97)',
+    timerCardText: '#1A1D2E',
+    timerCardTrack: '#EDE6D8',
+
+    presenceOnline: '#3BB273',
+
+    ink: '#1A1D2E',
   },
 } as const;
 

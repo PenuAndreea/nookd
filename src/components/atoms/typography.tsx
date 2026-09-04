@@ -6,7 +6,13 @@ type TypographyVariant = "h1" | "h2" | "body";
 
 type TypographyProps = TextProps & {
     variant?: TypographyVariant;
-    color?: "text" | "textSecondary" | "accent";
+    /**
+     * "sheetText"/"sheetTextSecondary" are for text on a surface that stays
+     * literally white regardless of theme (a card, a sheet) — unlike "text"/
+     * "textSecondary", they do not flip to near-white in dark mode, so they
+     * stay readable on that surface instead of disappearing into it.
+     */
+    color?: "text" | "textSecondary" | "accent" | "sheetText" | "sheetTextSecondary";
     style?: StyleProp<TextStyle>;
 };
 

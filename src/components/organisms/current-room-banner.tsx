@@ -2,6 +2,8 @@ import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { RoomWithDetails } from '@/api/rooms';
+import Button from '@/components/atoms/button';
+import StatusBadge from '@/components/atoms/status-badge';
 import Typography from '@/components/atoms/typography';
 import { VIBES } from '@/components/molecules/picker';
 import RoomThumbnail from '@/components/molecules/room-thumbnail';
@@ -33,11 +35,7 @@ export default function CurrentRoomBanner({ room }: { room: RoomWithDetails }) {
         >
             <View style={styles.top}>
                 <View style={styles.info}>
-                    {/* TODO: reuse StatusBadge */}
-                    <View style={styles.liveRow}>
-                        <View style={styles.liveDot} />
-                        <Text style={styles.liveText}>LIVE NOW</Text>
-                    </View>
+                    <StatusBadge memberCount={count} />
 
                     <Typography variant="h1" numberOfLines={1} style={styles.name}>
                         {room.name}
@@ -49,17 +47,20 @@ export default function CurrentRoomBanner({ room }: { room: RoomWithDetails }) {
                 <RoomThumbnail room={room} width={84} />
             </View>
 
-            {/* TODO: use custom button component */}
-            <View style={styles.returnButton}>
-                <Text style={styles.returnText}>Return to room  →</Text>
-            </View>
+            <Button
+                title="Return to room  →"
+                variant="surface"
+                fullWidth
+                size="large"
+                onPress={openRoom}
+            />
         </Pressable>
     );
 }
 
 const useStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     banner: {
-        backgroundColor: '#FBF0D2',
+        backgroundColor: colors.bannerBackground,
         borderRadius: BorderRadius.large,
         padding: Spacing.three,
         marginBottom: Spacing.three,
@@ -75,41 +76,13 @@ const useStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     },
     info: {
         flex: 1,
-        gap: 2,
-    },
-    liveRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-    },
-    liveDot: {
-        width: 7,
-        height: 7,
-        borderRadius: 4,
-        backgroundColor: '#C99A18',
-    },
-    liveText: {
-        fontSize: 11,
-        fontWeight: '700',
-        letterSpacing: 0.8,
-        color: '#8A6008',
+        gap: 4,
     },
     name: {
         marginBottom: 0,
     },
     meta: {
         fontSize: 14,
-        color: '#8A7A55',
-    },
-    returnButton: {
-        backgroundColor: colors.white,
-        borderRadius: BorderRadius.full,
-        paddingVertical: 14,
-        alignItems: 'center',
-    },
-    returnText: {
-        fontSize: 16,
-        fontWeight: '700',
-        color: colors.text,
+        color: colors.bannerTextSecondary,
     },
 });

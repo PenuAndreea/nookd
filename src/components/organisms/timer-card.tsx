@@ -16,6 +16,7 @@ export default function TimerCard({ elapsedSeconds, duration, memberCount, onPre
     const remainingSeconds = Math.max(durationSeconds - elapsedSeconds, 0)
     const progress = durationSeconds === 0 ? 0 : Math.min(elapsedSeconds / durationSeconds, 1)
     const colors = useTheme();
+    const styles = createStyles(colors);
 
     return (
         <Pressable hitSlop={10} onPress={onPress} style={styles.timerCard}>
@@ -37,7 +38,7 @@ export default function TimerCard({ elapsedSeconds, duration, memberCount, onPre
                     {isOpenEnded ? 'Always open' : `Goal: ${duration} min`}
                 </Text>
                 <View style={styles.timerFooterRight}>
-                    <Icon name="person.2" color={colors.text} />
+                    <Icon name="person.2" color={colors.timerCardText} />
                     <Text style={styles.timerFooterText}>
                         {memberCount}/{10}
                     </Text>
@@ -47,31 +48,30 @@ export default function TimerCard({ elapsedSeconds, duration, memberCount, onPre
     )
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     timerCard: {
         position: 'absolute',
         left: '50%',
         top: '60%',
         transform: [{ translateX: -107 }, { translateY: -90 }],
         width: 214,
-        backgroundColor: 'rgba(255,253,250,0.97)',
+        backgroundColor: colors.timerCardBackground,
         borderRadius: 24,
         paddingHorizontal: 22,
         paddingTop: 22,
         paddingBottom: 19,
-        shadowColor: '#263238',
+        shadowColor: colors.sheetText,
         shadowOpacity: 0.16,
         shadowRadius: 44,
         shadowOffset: { width: 0, height: 18 },
         elevation: 8,
     },
-    timerValue: { fontSize: 44, fontWeight: '700', color: '#1A1D2E', textAlign: 'center', letterSpacing: -1.5 },
-    timerLabel: { fontSize: 15, fontWeight: '500', color: '#1A1D2E', textAlign: 'center', marginTop: 5 },
-    progressTrack: { height: 7, borderRadius: 4, backgroundColor: '#EDE6D8', marginVertical: 16, overflow: 'hidden' },
+    timerValue: { fontSize: 44, fontWeight: '700', color: colors.timerCardText, textAlign: 'center', letterSpacing: -1.5 },
+    timerLabel: { fontSize: 15, fontWeight: '500', color: colors.timerCardText, textAlign: 'center', marginTop: 5 },
+    progressTrack: { height: 7, borderRadius: 4, backgroundColor: colors.timerCardTrack, marginVertical: 16, overflow: 'hidden' },
     openSpacer: { height: 7, marginVertical: 16 },
-    progressFill: { height: '100%', borderRadius: 4, backgroundColor: '#FFC83D' },
+    progressFill: { height: '100%', borderRadius: 4, backgroundColor: colors.accent },
     timerFooterRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     timerFooterRight: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-    timerFooterText: { fontSize: 13, fontWeight: '600', color: '#1A1D2E' },
-
+    timerFooterText: { fontSize: 13, fontWeight: '600', color: colors.timerCardText },
 })

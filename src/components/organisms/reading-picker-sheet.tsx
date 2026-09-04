@@ -4,9 +4,11 @@ import BottomSheet, {
     BottomSheetFlatList,
 } from '@gorhom/bottom-sheet';
 import { forwardRef, useCallback } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { UserBookWithBook } from '@/api/books';
+import TextButton from '@/components/atoms/text-button';
+import BookRow from '@/components/molecules/book-row';
 import { EmptyState } from '@/components/molecules/empty-state';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -60,32 +62,17 @@ const ReadingPickerSheet = forwardRef<BottomSheet, ReadingPickerSheetProps>(
                         <EmptyState title="Your library is empty" subtitle="Nothing to pick from yet." />
                     }
                     renderItem={({ item }) => (
-                        // TODO: this should be a proper list item component, not just a touchable row. Separate component
-                        <TouchableOpacity
-                            style={styles.bookRow}
-                            onPress={() => onSelect(item.book_id)}
-                            activeOpacity={0.7}
-                        >
-                            {item.book.cover_url ? (
-                                <Image source={{ uri: item.book.cover_url }} style={styles.cover} />
-                            ) : (
-                                <View style={styles.coverPlaceholder}>
-                                    <Text style={{ fontSize: 18 }}>📖</Text>
-                                </View>
-                            )}
-                            <View style={styles.bookInfo}>
-                                <Text style={styles.bookTitle} numberOfLines={1}>{item.book.title}</Text>
-                                {item.book.author && (
-                                    <Text style={styles.bookAuthor} numberOfLines={1}>{item.book.author}</Text>
-                                )}
-                            </View>
-                        </TouchableOpacity>
+                        <View style={styles.bookRowSpacing}>
+                            <BookRow book={item.book} onPress={() => onSelect(item.book_id)} />
+                        </View>
                     )}
                     ListFooterComponent={
                         <View style={styles.footer}>
-                            <TouchableOpacity onPress={onSkip} style={styles.skipButton}>
-                                <Text style={styles.skipText}>Not reading anything specific</Text>
-                            </TouchableOpacity>
+                            <TextButton
+                                title="Not reading anything specific"
+                                variant="secondary"
+                                onPress={onSkip}
+                            />
                         </View>
                     }
                 />
@@ -100,17 +87,17 @@ export default ReadingPickerSheet;
 
 const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     sheetBackground: {
-        backgroundColor: '#fff',
+        backgroundColor: colors.white,
         borderTopLeftRadius: 26,
         borderTopRightRadius: 26,
-        shadowColor: '#263238',
+        shadowColor: colors.sheetText,
         shadowOpacity: 0.18,
         shadowRadius: 40,
         shadowOffset: { width: 0, height: -10 },
         elevation: 12,
     },
     handleIndicator: {
-        backgroundColor: '#d8d2c4',
+        backgroundColor: colors.sheetHandle,
         width: 40,
     },
     header: {
@@ -120,60 +107,22 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
     title: {
         fontSize: 18,
         fontWeight: '600',
-        color: colors.text,
+        color: colors.sheetText,
     },
     subtitle: {
         fontSize: 13,
-        color: colors.textSecondary,
+        color: colors.sheetTextSecondary,
     },
     listContent: {
         paddingHorizontal: 24,
         paddingTop: 16,
         paddingBottom: 16,
-        gap: 4,
     },
-    bookRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-        paddingVertical: 8,
-    },
-    cover: {
-        width: 40,
-        height: 56,
-        borderRadius: 4,
-    },
-    coverPlaceholder: {
-        width: 40,
-        height: 56,
-        borderRadius: 4,
-        backgroundColor: colors.backgroundElement,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    bookInfo: {
-        flex: 1,
-    },
-    bookTitle: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: colors.text,
-    },
-    bookAuthor: {
-        fontSize: 13,
-        color: colors.textSecondary,
-        marginTop: 2,
+    bookRowSpacing: {
+        paddingVertical: 4,
     },
     footer: {
         paddingTop: 8,
         alignItems: 'center',
-    },
-    skipButton: {
-        padding: 8,
-    },
-    skipText: {
-        fontSize: 14,
-        color: colors.textSecondary,
-        fontWeight: '600',
     },
 });

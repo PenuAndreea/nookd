@@ -17,7 +17,7 @@ export const SearchField = ({ loading, ...props }: SearchFieldProps) => {
             <Text style={styles.icon}>🔍</Text>
             <TextInput
                 style={styles.input}
-                placeholderTextColor={colors.textSecondary}
+                placeholderTextColor={colors.sheetTextSecondary}
                 {...props}
             />
             {loading && <ActivityIndicator size="small" color={colors.accent} />}
@@ -42,7 +42,9 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
     input: {
         flex: 1,
         fontSize: 15,
-        color: colors.text,
+        // The wrapper is always white — needs the fixed-dark token, not the
+        // theme-flipping one, or typed text vanishes in dark mode.
+        color: colors.sheetText,
         paddingVertical: 13,
     },
 });

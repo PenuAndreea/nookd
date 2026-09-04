@@ -1,4 +1,7 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+
+import Chip from '@/components/atoms/chip';
+import { useTheme } from '@/hooks/use-theme';
 
 export const VIBES = [
     { id: 'book_club', label: 'BookClub', emoji: '👥' },
@@ -29,31 +32,32 @@ interface ChipGridProps {
     options: { id: string; label: string; emoji?: string }[];
     value: string | null;
     onChange: (id: string) => void;
+    /** Two per row (mood/vibe grid) instead of one flexible row (duration). */
+    twoPerRow?: boolean;
 }
 
-const ChipGrid = ({ label, options, value, onChange }: ChipGridProps) => (
-    <View style={styles.wrapper}>
-        <Text style={styles.label}>{label}</Text>
-        <View style={styles.moodGrid}>
-            {options.map(option => {
-                const selected = value === option.id;
-                return (
-                    <TouchableOpacity
+const ChipGrid = ({ label, options, value, onChange, twoPerRow }: ChipGridProps) => {
+    const colors = useTheme();
+    const styles = createStyles(colors);
+
+    return (
+        <View style={styles.wrapper}>
+            <Text style={styles.label}>{label}</Text>
+            <View style={styles.grid}>
+                {options.map(option => (
+                    <Chip
                         key={option.id}
-                        style={[styles.moodChip, selected && styles.moodChipSelected]}
+                        label={option.label}
+                        emoji={option.emoji}
+                        selected={value === option.id}
                         onPress={() => onChange(option.id)}
-                        activeOpacity={0.7}
-                    >
-                        {option.emoji && <Text style={styles.moodEmoji}>{option.emoji}</Text>}
-                        <Text style={[styles.moodText, selected && styles.moodTextSelected]}>
-                            {option.label}
-                        </Text>
-                    </TouchableOpacity>
-                );
-            })}
+                        style={twoPerRow ? styles.twoPerRowChip : styles.flexChip}
+                    />
+                ))}
+            </View>
         </View>
-    </View>
-);
+    );
+};
 
 interface MoodPickerProps {
     value: string | null;
@@ -61,11 +65,11 @@ interface MoodPickerProps {
 }
 
 export const VibePicker = ({ value, onChange }: MoodPickerProps) => (
-    <ChipGrid label="Vibe" options={VIBES} value={value} onChange={onChange} />
+    <ChipGrid label="Vibe" options={VIBES} value={value} onChange={onChange} twoPerRow />
 );
 
 export const SessionMoodPicker = ({ value, onChange }: MoodPickerProps) => (
-    <ChipGrid label="How was this session?" options={SESSION_MOODS} value={value} onChange={onChange} />
+    <ChipGrid label="How was this session?" options={SESSION_MOODS} value={value} onChange={onChange} twoPerRow />
 );
 
 interface DurationPickerProps {
@@ -74,100 +78,29 @@ interface DurationPickerProps {
 }
 
 export const DurationPicker = ({ value, onChange }: DurationPickerProps) => (
-    <View style={styles.wrapper}>
-        <Text style={styles.label}>Duration</Text>
-        <View style={styles.durationRow}>
-            {DURATIONS.map(duration => {
-                const selected = value === duration.id;
-                return (
-                    <TouchableOpacity
-                        key={duration.id}
-                        style={[styles.durationChip, selected && styles.durationChipSelected]}
-                        onPress={() => onChange(duration.id)}
-                        activeOpacity={0.7}
-                    >
-                        <Text style={[styles.durationText, selected && styles.durationTextSelected]}>
-                            {duration.label}
-                        </Text>
-                    </TouchableOpacity>
-                );
-            })}
-        </View>
-    </View>
+    <ChipGrid label="Duration" options={DURATIONS} value={value} onChange={onChange} />
 );
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     wrapper: {
         gap: 6,
     },
     label: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#888',
+        color: colors.textSecondary,
         textTransform: 'uppercase',
         letterSpacing: 0.6,
     },
-
-    // Mood
-    moodGrid: {
+    grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: 8,
     },
-    moodChip: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        borderWidth: 0.5,
-        borderColor: '#e0e0e0',
-        paddingHorizontal: 14,
-        paddingVertical: 10,
-        width: '47%',
+    twoPerRowChip: {
+        flexBasis: '47%',
     },
-    moodChipSelected: {
-        backgroundColor: '#FFF3D6',
-        borderWidth: 1.5,
-        borderColor: '#f0b429',
-    },
-    moodEmoji: {
-        fontSize: 18,
-    },
-    moodText: {
-        fontSize: 13,
-        fontWeight: '600',
-        color: '#555',
-    },
-    moodTextSelected: {
-        color: '#5a3a00',
-    },
-
-    // Duration
-    durationRow: {
-        flexDirection: 'row',
-        gap: 8,
-    },
-    durationChip: {
+    flexChip: {
         flex: 1,
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        borderWidth: 0.5,
-        borderColor: '#e0e0e0',
-        paddingVertical: 11,
-    },
-    durationChipSelected: {
-        backgroundColor: '#FFF3D6',
-        borderWidth: 1.5,
-        borderColor: '#f0b429',
-    },
-    durationText: {
-        fontSize: 13,
-        fontWeight: '600',
-        color: '#888',
-    },
-    durationTextSelected: {
-        color: '#5a3a00',
     },
 });

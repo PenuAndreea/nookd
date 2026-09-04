@@ -26,14 +26,17 @@ export function RoomsProvider({ children }: { children: ReactNode }) {
     const hasLoadedRef = useRef(false);
 
     const load = useCallback(async (isRefresh: boolean) => {
+        if (isRefresh) setRefreshing(true);
+        else setLoading(true);
+
         try {
-            isRefresh ? setRefreshing(true) : setLoading(true);
             const data = await getRooms();
             setRooms(data);
         } catch (error) {
             console.error('Error loading rooms:', error);
         } finally {
-            isRefresh ? setRefreshing(false) : setLoading(false);
+            if (isRefresh) setRefreshing(false);
+            else setLoading(false);
         }
     }, []);
 

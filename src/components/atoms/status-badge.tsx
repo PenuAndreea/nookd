@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { BorderRadius } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
 
 export const POPULAR_FROM = 5;
 
@@ -14,18 +15,19 @@ type Status = {
 
 // Derived from who is actually in the room, so a badge never claims activity
 // the room does not have.
-export function statusFor(memberCount: number): Status {
+function statusFor(memberCount: number, colors: ReturnType<typeof useTheme>): Status {
     if (memberCount >= POPULAR_FROM) {
-        return { label: 'Popular', emoji: '🔥', bg: '#FDF1DC', fg: '#8A6008', hollow: false };
+        return { label: 'Popular', emoji: '🔥', bg: colors.statusPopularBg, fg: colors.statusPopularFg, hollow: false };
     }
     if (memberCount > 0) {
-        return { label: 'Live', emoji: '', bg: '#E7F4EC', fg: '#2F7A4F', hollow: false };
+        return { label: 'Live', emoji: '', bg: colors.statusLiveBg, fg: colors.statusLiveFg, hollow: false };
     }
-    return { label: 'Quiet', emoji: '', bg: '#EFEDE9', fg: '#7B7369', hollow: true };
+    return { label: 'Quiet', emoji: '', bg: colors.statusQuietBg, fg: colors.statusQuietFg, hollow: true };
 }
 
 export default function StatusBadge({ memberCount }: { memberCount: number }) {
-    const status = statusFor(memberCount);
+    const colors = useTheme();
+    const status = statusFor(memberCount, colors);
 
     return (
         <View style={[styles.badge, { backgroundColor: status.bg }]}>

@@ -73,17 +73,17 @@ export default ProfileSheet;
 
 const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     sheetBackground: {
-        backgroundColor: '#fff',
+        backgroundColor: colors.white,
         borderTopLeftRadius: 26,
         borderTopRightRadius: 26,
-        shadowColor: '#263238',
+        shadowColor: colors.sheetText,
         shadowOpacity: 0.18,
         shadowRadius: 40,
         shadowOffset: { width: 0, height: -10 },
         elevation: 12,
     },
     handleIndicator: {
-        backgroundColor: '#d8d2c4',
+        backgroundColor: colors.sheetHandle,
         width: 40,
     },
     content: {
@@ -102,6 +102,6 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
     email: {
         fontSize: 15,
         fontWeight: '600',
-        color: colors.text,
+        color: colors.sheetText,
     },
 });

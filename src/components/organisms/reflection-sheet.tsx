@@ -5,10 +5,12 @@ import BottomSheet, {
     BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { forwardRef, useCallback, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { Book } from '@/api/books';
 import Button from '@/components/atoms/button';
+import Checkbox from '@/components/atoms/checkbox';
+import TextButton from '@/components/atoms/text-button';
 import { SessionMoodPicker } from '@/components/molecules/picker';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -51,7 +53,6 @@ const ReflectionSheet = forwardRef<BottomSheet, ReflectionSheetProps>(
             []
         );
 
-        // TODO: this should be a proper form component, not just a bunch of state variables. Separate component
         async function handleSubmit() {
             setSubmitting(true);
             setError(null);
@@ -116,14 +117,11 @@ const ReflectionSheet = forwardRef<BottomSheet, ReflectionSheetProps>(
                     <SessionMoodPicker value={mood} onChange={setMood} />
 
                     {book && (
-                        <TouchableOpacity
-                            style={styles.finishedRow}
+                        <Checkbox
+                            label="I finished this book"
+                            checked={finished}
                             onPress={() => setFinished(!finished)}
-                            activeOpacity={0.7}
-                        >
-                            <View style={[styles.checkbox, finished && styles.checkboxChecked]} />
-                            <Text style={styles.finishedLabel}>I finished this book</Text>
-                        </TouchableOpacity>
+                        />
                     )}
 
                     {error && <Text style={styles.error}>{error}</Text>}
@@ -133,9 +131,13 @@ const ReflectionSheet = forwardRef<BottomSheet, ReflectionSheetProps>(
                             title={submitting ? 'Saving...' : 'Save'}
                             onPress={handleSubmit}
                         />
-                        <TouchableOpacity onPress={onSkip} disabled={submitting} style={styles.skipButton}>
-                            <Text style={styles.skipText}>Skip</Text>
-                        </TouchableOpacity>
+                        <TextButton
+                            title="Skip"
+                            variant="secondary"
+                            onPress={onSkip}
+                            disabled={submitting}
+                            style={styles.skipText}
+                        />
                     </View>
                 </BottomSheetView>
             </BottomSheet>
@@ -149,17 +151,17 @@ export default ReflectionSheet;
 
 const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     sheetBackground: {
-        backgroundColor: '#fff',
+        backgroundColor: colors.white,
         borderTopLeftRadius: 26,
         borderTopRightRadius: 26,
-        shadowColor: '#263238',
+        shadowColor: colors.sheetText,
         shadowOpacity: 0.18,
         shadowRadius: 40,
         shadowOffset: { width: 0, height: -10 },
         elevation: 12,
     },
     handleIndicator: {
-        backgroundColor: '#d8d2c4',
+        backgroundColor: colors.sheetHandle,
         width: 40,
     },
     content: {
@@ -227,7 +229,7 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
     },
     error: {
         fontSize: 13,
-        color: '#e24b4a',
+        color: colors.error,
     },
     actions: {
         gap: 12,
