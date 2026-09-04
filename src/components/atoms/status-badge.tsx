@@ -52,6 +52,12 @@ const styles = StyleSheet.create({
     badge: {
         flexDirection: 'row',
         alignItems: 'center',
+        // A pill, not a bar: without this it stretches to fill its parent's
+        // cross axis whenever that parent is a column with default
+        // alignItems (e.g. stacked in current-room-banner's info column,
+        // rather than a title row like RoomItem's, where the row's own
+        // main-axis sizing already kept it content-width).
+        alignSelf: 'flex-start',
         gap: 4,
         paddingHorizontal: 8,
         paddingVertical: 3,
