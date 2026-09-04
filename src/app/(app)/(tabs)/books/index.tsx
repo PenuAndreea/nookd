@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, FlatList, KeyboardAvoidingView, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -154,7 +154,10 @@ export default function BooksScreen() {
     }));
 
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView
+            style={styles.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
             <Typography variant="title1">{t('books.title')}</Typography>
 
             <SearchField
@@ -238,7 +241,7 @@ export default function BooksScreen() {
                     renderItem={({ item }) => <BookItem userBook={item} />}
                 />
             )}
-        </View>
+        </KeyboardAvoidingView>
     );
 }
 

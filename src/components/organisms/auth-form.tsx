@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import logo from '@/assets/images/logo.png';
@@ -66,52 +66,64 @@ export default function AuthForm({
     }
 
     return (
-        <View style={styles.container}>
-            <Image source={logo} style={styles.logo} />
-            <Typography style={styles.title} variant="h1">{title}</Typography>
+        <KeyboardAvoidingView
+            style={styles.flex}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+            <ScrollView
+                style={styles.flex}
+                contentContainerStyle={styles.container}
+                keyboardShouldPersistTaps="handled"
+            >
+                <Image source={logo} style={styles.logo} />
+                <Typography style={styles.title} variant="h1">{title}</Typography>
 
-            <LabeledInput
-                label={t('auth.emailLabel')}
-                placeholder={t('auth.emailPlaceholder')}
-                autoCapitalize="none"
-                autoCorrect={false}
-                spellCheck={false}
-                keyboardType="email-address"
-                value={email}
-                onChangeText={setEmail}
-            />
-            <LabeledInput
-                label={t('auth.passwordLabel')}
-                placeholder={passwordPlaceholder ?? t('auth.passwordPlaceholder')}
-                autoCapitalize="none"
-                autoCorrect={false}
-                spellCheck={false}
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-            />
+                <LabeledInput
+                    label={t('auth.emailLabel')}
+                    placeholder={t('auth.emailPlaceholder')}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    spellCheck={false}
+                    keyboardType="email-address"
+                    value={email}
+                    onChangeText={setEmail}
+                />
+                <LabeledInput
+                    label={t('auth.passwordLabel')}
+                    placeholder={passwordPlaceholder ?? t('auth.passwordPlaceholder')}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    spellCheck={false}
+                    secureTextEntry
+                    value={password}
+                    onChangeText={setPassword}
+                />
 
-            {error ? <Typography variant="caption" color="error">{error}</Typography> : null}
+                {error ? <Typography variant="caption" color="error">{error}</Typography> : null}
 
-            {loading ? (
-                <ActivityIndicator color={colors.accent} />
-            ) : (
-                <Button title={submitLabel} onPress={handleSubmit} />
-            )}
+                {loading ? (
+                    <ActivityIndicator color={colors.accent} />
+                ) : (
+                    <Button title={submitLabel} onPress={handleSubmit} />
+                )}
 
-            <TextButton
-                variant="secondary"
-                title={`${footerPrompt} ${footerActionLabel}`}
-                onPress={onFooterPress}
-                style={styles.footer}
-            />
-        </View>
+                <TextButton
+                    variant="secondary"
+                    title={`${footerPrompt} ${footerActionLabel}`}
+                    onPress={onFooterPress}
+                    style={styles.footer}
+                />
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 }
 
 const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
-    container: {
+    flex: {
         flex: 1,
+    },
+    container: {
+        flexGrow: 1,
         justifyContent: 'center',
         padding: Spacing.four,
         gap: Spacing.three,

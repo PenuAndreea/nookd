@@ -33,7 +33,15 @@ export default function TabLayout() {
                 left behind there when you switch back, so rooms would pile up
                 and "back" would land on a previously visited room. */}
             <Stack.Screen name="room/[id]" />
-            <Stack.Screen name="create-room" options={{ presentation: 'formSheet' }} />
+            {/* sheetAllowedDetents pinned to full height: left at its
+                'fitToContents' default, the sheet's own auto-sizing pass
+                conflicts with a scrollable child (the form needs to scroll
+                so the submit button clears the keyboard) and clips the
+                screen's Header off the top. */}
+            <Stack.Screen
+              name="create-room"
+              options={{ presentation: 'formSheet', sheetAllowedDetents: [1] }}
+            />
           </Stack>
         </RoomsProvider>
       </GestureHandlerRootView>

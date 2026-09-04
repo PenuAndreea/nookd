@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -142,41 +142,46 @@ export default function BookDetailScreen() {
     }
 
     return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-            <Header title="" showBack />
+        <KeyboardAvoidingView
+            style={styles.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+            <ScrollView style={styles.container} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+                <Header title="" showBack />
 
-            <BookHero book={book} activeRoomCount={activeRoomCount} />
+                <BookHero book={book} activeRoomCount={activeRoomCount} />
 
-            {book.description && (
-                <Typography color="textSecondary">{book.description}</Typography>
-            )}
+                {book.description && (
+                    <Typography color="textSecondary">{book.description}</Typography>
+                )}
 
-            {!userBook ? (
-                <Button title={saving ? t('books.addingToReadingList') : t('books.addToReadingList')} onPress={handleAdd} />
-            ) : (
-                <View style={styles.listSection}>
-                    <Typography variant="sectionLabel" color="textSecondary">{t('books.statusLabel')}</Typography>
-                    <BookStatusChips
-                        value={userBook.status}
-                        onChange={handleStatusChange}
-                        disabled={saving}
-                    />
-
-                    {userBook.status === 'currently_reading' && (
-                        <LabeledInput
-                            label={book.page_count
-                                ? t('books.currentPageLabelWithTotal', { total: book.page_count })
-                                : t('books.currentPageLabel')}
-                            value={pageInput}
-                            onChangeText={setPageInput}
-                            keyboardType="number-pad"
-                            placeholder="0"
-                            right={<Button title={t('common.save')} size="small" onPress={handleSavePage} />}
+                {!userBook ? (
+                    <Button title={saving ? t('books.addingToReadingList') : t('books.addToReadingList')} onPress={handleAdd} />
+                ) : (
+                    <View style={styles.listSection}>
+                        <Typography variant="sectionLabel" color="textSecondary">{t('books.statusLabel')}</Typography>
+                        <BookStatusChips
+                            value={userBook.status}
+                            onChange={handleStatusChange}
+                            disabled={saving}
                         />
-                    )}
-                </View>
-            )}
-        </ScrollView>
+
+                        {userBook.status === 'currently_reading' && (
+                            <LabeledInput
+                                label={book.page_count
+                                    ? t('books.currentPageLabelWithTotal', { total: book.page_count })
+                                    : t('books.currentPageLabel')}
+                                value={pageInput}
+                                onChangeText={setPageInput}
+                                keyboardType="number-pad"
+                                placeholder="0"
+                                right={<Button title={t('common.save')} size="small" onPress={handleSavePage} />}
+                            />
+                        )}
+                    </View>
+                )}
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 }
 

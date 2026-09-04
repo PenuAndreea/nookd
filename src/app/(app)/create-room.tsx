@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 
 import { getOrCreateBook } from '@/api/books';
 import { createRoom, RoomInsert } from '@/api/rooms';
@@ -90,9 +90,18 @@ export default function CreateRoomScreen() {
     }
 
     return (
-        <View style={styles.container}>
-            <Header title={t('rooms.create.headerTitle')} showBack />
-            <View style={{ marginHorizontal: 16, gap: 16 }}>
+        <ScrollView
+            style={styles.container}
+            contentContainerStyle={styles.content}
+            stickyHeaderIndices={[0]}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="interactive"
+            automaticallyAdjustKeyboardInsets
+        >
+            <View style={styles.headerBar}>
+                <Header title={t('rooms.create.headerTitle')} showBack applyTopInset={false} />
+            </View>
+            <View style={styles.form}>
                 <LabeledInput
                     label={t('rooms.create.nameLabel')}
                     placeholder={t('rooms.create.namePlaceholder')}
@@ -116,23 +125,30 @@ export default function CreateRoomScreen() {
                 />
                 <DurationPicker value={duration} onChange={setDuration} />
                 {vibe === 'book_club' && <BookSearch value={book} onChange={setBook} />}
-                <View style={{ justifyContent: 'center' }}>
-                    <Button
-                        size='medium'
-                        title={isSubmitting ? t('rooms.create.submitting') : t('rooms.create.submit')}
-                        onPress={handleCreateRoom}
-                    />
-                </View>
+                <Button
+                    size='medium'
+                    title={isSubmitting ? t('rooms.create.submitting') : t('rooms.create.submit')}
+                    onPress={handleCreateRoom}
+                />
             </View>
-        </View>
+        </ScrollView>
     )
 }
 
 const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     container: {
         flex: 1,
-        gap: Spacing.three,
         backgroundColor: colors.background,
-        // paddingVertical: Spacing.four,
+    },
+    content: {
+        paddingBottom: Spacing.four,
+    },
+    // Opaque so the form doesn't show through while it is pinned.
+    headerBar: {
+        backgroundColor: colors.background,
+    },
+    form: {
+        padding: Spacing.three,
+        gap: Spacing.three,
     },
 });
