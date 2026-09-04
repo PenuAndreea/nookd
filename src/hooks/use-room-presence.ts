@@ -12,6 +12,8 @@ export interface RoomPresenceState {
     memberCount: number
     isJoined: boolean
     lastSessionId: string | null
+    /** Set when the realtime presence channel itself failed after joining — membership and the reading session are still live, but who's-here may be stale. */
+    presenceError: boolean
     joinRoom: (bookId?: string | null) => Promise<void>
     leaveRoom: () => Promise<void>
 }
@@ -29,6 +31,7 @@ export function useRoomPresence(roomId: string, userId: string | undefined): Roo
     const [members, setMembers] = useState<RoomMember[]>([])
     const [isJoined, setIsJoined] = useState(false)
     const [lastSessionId, setLastSessionId] = useState<string | null>(null)
+    const [presenceError, setPresenceError] = useState(false)
 
     const channelRef = useRef<RealtimeChannel | null>(null)
     const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -93,8 +96,10 @@ export function useRoomPresence(roomId: string, userId: string | undefined): Roo
                 .subscribe(async (status, err) => {
                     if (status === 'SUBSCRIBED') {
                         await channel.track({ user_id: userId, online_at: new Date().toISOString() })
+                        setPresenceError(false)
                     } else if (err) {
                         console.error('Room presence channel error:', err)
+                        setPresenceError(true)
                     }
                 })
 
@@ -131,6 +136,7 @@ export function useRoomPresence(roomId: string, userId: string | undefined): Roo
 
         setMembers([])
         setIsJoined(false)
+        setPresenceError(false)
     }, [roomId, userId])
 
     // Release client-side resources when the room screen unmounts. This is
@@ -156,6 +162,7 @@ export function useRoomPresence(roomId: string, userId: string | undefined): Roo
         memberCount: members.length,
         isJoined,
         lastSessionId,
+        presenceError,
         joinRoom,
         leaveRoom,
     }

@@ -1,11 +1,12 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useLocalSearchParams } from 'expo-router';
 import { useRef } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 
 import Button from '@/components/atoms/button';
+import { ErrorState } from '@/components/molecules/error-state';
 import { Header } from '@/components/molecules/header';
 import ReadingPickerSheet from '@/components/organisms/reading-picker-sheet';
 import ReflectionSheet from '@/components/organisms/reflection-sheet';
@@ -17,6 +18,8 @@ import { useRoomData } from '@/hooks/use-room-data';
 import { useRoomReflection } from '@/hooks/use-room-reflection';
 import { useRoomSession } from '@/hooks/use-room-session';
 import { useTheme } from '@/hooks/use-theme';
+
+export { default as ErrorBoundary } from '@/components/organisms/route-error-boundary';
 
 export default function SilentRoomScreen() {
     const { id, autojoin } = useLocalSearchParams<{ id: string; autojoin?: string }>();
@@ -31,13 +34,14 @@ export default function SilentRoomScreen() {
     const reflectionSheetRef = useRef<BottomSheet>(null);
     const readingPickerRef = useRef<BottomSheet>(null);
 
-    const { room, userBookForRoom, libraryBooks, theme } = useRoomData(roomId, userId);
+    const { room, roomError, retryRoom, userBookForRoom, libraryBooks, libraryError, retryLibrary, theme } = useRoomData(roomId, userId);
 
     const {
         members,
         memberCount,
         lastSessionId,
         isJoined,
+        presenceError,
         hasCheckedMembership,
         displayedElapsedSeconds,
         booksInRoom,
@@ -77,6 +81,23 @@ export default function SilentRoomScreen() {
     // pastel background regardless of the user's chosen theme.
     const screenBackground = theme && !isDark ? theme.background : colors.creme;
 
+    // The room row failed to load and we have nothing to render around it —
+    // every other piece of this screen (timer, sheets) needs `room` to mean
+    // anything, so show a single full-screen error instead of a page of
+    // blank/fallback pieces.
+    if (roomError && !room) {
+        return (
+            <View style={{ flex: 1, backgroundColor: screenBackground }}>
+                <Header title='' showBack />
+                <ErrorState
+                    title={t('rooms.loadRoomErrorTitle')}
+                    subtitle={t('rooms.loadRoomErrorSubtitle')}
+                    onRetry={retryRoom}
+                />
+            </View>
+        );
+    }
+
     return (
         <View style={{ flex: 1, backgroundColor: screenBackground }}>
             <Header
@@ -86,6 +107,11 @@ export default function SilentRoomScreen() {
                     <Button title={t('rooms.join')} size="small" onPress={handleJoinPress} />
                 ) : undefined}
             />
+            {isJoined && presenceError && (
+                <Text style={[styles.presenceWarning, { color: colors.statusPopularFg, backgroundColor: colors.statusPopularBg }]}>
+                    {t('rooms.presenceIssue')}
+                </Text>
+            )}
             <View style={{ flex: 1 }}>
                 {theme && (
                     <Animated.View style={styles.illustration}>
@@ -128,6 +154,8 @@ export default function SilentRoomScreen() {
             <ReadingPickerSheet
                 ref={readingPickerRef}
                 books={libraryBooks}
+                error={libraryError}
+                onRetry={retryLibrary}
                 onSelect={handleSelectBook}
                 onSkip={handleSkipBook}
             />
@@ -136,6 +164,17 @@ export default function SilentRoomScreen() {
 }
 
 const styles = StyleSheet.create({
+    presenceWarning: {
+        position: 'absolute',
+        top: 60,
+        left: 0,
+        right: 0,
+        textAlign: 'center',
+        fontSize: 12,
+        fontWeight: '600',
+        paddingVertical: 4,
+        zIndex: 1,
+    },
     illustration: {
         position: 'absolute',
         top: 0,

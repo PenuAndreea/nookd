@@ -5,6 +5,8 @@ import AuthForm from '@/components/organisms/auth-form';
 
 import { useAuth } from '../../contexts/auth-context';
 
+export { default as ErrorBoundary } from '@/components/organisms/route-error-boundary';
+
 export default function SignInScreen() {
     const { signIn } = useAuth();
     const router = useRouter();

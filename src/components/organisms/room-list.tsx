@@ -7,6 +7,7 @@ import ReadingNook from '@/assets/images/icons/reading-nook.svg';
 import BookLover from '@/assets/images/illustrations/cuate/book-lover.svg';
 import Button from '@/components/atoms/button';
 import { EmptyState } from '@/components/molecules/empty-state';
+import { ErrorState } from '@/components/molecules/error-state';
 import { Spacing } from '@/constants/theme';
 import { useRooms } from '@/contexts/rooms-context';
 import { useTheme } from '@/hooks/use-theme';
@@ -14,7 +15,7 @@ import CurrentRoomBanner from './current-room-banner';
 import RoomItem from './room-item';
 
 export default function RoomList() {
-    const { rooms, currentRoom, loading, refreshing, refresh } = useRooms();
+    const { rooms, currentRoom, loading, refreshing, error, refresh } = useRooms();
     const colors = useTheme();
     const styles = useStyles(colors);
     const { t } = useTranslation();
@@ -50,7 +51,13 @@ export default function RoomList() {
                         // Being in the sole existing room is not an empty state,
                         // but the list itself stays mounted so pull-to-refresh
                         // keeps working.
-                        currentRoom ? null : (
+                        currentRoom ? null : error ? (
+                            <ErrorState
+                                title={t('rooms.loadErrorTitle')}
+                                subtitle={t('rooms.loadErrorSubtitle')}
+                                onRetry={refresh}
+                            />
+                        ) : (
                             <EmptyState
                                 illustration={<BookLover width={200} height={200} />}
                                 title={t('rooms.emptyTitle')}

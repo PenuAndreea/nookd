@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -15,12 +15,15 @@ import {
 import Button from '@/components/atoms/button';
 import BookHero from '@/components/molecules/book-hero';
 import { BookStatusChips } from '@/components/molecules/book-status-chips';
+import { ErrorState } from '@/components/molecules/error-state';
 import { Header } from '@/components/molecules/header';
 import { LabeledInput } from '@/components/molecules/labeled-input';
 import { Spacing } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/hooks/use-theme';
 import { useLocalSearchParams } from 'expo-router';
+
+export { default as ErrorBoundary } from '@/components/organisms/route-error-boundary';
 
 export default function BookDetailScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
@@ -35,6 +38,7 @@ export default function BookDetailScreen() {
     const [activeRoomCount, setActiveRoomCount] = useState(0);
     const [pageInput, setPageInput] = useState('');
     const [saving, setSaving] = useState(false);
+    const [loadError, setLoadError] = useState(false);
 
     const load = useCallback(async () => {
         if (!id) return;
@@ -45,6 +49,7 @@ export default function BookDetailScreen() {
             ]);
             setBook(bookData);
             setActiveRoomCount(roomCount);
+            setLoadError(false);
 
             if (userId) {
                 const entry = await getUserBookForBook(userId, id);
@@ -53,6 +58,7 @@ export default function BookDetailScreen() {
             }
         } catch (error) {
             console.error('Error loading book:', error);
+            setLoadError(true);
         }
     }, [id, userId]);
 
@@ -75,6 +81,7 @@ export default function BookDetailScreen() {
             setUserBook(entry);
         } catch (error) {
             console.error('Error adding book to reading list:', error);
+            Alert.alert(t('books.addToListErrorTitle'), t('common.genericErrorMessage'));
         } finally {
             setSaving(false);
         }
@@ -95,6 +102,7 @@ export default function BookDetailScreen() {
             setUserBook(updated);
         } catch (error) {
             console.error('Error updating reading status:', error);
+            Alert.alert(t('books.updateStatusErrorTitle'), t('common.genericErrorMessage'));
         } finally {
             setSaving(false);
         }
@@ -111,6 +119,7 @@ export default function BookDetailScreen() {
             setUserBook(updated);
         } catch (error) {
             console.error('Error updating page progress:', error);
+            Alert.alert(t('books.savePageErrorTitle'), t('common.genericErrorMessage'));
         } finally {
             setSaving(false);
         }
@@ -120,6 +129,13 @@ export default function BookDetailScreen() {
         return (
             <View style={styles.container}>
                 <Header title="" showBack />
+                {loadError && (
+                    <ErrorState
+                        title={t('books.loadErrorTitle')}
+                        subtitle={t('books.loadErrorSubtitle')}
+                        onRetry={load}
+                    />
+                )}
             </View>
         );
     }

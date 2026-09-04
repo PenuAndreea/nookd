@@ -14,6 +14,8 @@ import { useAuth } from '@/contexts/auth-context';
 import { useRooms } from '@/contexts/rooms-context';
 import { useTheme } from '@/hooks/use-theme';
 
+export { default as ErrorBoundary } from '@/components/organisms/route-error-boundary';
+
 function greetingFor(hour: number, t: (key: string) => string) {
   if (hour < 12) return t('home.greetingMorning');
   if (hour < 18) return t('home.greetingAfternoon');

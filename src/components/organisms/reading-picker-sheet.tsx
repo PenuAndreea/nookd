@@ -11,16 +11,20 @@ import { UserBookWithBook } from '@/api/books';
 import TextButton from '@/components/atoms/text-button';
 import BookRow from '@/components/molecules/book-row';
 import { EmptyState } from '@/components/molecules/empty-state';
+import { ErrorState } from '@/components/molecules/error-state';
 import { useTheme } from '@/hooks/use-theme';
 
 interface ReadingPickerSheetProps {
     books: UserBookWithBook[];
+    /** The library fetch failed — shown instead of the "empty library" message so a fetch error isn't mistaken for having no books. */
+    error?: boolean;
+    onRetry?: () => void;
     onSelect: (bookId: string) => void;
     onSkip: () => void;
 }
 
 const ReadingPickerSheet = forwardRef<BottomSheet, ReadingPickerSheetProps>(
-    ({ books, onSelect, onSkip }, ref) => {
+    ({ books, error, onRetry, onSelect, onSkip }, ref) => {
         const colors = useTheme();
         const styles = createStyles(colors);
         const { t } = useTranslation();
@@ -60,9 +64,15 @@ const ReadingPickerSheet = forwardRef<BottomSheet, ReadingPickerSheetProps>(
                             </Text>
                         </View>
                     }
-                    ListEmptyComponent={
+                    ListEmptyComponent={error ? (
+                        <ErrorState
+                            title={t('rooms.readingPicker.loadErrorTitle')}
+                            subtitle={t('rooms.readingPicker.loadErrorSubtitle')}
+                            onRetry={onRetry}
+                        />
+                    ) : (
                         <EmptyState title={t('rooms.readingPicker.emptyLibraryTitle')} subtitle={t('rooms.readingPicker.emptyLibrarySubtitle')} />
-                    }
+                    )}
                     renderItem={({ item }) => (
                         <View style={styles.bookRowSpacing}>
                             <BookRow book={item.book} onPress={() => onSelect(item.book_id)} />

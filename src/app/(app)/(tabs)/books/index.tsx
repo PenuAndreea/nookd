@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -19,12 +19,15 @@ import { BookStatusChips } from '@/components/molecules/book-status-chips';
 import BookCarousel, { BookCarouselItem } from '@/components/molecules/book-carousel';
 import BookRow from '@/components/molecules/book-row';
 import { EmptyState } from '@/components/molecules/empty-state';
+import { ErrorState } from '@/components/molecules/error-state';
 import { SearchField } from '@/components/molecules/search-field';
 import BookItem from '@/components/organisms/book-item';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/hooks/use-theme';
 import { router } from 'expo-router';
+
+export { default as ErrorBoundary } from '@/components/organisms/route-error-boundary';
 
 export default function BooksScreen() {
     const { session } = useAuth();
@@ -36,11 +39,13 @@ export default function BooksScreen() {
     const [query, setQuery] = useState('');
     const [searchResults, setSearchResults] = useState<OpenLibraryResult[]>([]);
     const [searching, setSearching] = useState(false);
+    const [searchError, setSearchError] = useState(false);
     const [addingKey, setAddingKey] = useState<string | null>(null);
 
     const [status, setStatus] = useState<UserBookStatus>('currently_reading');
     const [userBooks, setUserBooks] = useState<UserBookWithBook[]>([]);
     const [loadingList, setLoadingList] = useState(false);
+    const [listError, setListError] = useState(false);
 
     const [activelyRead, setActivelyRead] = useState<RoomWithBook[]>([]);
     const [popularBooks, setPopularBooks] = useState<PopularBook[]>([]);
@@ -51,8 +56,10 @@ export default function BooksScreen() {
         try {
             const data = await getUserBooks(userId, status);
             setUserBooks(data);
+            setListError(false);
         } catch (error) {
             console.error('Error loading reading list:', error);
+            setListError(true);
         } finally {
             setLoadingList(false);
         }
@@ -70,6 +77,10 @@ export default function BooksScreen() {
     }, [loadUserBooks]);
 
     useEffect(() => {
+        // Decorative secondary shelves — a failure here just means the
+        // carousel stays hidden (BookCarousel renders nothing for an empty
+        // list), which is a reasonable degrade for content that isn't the
+        // point of this screen. The primary list below has its own error UI.
         getActivelyReadBooks().then(setActivelyRead).catch((error) => {
             console.error('Error loading what others are reading:', error);
         });
@@ -80,6 +91,7 @@ export default function BooksScreen() {
 
     async function search(text: string) {
         setQuery(text);
+        setSearchError(false);
         if (text.length < 3) {
             setSearchResults([]);
             return;
@@ -92,6 +104,7 @@ export default function BooksScreen() {
         } catch (error) {
             console.error('Error searching books:', error);
             setSearchResults([]);
+            setSearchError(true);
         } finally {
             setSearching(false);
         }
@@ -107,6 +120,7 @@ export default function BooksScreen() {
             router.navigate(`/books/${book.id}`);
         } catch (error) {
             console.error('Error opening book:', error);
+            Alert.alert(t('books.openBookErrorTitle'), t('common.genericErrorMessage'));
         } finally {
             setAddingKey(null);
         }
@@ -123,6 +137,7 @@ export default function BooksScreen() {
             if (status === 'want_to_read') await loadUserBooks();
         } catch (error) {
             console.error('Error adding book to reading list:', error);
+            Alert.alert(t('books.addToListErrorTitle'), t('common.genericErrorMessage'));
         } finally {
             setAddingKey(null);
         }
@@ -154,9 +169,15 @@ export default function BooksScreen() {
                     keyExtractor={(item) => item.openLibraryKey}
                     contentContainerStyle={styles.listContent}
                     keyboardShouldPersistTaps="handled"
-                    ListEmptyComponent={!searching ? (
+                    ListEmptyComponent={searching ? null : searchError ? (
+                        <ErrorState
+                            title={t('books.searchErrorTitle')}
+                            subtitle={t('books.searchErrorSubtitle')}
+                            onRetry={() => search(query)}
+                        />
+                    ) : (
                         <EmptyState title={t('books.noBooksFoundTitle')} subtitle={t('books.noBooksFoundSubtitle', { query })} />
-                    ) : null}
+                    )}
                     renderItem={({ item }) => (
                         <View style={styles.searchResultSpacing}>
                             <BookRow
@@ -202,9 +223,15 @@ export default function BooksScreen() {
                             <BookStatusChips value={status} onChange={setStatus} equalWidth />
                         </View>
                     }
-                    ListEmptyComponent={!loadingList ? (
+                    ListEmptyComponent={loadingList ? null : listError ? (
+                        <ErrorState
+                            title={t('books.listErrorTitle')}
+                            subtitle={t('books.listErrorSubtitle')}
+                            onRetry={loadUserBooks}
+                        />
+                    ) : (
                         <EmptyState title={t('books.emptyLibraryTitle')} subtitle={t('books.emptyLibrarySubtitle')} />
-                    ) : null}
+                    )}
                     renderItem={({ item }) => <BookItem userBook={item} />}
                 />
             )}

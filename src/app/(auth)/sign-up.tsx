@@ -7,6 +7,8 @@ import i18n from '@/i18n';
 
 import { useAuth } from '../../contexts/auth-context';
 
+export { default as ErrorBoundary } from '@/components/organisms/route-error-boundary';
+
 export default function SignUpScreen() {
     const { signUp } = useAuth();
     const router = useRouter();

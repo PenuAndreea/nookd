@@ -8,6 +8,8 @@ type RoomsContextType = {
     currentRoom: RoomWithDetails | null;
     loading: boolean;
     refreshing: boolean;
+    /** Set when the last load/refresh failed and `rooms` is stale or empty as a result. */
+    error: boolean;
     refresh: () => Promise<void>;
     addRoom: (room: RoomWithDetails) => void;
     markJoined: (roomId: string, userId: string) => void;
@@ -23,6 +25,7 @@ export function RoomsProvider({ children }: { children: ReactNode }) {
     const [rooms, setRooms] = useState<RoomWithDetails[] | null>(null);
     const [loading, setLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
+    const [error, setError] = useState(false);
     const hasLoadedRef = useRef(false);
 
     const load = useCallback(async (isRefresh: boolean) => {
@@ -32,8 +35,10 @@ export function RoomsProvider({ children }: { children: ReactNode }) {
         try {
             const data = await getRooms();
             setRooms(data);
+            setError(false);
         } catch (error) {
             console.error('Error loading rooms:', error);
+            setError(true);
         } finally {
             if (isRefresh) setRefreshing(false);
             else setLoading(false);
@@ -83,7 +88,7 @@ export function RoomsProvider({ children }: { children: ReactNode }) {
 
     return (
         <RoomsContext.Provider
-            value={{ rooms, currentRoom, loading, refreshing, refresh, addRoom, markJoined, markLeft }}
+            value={{ rooms, currentRoom, loading, refreshing, error, refresh, addRoom, markJoined, markLeft }}
         >
             {children}
         </RoomsContext.Provider>

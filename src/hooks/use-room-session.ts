@@ -39,7 +39,7 @@ export function useRoomSession({
     reflectionSheetRef,
     readingPickerRef,
 }: UseRoomSessionParams) {
-    const { members, memberCount, lastSessionId, isJoined, joinRoom, leaveRoom } =
+    const { members, memberCount, lastSessionId, isJoined, presenceError, joinRoom, leaveRoom } =
         useRoomPresence(roomId, userId)
     const { currentRoom, markJoined, markLeft } = useRooms()
 
@@ -85,6 +85,7 @@ export function useRoomSession({
         } catch (error) {
             console.error('Error joining room:', error)
             hasAttemptedJoinRef.current = false
+            Alert.alert(i18n.t('rooms.joinErrorTitle'), i18n.t('rooms.joinErrorMessage'))
         }
     }, [joinRoom, markJoined, roomId, userId])
 
@@ -104,6 +105,9 @@ export function useRoomSession({
                 setJoinedAt(existingMember.joined_at)
                 return attemptJoin(existingMember.book_id)
             })
+            // Background reconciliation, not a user-initiated action — on
+            // failure we just fall through to the normal "not joined" state
+            // (the Join button), which is a reasonable degrade on its own.
             .catch((error) => console.error('Error checking existing membership:', error))
             .finally(() => setHasCheckedMembership(true))
     }, [userId, room, roomId, attemptJoin])
@@ -123,6 +127,7 @@ export function useRoomSession({
             markLeft(oldRoomId, userId)
         } catch (error) {
             console.error('Error leaving previous room:', error)
+            Alert.alert(i18n.t('rooms.switchRoomErrorTitle'), i18n.t('rooms.switchRoomErrorMessage'))
             return
         }
         proceedToJoin()
@@ -181,6 +186,7 @@ export function useRoomSession({
             setMemberBooks((prev) => ({ ...prev, [userId]: selected }))
         } catch (error) {
             console.error('Error updating book selection:', error)
+            Alert.alert(i18n.t('rooms.selectBookErrorTitle'), i18n.t('rooms.selectBookErrorMessage'))
         }
     }
 
@@ -206,6 +212,8 @@ export function useRoomSession({
                     setMemberBooks(Object.fromEntries(roomMembers.map((m) => [m.user_id, m.book])))
                 }
             })
+            // Decorative — degrades to no book badges next to readers, not
+            // worth interrupting the room over.
             .catch((error) => console.error('Error loading member books:', error))
 
         return () => {
@@ -215,7 +223,13 @@ export function useRoomSession({
 
     async function handleLeaveRoom() {
         bottomSheetRef.current?.close();
-        await leaveRoom();
+        try {
+            await leaveRoom();
+        } catch (error) {
+            console.error('Error leaving room:', error)
+            Alert.alert(i18n.t('rooms.switchRoomErrorTitle'), i18n.t('rooms.switchRoomErrorMessage'))
+            return
+        }
         if (userId) markLeft(roomId, userId)
         setJoinedAt(null)
         reflectionSheetRef.current?.snapToIndex(0);
@@ -226,6 +240,7 @@ export function useRoomSession({
         memberCount,
         lastSessionId,
         isJoined,
+        presenceError,
         hasCheckedMembership,
         displayedElapsedSeconds,
         booksInRoom,

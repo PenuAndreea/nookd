@@ -15,6 +15,8 @@ import { useRooms } from '@/contexts/rooms-context';
 import { useTheme } from '@/hooks/use-theme';
 import { router } from 'expo-router';
 
+export { default as ErrorBoundary } from '@/components/organisms/route-error-boundary';
+
 export default function CreateRoomScreen() {
     const colors = useTheme();
     const styles = createStyles(colors);
