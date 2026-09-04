@@ -1,7 +1,7 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useRef } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 
 import logo from '@/assets/images/logo.png';
 import Avatar from '@/components/atoms/avatar';
@@ -9,6 +9,7 @@ import { Icon } from '@/components/atoms/icon';
 import Typography from '@/components/atoms/typography';
 import ProfileSheet from '@/components/organisms/profile-sheet';
 import RoomList from '@/components/organisms/room-list';
+import { createCommonStyles } from '@/constants/common-styles';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useRooms } from '@/contexts/rooms-context';
@@ -41,6 +42,7 @@ export default function HomeScreen() {
   const { session, signOut } = useAuth();
   const colors = useTheme();
   const styles = useStyles(colors);
+  const common = createCommonStyles();
   const userId = session?.user.id;
   const { t } = useTranslation();
 
@@ -77,7 +79,7 @@ export default function HomeScreen() {
               hitSlop={12}
               accessibilityRole="button"
               accessibilityLabel={t('home.openProfile')}
-              style={({ pressed }) => pressed && styles.pressed}
+              style={({ pressed }) => pressed && common.pressed}
             >
               <View>
                 <Avatar id={userId} size="xlarge" />
@@ -93,7 +95,7 @@ export default function HomeScreen() {
         <Typography variant="h1">
           {greetingFor(new Date().getHours(), t)}, {DISPLAY_NAME}
         </Typography>
-        <Text style={styles.subtitle}>{subtitle}</Text>
+        <Typography variant="subtitle" color="textSecondary">{subtitle}</Typography>
       </View>
 
       <RoomList />
@@ -150,9 +152,4 @@ const useStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     marginTop: Spacing.three,
     gap: Spacing.half,
   },
-  subtitle: {
-    fontSize: 15,
-    color: colors.textSecondary,
-  },
-  pressed: { opacity: 0.7 },
 });

@@ -1,5 +1,6 @@
 import { StyleProp, StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
 
+import { TypographyStyles } from './typography';
 import { useTheme } from '@/hooks/use-theme';
 
 interface ChipProps {
@@ -53,8 +54,7 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         fontSize: 16,
     },
     text: {
-        fontSize: 13,
-        fontWeight: '600',
+        ...TypographyStyles.captionSemibold,
         color: colors.chipText,
         textAlign: 'center',
     },

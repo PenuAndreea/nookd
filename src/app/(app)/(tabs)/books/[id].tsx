@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -13,6 +13,7 @@ import {
     UserBookStatus,
 } from '@/api/books';
 import Button from '@/components/atoms/button';
+import Typography from '@/components/atoms/typography';
 import BookHero from '@/components/molecules/book-hero';
 import { BookStatusChips } from '@/components/molecules/book-status-chips';
 import { ErrorState } from '@/components/molecules/error-state';
@@ -147,14 +148,14 @@ export default function BookDetailScreen() {
             <BookHero book={book} activeRoomCount={activeRoomCount} />
 
             {book.description && (
-                <Text style={styles.description}>{book.description}</Text>
+                <Typography color="textSecondary">{book.description}</Typography>
             )}
 
             {!userBook ? (
                 <Button title={saving ? t('books.addingToReadingList') : t('books.addToReadingList')} onPress={handleAdd} />
             ) : (
                 <View style={styles.listSection}>
-                    <Text style={styles.sectionLabel}>{t('books.statusLabel')}</Text>
+                    <Typography variant="sectionLabel" color="textSecondary">{t('books.statusLabel')}</Typography>
                     <BookStatusChips
                         value={userBook.status}
                         onChange={handleStatusChange}
@@ -189,19 +190,7 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         paddingBottom: Spacing.six,
         gap: Spacing.four,
     },
-    description: {
-        fontSize: 14,
-        lineHeight: 20,
-        color: colors.textSecondary,
-    },
     listSection: {
         gap: Spacing.three,
-    },
-    sectionLabel: {
-        fontSize: 12,
-        fontWeight: '600',
-        color: colors.textSecondary,
-        textTransform: 'uppercase',
-        letterSpacing: 0.6,
     },
 });

@@ -1,5 +1,6 @@
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+import Typography from '@/components/atoms/typography';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -25,7 +26,7 @@ export default function BookCarousel({ title, items, onPressItem }: BookCarousel
 
     return (
         <View style={styles.section}>
-            <Text style={styles.label}>{title}</Text>
+            <Typography variant="sectionLabel" color="textSecondary">{title}</Typography>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 {items.map(({ key, book, subtitle }) => (
                     <TouchableOpacity
@@ -41,8 +42,8 @@ export default function BookCarousel({ title, items, onPressItem }: BookCarousel
                                 <Text style={{ fontSize: 20 }}>📖</Text>
                             </View>
                         )}
-                        <Text style={styles.title} numberOfLines={2}>{book.title}</Text>
-                        {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+                        <Typography variant="small" style={styles.title} numberOfLines={2}>{book.title}</Typography>
+                        {subtitle && <Typography variant="tiny" color="textSecondary" style={styles.subtitle}>{subtitle}</Typography>}
                     </TouchableOpacity>
                 ))}
             </ScrollView>
@@ -54,13 +55,6 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
     section: {
         marginBottom: Spacing.four,
         gap: Spacing.two,
-    },
-    label: {
-        fontSize: 12,
-        fontWeight: '600',
-        color: colors.textSecondary,
-        textTransform: 'uppercase',
-        letterSpacing: 0.6,
     },
     card: {
         width: 88,
@@ -77,13 +71,9 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         justifyContent: 'center',
     },
     title: {
-        fontSize: 12,
-        color: colors.text,
         marginTop: 4,
     },
     subtitle: {
-        fontSize: 11,
-        color: colors.textSecondary,
         marginTop: 2,
     },
 });

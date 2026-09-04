@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -18,6 +18,7 @@ import {
 import { BookStatusChips } from '@/components/molecules/book-status-chips';
 import BookCarousel, { BookCarouselItem } from '@/components/molecules/book-carousel';
 import BookRow from '@/components/molecules/book-row';
+import Typography from '@/components/atoms/typography';
 import { EmptyState } from '@/components/molecules/empty-state';
 import { ErrorState } from '@/components/molecules/error-state';
 import { SearchField } from '@/components/molecules/search-field';
@@ -154,7 +155,7 @@ export default function BooksScreen() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>{t('books.title')}</Text>
+            <Typography variant="title1">{t('books.title')}</Typography>
 
             <SearchField
                 placeholder={t('books.searchPlaceholder')}
@@ -191,9 +192,9 @@ export default function BooksScreen() {
                                         disabled={addingKey === item.openLibraryKey}
                                         hitSlop={8}
                                     >
-                                        <Text style={styles.addChipText}>
+                                        <Typography variant="smallBold">
                                             {addingKey === item.openLibraryKey ? t('books.adding') : t('books.addChip')}
-                                        </Text>
+                                        </Typography>
                                     </Pressable>
                                 }
                             />
@@ -218,7 +219,9 @@ export default function BooksScreen() {
                                 onPressItem={(bookId) => router.navigate(`/books/${bookId}`)}
                             />
 
-                            <Text style={[styles.sectionLabel, { marginBottom: Spacing.two }]}>{t('books.myLibrary')}</Text>
+                            <Typography variant="sectionLabel" color="textSecondary" style={{ marginBottom: Spacing.two }}>
+                                {t('books.myLibrary')}
+                            </Typography>
 
                             <BookStatusChips value={status} onChange={setStatus} equalWidth />
                         </View>
@@ -247,11 +250,6 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         backgroundColor: colors.background,
         gap: Spacing.three,
     },
-    title: {
-        fontFamily: 'Lora_700Bold',
-        fontSize: 24,
-        color: colors.text,
-    },
     listContent: {
         paddingBottom: Spacing.five,
     },
@@ -263,17 +261,5 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         borderRadius: BorderRadius.full,
         paddingHorizontal: 10,
         paddingVertical: 6,
-    },
-    addChipText: {
-        fontSize: 12,
-        fontWeight: '600',
-        color: colors.text,
-    },
-    sectionLabel: {
-        fontSize: 12,
-        fontWeight: '600',
-        color: colors.textSecondary,
-        textTransform: 'uppercase',
-        letterSpacing: 0.6,
     },
 });

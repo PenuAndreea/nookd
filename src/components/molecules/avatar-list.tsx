@@ -1,8 +1,9 @@
 import { useTheme } from "@/hooks/use-theme";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import Avatar from "../atoms/avatar";
+import Typography from "../atoms/typography";
 
 const SHOWN = 3;
 
@@ -13,7 +14,7 @@ export default function AvatarList({ userIds }: { userIds?: string[] }) {
 
     const count = userIds?.length ?? 0;
     if (count === 0) {
-        return <Text style={styles.emptyText}>{t('rooms.noOneYet')}</Text>;
+        return <Typography variant="caption" color="sheetTextSecondary">{t('rooms.noOneYet')}</Typography>;
     }
 
     return (
@@ -23,7 +24,9 @@ export default function AvatarList({ userIds }: { userIds?: string[] }) {
                     <Avatar id={userId} size="small" />
                 </View>
             ))}
-            <Text style={styles.readerCount}>{t('rooms.reading', { count })}</Text>
+            <Typography variant="caption" color="sheetTextSecondary" style={styles.readerCount}>
+                {t('rooms.reading', { count })}
+            </Typography>
         </View>
     )
 }
@@ -42,14 +45,6 @@ const useStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
         marginLeft: -10,
     },
     readerCount: {
-        // Only ever rendered inside RoomItem's always-white card — needs the
-        // fixed-dark token, not the theme-flipping one.
-        color: colors.sheetTextSecondary,
         marginLeft: 8,
-        fontSize: 13,
-    },
-    emptyText: {
-        color: colors.sheetTextSecondary,
-        fontSize: 13,
     },
 });

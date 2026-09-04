@@ -1,31 +1,34 @@
-import { FontLineHeights, FontSizes } from "@/constants/theme";
+import { TypographyStyles } from "./typography";
 import { useTheme } from "@/hooks/use-theme";
 import { ReactNode } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 import { Icon, IconName } from "./icon";
 
+// Layout only — the font side of each size (fontSize/lineHeight/fontWeight)
+// lives in Typography's buttonSmall/buttonMedium/buttonLarge, so it isn't
+// declared twice.
 const ButtonSizes = {
     small: {
         paddingHorizontal: 14,
         paddingVertical: 6,
         borderRadius: 12,
-        fontSize: 12,
-        lineHeight: FontLineHeights.small,
     },
     medium: {
         paddingHorizontal: 12,
         paddingVertical: 8,
         borderRadius: 12,
-        fontSize: FontSizes.medium,
-        lineHeight: FontLineHeights.medium,
     },
     large: {
         paddingHorizontal: 16,
         paddingVertical: 12,
         borderRadius: 16,
-        fontSize: FontSizes.large,
-        lineHeight: FontLineHeights.large,
     },
+}
+
+const ButtonTextStyles = {
+    small: TypographyStyles.buttonSmall,
+    medium: TypographyStyles.buttonMedium,
+    large: TypographyStyles.buttonLarge,
 }
 
 type ButtonProps = {
@@ -108,20 +111,16 @@ const createStyles = (colors: ReturnType<typeof useTheme>, size?: keyof typeof B
             backgroundColor: colors.ink,
         },
         buttonText: {
+            ...ButtonTextStyles[size || 'medium'],
             // Both non-round backgrounds (`accent`, `white`) are fixed values
             // that do not flip with the theme, so this cannot use the
             // flipping `text` token either — it would go near-white-on-yellow
             // (primary) or near-white-on-white (surface) in dark mode.
             color: isRound ? colors.accent : colors.ink,
             textAlign: 'center',
-            fontWeight: '700',
-            fontSize: ButtonSizes[size || 'medium'].fontSize,
-            lineHeight: ButtonSizes[size || 'medium'].lineHeight,
         },
         floatingText: {
-            fontSize: ButtonSizes[size || 'medium'].fontSize,
-            fontWeight: '700',
-            lineHeight: ButtonSizes[size || 'medium'].lineHeight,
+            ...ButtonTextStyles[size || 'medium'],
         },
         pressed: {
             opacity: 0.92,

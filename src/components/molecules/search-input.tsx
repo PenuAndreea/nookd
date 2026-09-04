@@ -10,6 +10,7 @@ import {
 import { useTranslation } from 'react-i18next';
 
 import { searchOpenLibrary } from '@/api/books';
+import Typography from '@/components/atoms/typography';
 import { useTheme } from '@/hooks/use-theme';
 import { SearchField } from './search-field';
 
@@ -75,7 +76,9 @@ export const BookSearch = ({ value, onChange }: BookSearchProps) => {
 
     return (
         <View style={styles.wrapper}>
-            <Text style={styles.label}>{t('common.book')} <Text style={styles.optional}>({t('common.optional')})</Text></Text>
+            <Typography variant="sectionLabel" color="textSecondary">
+                {t('common.book')} <Text style={styles.optional}>({t('common.optional')})</Text>
+            </Typography>
 
             {value ? (
                 <View style={styles.selectedBook}>
@@ -83,11 +86,11 @@ export const BookSearch = ({ value, onChange }: BookSearchProps) => {
                         <Image source={{ uri: value.thumbnail }} style={styles.thumbnail} resizeMode="contain" />
                     )}
                     <View style={styles.selectedInfo}>
-                        <Text style={styles.selectedTitle} numberOfLines={1}>{value.title}</Text>
-                        <Text style={styles.selectedAuthor} numberOfLines={1}>{value.author}</Text>
+                        <Typography variant="bodyBold" numberOfLines={1}>{value.title}</Typography>
+                        <Typography variant="caption" color="textSecondary" style={styles.selectedAuthor} numberOfLines={1}>{value.author}</Typography>
                     </View>
                     <TouchableOpacity onPress={clear} style={styles.clearButton} hitSlop={8}>
-                        <Text style={styles.clearText}>✕</Text>
+                        <Typography color="textSecondary">✕</Typography>
                     </TouchableOpacity>
                 </View>
             ) : (
@@ -121,8 +124,8 @@ export const BookSearch = ({ value, onChange }: BookSearchProps) => {
                                     </View>
                                 )}
                                 <View style={styles.resultInfo}>
-                                    <Text style={styles.resultTitle} numberOfLines={1}>{item.title}</Text>
-                                    <Text style={styles.resultAuthor} numberOfLines={1}>{item.author}</Text>
+                                    <Typography variant="bodyBold" color="sheetText" numberOfLines={1}>{item.title}</Typography>
+                                    <Typography variant="caption" color="sheetTextSecondary" style={styles.resultAuthor} numberOfLines={1}>{item.author}</Typography>
                                 </View>
                             </TouchableOpacity>
                         )}
@@ -136,13 +139,6 @@ export const BookSearch = ({ value, onChange }: BookSearchProps) => {
 const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     wrapper: {
         gap: 6,
-    },
-    label: {
-        fontSize: 12,
-        fontWeight: '600',
-        color: colors.textSecondary,
-        textTransform: 'uppercase',
-        letterSpacing: 0.6,
     },
     optional: {
         fontWeight: '400',
@@ -182,16 +178,7 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
     resultInfo: {
         flex: 1,
     },
-    resultTitle: {
-        // The dropdown is always white — needs the fixed-dark token, not the
-        // theme-flipping one, or it disappears in dark mode.
-        fontSize: 14,
-        fontWeight: '600',
-        color: colors.sheetText,
-    },
     resultAuthor: {
-        fontSize: 13,
-        color: colors.sheetTextSecondary,
         marginTop: 2,
     },
     separator: {
@@ -219,21 +206,10 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
     selectedInfo: {
         flex: 1,
     },
-    selectedTitle: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: colors.text,
-    },
     selectedAuthor: {
-        fontSize: 13,
-        color: colors.textSecondary,
         marginTop: 2,
     },
     clearButton: {
         padding: 4,
-    },
-    clearText: {
-        fontSize: 14,
-        color: colors.textSecondary,
     },
 });

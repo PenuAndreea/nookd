@@ -1,6 +1,8 @@
 import { ReactNode } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import Typography from '@/components/atoms/typography';
+import { createCommonStyles } from '@/constants/common-styles';
 import { BorderRadius } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -29,6 +31,7 @@ interface BookRowProps {
 export default function BookRow({ book, onPress, disabled, size = 'small', trailing, belowInfo }: BookRowProps) {
     const colors = useTheme();
     const styles = createStyles(colors, size);
+    const common = createCommonStyles();
     const cover = COVER_SIZES[size];
 
     const content = (
@@ -41,9 +44,15 @@ export default function BookRow({ book, onPress, disabled, size = 'small', trail
                 </View>
             )}
             <View style={styles.info}>
-                <Text style={styles.title} numberOfLines={size === 'medium' ? 2 : 1}>{book.title}</Text>
+                <Typography
+                    variant={size === 'medium' ? 'cardTitle' : 'bodyBold'}
+                    color="sheetText"
+                    numberOfLines={size === 'medium' ? 2 : 1}
+                >
+                    {book.title}
+                </Typography>
                 {book.author && (
-                    <Text style={styles.author} numberOfLines={1}>{book.author}</Text>
+                    <Typography variant="caption" color="sheetTextSecondary" numberOfLines={1}>{book.author}</Typography>
                 )}
                 {belowInfo}
             </View>
@@ -57,7 +66,7 @@ export default function BookRow({ book, onPress, disabled, size = 'small', trail
 
     return (
         <Pressable
-            style={({ pressed }) => [styles.row, styles.pressable, pressed && styles.pressed]}
+            style={({ pressed }) => [styles.row, styles.pressable, pressed && common.pressed]}
             onPress={onPress}
             disabled={disabled}
         >
@@ -79,9 +88,6 @@ const createStyles = (colors: ReturnType<typeof useTheme>, size: 'small' | 'medi
         borderColor: colors.border,
         padding: 12,
     },
-    pressed: {
-        opacity: 0.7,
-    },
     cover: {
         borderRadius: size === 'small' ? 4 : 8,
     },
@@ -96,18 +102,5 @@ const createStyles = (colors: ReturnType<typeof useTheme>, size: 'small' | 'medi
     info: {
         flex: 1,
         gap: 2,
-    },
-    title: {
-        fontFamily: size === 'medium' ? 'Lora_700Bold' : undefined,
-        fontSize: size === 'medium' ? 16 : 14,
-        fontWeight: size === 'medium' ? undefined : '600',
-        // Both current call sites always pass `onPress`, so this always sits
-        // on the always-white `pressable` card — needs the fixed-dark token,
-        // not the theme-flipping one, or it disappears in dark mode.
-        color: colors.sheetText,
-    },
-    author: {
-        fontSize: 13,
-        color: colors.sheetTextSecondary,
     },
 });

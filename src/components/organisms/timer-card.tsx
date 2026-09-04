@@ -1,7 +1,8 @@
 import { useTheme } from "@/hooks/use-theme";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Icon } from "../atoms/icon";
+import Typography from "../atoms/typography";
 
 const MAX_MEMBERS = 10;
 
@@ -24,12 +25,12 @@ export default function TimerCard({ elapsedSeconds, duration, memberCount, onPre
 
     return (
         <Pressable hitSlop={10} onPress={onPress} style={styles.timerCard}>
-            <Text style={styles.timerValue}>
+            <Typography variant="timerValue" style={styles.timerValue}>
                 {formatDuration(isOpenEnded ? elapsedSeconds : remainingSeconds)}
-            </Text>
-            <Text style={styles.timerLabel}>
+            </Typography>
+            <Typography variant="timerLabel" style={styles.timerLabel}>
                 {isOpenEnded ? t('rooms.timer.reading') : t('rooms.timer.remaining')}
-            </Text>
+            </Typography>
             {isOpenEnded ? (
                 <View style={styles.openSpacer} />
             ) : (
@@ -38,14 +39,14 @@ export default function TimerCard({ elapsedSeconds, duration, memberCount, onPre
                 </View>
             )}
             <View style={styles.timerFooterRow}>
-                <Text style={styles.timerFooterText}>
+                <Typography variant="captionSemibold" style={styles.timerFooterText}>
                     {isOpenEnded ? t('rooms.timer.alwaysOpen') : t('rooms.timer.goal', { duration })}
-                </Text>
+                </Typography>
                 <View style={styles.timerFooterRight}>
                     <Icon name="person.2" color={colors.timerCardText} />
-                    <Text style={styles.timerFooterText}>
+                    <Typography variant="captionSemibold" style={styles.timerFooterText}>
                         {memberCount}/{MAX_MEMBERS}
-                    </Text>
+                    </Typography>
                 </View>
             </View>
         </Pressable>
@@ -70,12 +71,12 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         shadowOffset: { width: 0, height: 18 },
         elevation: 8,
     },
-    timerValue: { fontSize: 44, fontWeight: '700', color: colors.timerCardText, textAlign: 'center', letterSpacing: -1.5 },
-    timerLabel: { fontSize: 15, fontWeight: '500', color: colors.timerCardText, textAlign: 'center', marginTop: 5 },
+    timerValue: { color: colors.timerCardText, textAlign: 'center' },
+    timerLabel: { color: colors.timerCardText, textAlign: 'center', marginTop: 5 },
     progressTrack: { height: 7, borderRadius: 4, backgroundColor: colors.timerCardTrack, marginVertical: 16, overflow: 'hidden' },
     openSpacer: { height: 7, marginVertical: 16 },
     progressFill: { height: '100%', borderRadius: 4, backgroundColor: colors.accent },
     timerFooterRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     timerFooterRight: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-    timerFooterText: { fontSize: 13, fontWeight: '600', color: colors.timerCardText },
+    timerFooterText: { color: colors.timerCardText },
 })

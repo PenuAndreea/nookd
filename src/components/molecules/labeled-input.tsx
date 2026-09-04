@@ -1,6 +1,7 @@
 import { ReactNode, useState } from 'react';
-import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
+import { StyleSheet, TextInput, TextInputProps, View } from 'react-native';
 
+import Typography, { TypographyStyles } from '@/components/atoms/typography';
 import { useTheme } from '@/hooks/use-theme';
 
 interface LabeledInputProps extends TextInputProps {
@@ -32,14 +33,14 @@ export const LabeledInput = ({ label, error, right, ...props }: LabeledInputProp
 
     return (
         <View style={styles.wrapper}>
-            <Text style={styles.label}>{label}</Text>
+            <Typography variant="sectionLabel" color="textSecondary">{label}</Typography>
             {right ? (
                 <View style={styles.row}>
                     {input}
                     {right}
                 </View>
             ) : input}
-            {error && <Text style={styles.error}>{error}</Text>}
+            {error && <Typography variant="small" color="error">{error}</Typography>}
         </View>
     );
 };
@@ -48,26 +49,19 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
     wrapper: {
         gap: 6,
     },
-    label: {
-        fontSize: 12,
-        fontWeight: '600',
-        color: colors.textSecondary,
-        textTransform: 'uppercase',
-        letterSpacing: 0.6,
-    },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
     },
     input: {
+        ...TypographyStyles.subtitle,
         backgroundColor: colors.white,
         borderRadius: 12,
         borderWidth: 0.5,
         borderColor: colors.border,
         paddingHorizontal: 14,
         paddingVertical: 13,
-        fontSize: 15,
         // The box is always white — typed text needs the fixed-dark token,
         // or it turns near-white (and invisible) in dark mode.
         color: colors.sheetText,
@@ -82,9 +76,5 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
     inputError: {
         borderWidth: 1.5,
         borderColor: colors.error,
-    },
-    error: {
-        fontSize: 12,
-        color: colors.error,
     },
 });

@@ -1,7 +1,8 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import Avatar from '@/components/atoms/avatar';
+import Typography from '@/components/atoms/typography';
 import { useTheme } from '@/hooks/use-theme';
 
 const SHOWN = 5;
@@ -26,17 +27,19 @@ export default function ReaderList({ members, currentUserId }: ReaderListProps) 
             {shown.map((member) => (
                 <View key={member.user_id} style={styles.cell}>
                     <Avatar id={member.user_id} size="xlarge" />
-                    <Text style={styles.name} numberOfLines={1}>
+                    <Typography variant="small" color="sheetTextSecondary" numberOfLines={1}>
                         {member.user_id === currentUserId ? t('rooms.readerList.you') : ''}
-                    </Text>
+                    </Typography>
                 </View>
             ))}
             {overflow > 0 && (
                 <View style={styles.cell}>
                     <View style={styles.moreCircle}>
-                        <Text style={styles.moreText}>{t('rooms.readerList.overflow', { count: overflow })}</Text>
+                        <Typography variant="captionBold" style={{ color: colors.statusQuietFg }}>
+                            {t('rooms.readerList.overflow', { count: overflow })}
+                        </Typography>
                     </View>
-                    <Text style={styles.name}>{t('rooms.readerList.more')}</Text>
+                    <Typography variant="small" color="sheetTextSecondary">{t('rooms.readerList.more')}</Typography>
                 </View>
             )}
         </ScrollView>
@@ -50,10 +53,6 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         marginRight: 14,
         gap: 6,
     },
-    name: {
-        fontSize: 12,
-        color: colors.sheetTextSecondary,
-    },
     moreCircle: {
         width: 44,
         height: 44,
@@ -61,10 +60,5 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         backgroundColor: colors.statusQuietBg,
         alignItems: 'center',
         justifyContent: 'center',
-    },
-    moreText: {
-        fontSize: 13,
-        fontWeight: '700',
-        color: colors.statusQuietFg,
     },
 });

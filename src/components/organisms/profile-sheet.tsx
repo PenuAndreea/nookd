@@ -4,11 +4,12 @@ import BottomSheet, {
     BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { forwardRef, useCallback } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import Avatar from '@/components/atoms/avatar';
 import Button from '@/components/atoms/button';
+import Typography from '@/components/atoms/typography';
 import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -52,9 +53,9 @@ const ProfileSheet = forwardRef<BottomSheet, ProfileSheetProps>(
                     <View style={styles.identity}>
                         <Avatar id={userId} size="xxlarge" />
                         {email && (
-                            <Text style={styles.email} numberOfLines={1}>
+                            <Typography variant="subhead" color="sheetText" numberOfLines={1}>
                                 {email}
-                            </Text>
+                            </Typography>
                         )}
                     </View>
 
@@ -100,10 +101,5 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
     identity: {
         alignItems: 'center',
         gap: Spacing.two,
-    },
-    email: {
-        fontSize: 15,
-        fontWeight: '600',
-        color: colors.sheetText,
     },
 });

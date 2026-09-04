@@ -5,13 +5,14 @@ import BottomSheet, {
     BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { forwardRef, useCallback, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Book } from '@/api/books';
 import Button from '@/components/atoms/button';
 import Checkbox from '@/components/atoms/checkbox';
 import TextButton from '@/components/atoms/text-button';
+import Typography, { TypographyStyles } from '@/components/atoms/typography';
 import { SessionMoodPicker } from '@/components/molecules/picker';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -84,11 +85,11 @@ const ReflectionSheet = forwardRef<BottomSheet, ReflectionSheetProps>(
                 handleIndicatorStyle={styles.handleIndicator}
             >
                 <BottomSheetView style={styles.content}>
-                    <Text style={styles.title}>{t('rooms.reflection.title')}</Text>
-                    {book && <Text style={styles.subtitle}>{book.title}</Text>}
+                    <Typography variant="sheetTitle">{t('rooms.reflection.title')}</Typography>
+                    {book && <Typography color="textSecondary" style={styles.subtitle}>{book.title}</Typography>}
 
                     <View style={styles.section}>
-                        <Text style={styles.label}>{t('rooms.reflection.thoughtsLabel')}</Text>
+                        <Typography variant="sectionLabel" color="textSecondary">{t('rooms.reflection.thoughtsLabel')}</Typography>
                         <BottomSheetTextInput
                             style={styles.textArea}
                             placeholder={t('rooms.reflection.thoughtsPlaceholder')}
@@ -102,11 +103,11 @@ const ReflectionSheet = forwardRef<BottomSheet, ReflectionSheetProps>(
 
                     {book && (
                         <View style={styles.section}>
-                            <Text style={styles.label}>
+                            <Typography variant="sectionLabel" color="textSecondary">
                                 {book.page_count
                                     ? t('rooms.reflection.pageReachedLabelWithTotal', { total: book.page_count })
                                     : t('rooms.reflection.pageReachedLabel')}
-                            </Text>
+                            </Typography>
                             <BottomSheetTextInput
                                 style={styles.pageInput}
                                 placeholder="0"
@@ -128,7 +129,7 @@ const ReflectionSheet = forwardRef<BottomSheet, ReflectionSheetProps>(
                         />
                     )}
 
-                    {error && <Text style={styles.error}>{error}</Text>}
+                    {error && <Typography variant="caption" color="error">{error}</Typography>}
 
                     <View style={styles.actions}>
                         <Button
@@ -174,78 +175,37 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         paddingVertical: 16,
         gap: 16,
     },
-    title: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: colors.text,
-    },
     subtitle: {
-        fontSize: 14,
-        color: colors.textSecondary,
         marginTop: -12,
     },
     section: {
         gap: 6,
     },
-    label: {
-        fontSize: 12,
-        fontWeight: '600',
-        color: colors.textSecondary,
-        textTransform: 'uppercase',
-        letterSpacing: 0.6,
-    },
     textArea: {
+        ...TypographyStyles.subtitle,
         backgroundColor: colors.backgroundElement,
         borderRadius: 12,
         paddingHorizontal: 14,
         paddingVertical: 12,
-        fontSize: 15,
         color: colors.text,
         minHeight: 72,
         textAlignVertical: 'top',
     },
     pageInput: {
+        ...TypographyStyles.subtitle,
         backgroundColor: colors.backgroundElement,
         borderRadius: 12,
         paddingHorizontal: 14,
         paddingVertical: 12,
-        fontSize: 15,
         color: colors.text,
-    },
-    finishedRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
-    },
-    checkbox: {
-        width: 20,
-        height: 20,
-        borderRadius: 6,
-        borderWidth: 1.5,
-        borderColor: colors.accent,
-    },
-    checkboxChecked: {
-        backgroundColor: colors.accent,
-    },
-    finishedLabel: {
-        fontSize: 14,
-        color: colors.text,
-    },
-    error: {
-        fontSize: 13,
-        color: colors.error,
     },
     actions: {
         gap: 12,
         alignItems: 'center',
         marginTop: 8,
     },
-    skipButton: {
-        padding: 8,
-    },
     skipText: {
-        fontSize: 14,
+        ...TypographyStyles.bodyBold,
         color: colors.textSecondary,
-        fontWeight: '600',
     },
 });

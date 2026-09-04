@@ -1,5 +1,6 @@
 import { ActivityIndicator, StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
 
+import { TypographyStyles } from '@/components/atoms/typography';
 import { useTheme } from '@/hooks/use-theme';
 
 interface SearchFieldProps extends TextInputProps {
@@ -40,8 +41,8 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         fontSize: 16,
     },
     input: {
+        ...TypographyStyles.subtitle,
         flex: 1,
-        fontSize: 15,
         // The wrapper is always white — needs the fixed-dark token, not the
         // theme-flipping one, or typed text vanishes in dark mode.
         color: colors.sheetText,

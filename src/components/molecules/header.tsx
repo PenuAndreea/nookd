@@ -1,7 +1,9 @@
 import { useRouter } from 'expo-router';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import BackButton from '@/components/atoms/back-button';
+import { TypographyStyles } from '@/components/atoms/typography';
 import { useTheme } from '@/hooks/use-theme';
 
 interface HeaderProps {
@@ -21,14 +23,7 @@ export const Header = ({ title, showBack = false, onBack, right }: HeaderProps) 
         <View style={[styles.wrapper, { paddingTop: insets.top - 20 }]}>
             <View style={styles.left}>
                 {showBack && (
-                    <TouchableOpacity
-                        style={styles.backButton}
-                        onPress={onBack ?? (() => router.back())}
-                        hitSlop={8}
-                        activeOpacity={0.7}
-                    >
-                        <Text style={styles.backArrow}>‹</Text>
-                    </TouchableOpacity>
+                    <BackButton onPress={onBack ?? (() => router.back())} />
                 )}
             </View>
 
@@ -58,28 +53,9 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         alignItems: 'flex-end',
     },
     title: {
-        fontSize: 17,
-        fontWeight: '700',
+        ...TypographyStyles.navTitle,
         color: colors.text,
         flex: 1,
         textAlign: 'center',
-    },
-    backButton: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        backgroundColor: colors.white,
-        borderWidth: 0.5,
-        borderColor: colors.border,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    backArrow: {
-        fontSize: 24,
-        // The circle behind this is always white (see `backButton`), so the
-        // arrow needs the always-dark `sheetText` token, not `text` — which
-        // turns near-white in dark mode and would vanish on a white circle.
-        color: colors.sheetText,
-        lineHeight: 28,
     },
 });

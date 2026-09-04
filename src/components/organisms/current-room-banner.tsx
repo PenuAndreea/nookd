@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { RoomWithDetails } from '@/api/rooms';
@@ -44,7 +44,7 @@ export default function CurrentRoomBanner({ room }: { room: RoomWithDetails }) {
                         {room.name}
                     </Typography>
 
-                    <Text style={styles.meta} numberOfLines={1}>{meta}</Text>
+                    <Typography style={styles.meta} numberOfLines={1}>{meta}</Typography>
                 </View>
 
                 <RoomThumbnail room={room} width={84} />
@@ -85,7 +85,6 @@ const useStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
         marginBottom: 0,
     },
     meta: {
-        fontSize: 14,
         color: colors.bannerTextSecondary,
     },
 });

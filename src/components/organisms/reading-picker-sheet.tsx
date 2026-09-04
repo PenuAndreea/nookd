@@ -4,11 +4,12 @@ import BottomSheet, {
     BottomSheetFlatList,
 } from '@gorhom/bottom-sheet';
 import { forwardRef, useCallback } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { UserBookWithBook } from '@/api/books';
 import TextButton from '@/components/atoms/text-button';
+import Typography from '@/components/atoms/typography';
 import BookRow from '@/components/molecules/book-row';
 import { EmptyState } from '@/components/molecules/empty-state';
 import { ErrorState } from '@/components/molecules/error-state';
@@ -58,10 +59,10 @@ const ReadingPickerSheet = forwardRef<BottomSheet, ReadingPickerSheetProps>(
                     contentContainerStyle={styles.listContent}
                     ListHeaderComponent={
                         <View style={styles.header}>
-                            <Text style={styles.title}>{t('rooms.readingPicker.title')}</Text>
-                            <Text style={styles.subtitle}>
+                            <Typography variant="sheetTitle" color="sheetText">{t('rooms.readingPicker.title')}</Typography>
+                            <Typography variant="caption" color="sheetTextSecondary">
                                 {t('rooms.readingPicker.subtitle')}
-                            </Text>
+                            </Typography>
                         </View>
                     }
                     ListEmptyComponent={error ? (
@@ -115,15 +116,6 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
     header: {
         paddingBottom: 12,
         gap: 4,
-    },
-    title: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: colors.sheetText,
-    },
-    subtitle: {
-        fontSize: 13,
-        color: colors.sheetTextSecondary,
     },
     listContent: {
         paddingHorizontal: 24,

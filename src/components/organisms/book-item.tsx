@@ -1,6 +1,7 @@
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 
 import { UserBookWithBook } from '@/api/books';
+import { createCommonStyles } from '@/constants/common-styles';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { router } from 'expo-router';
@@ -10,6 +11,7 @@ import Typography from '../atoms/typography';
 export default function BookItem({ userBook }: { userBook: UserBookWithBook }) {
     const colors = useTheme();
     const styles = useStyles(colors);
+    const common = createCommonStyles();
 
     const { book } = userBook;
     const hasProgress =
@@ -26,7 +28,7 @@ export default function BookItem({ userBook }: { userBook: UserBookWithBook }) {
 
     return (
         <Pressable
-            style={({ pressed }) => [styles.container, pressed && styles.containerPressed]}
+            style={({ pressed }) => [styles.container, pressed && common.pressed]}
             onPress={navigateToBook}
         >
             <View style={[styles.cover, book.cover_url && styles.coverNoBackground]}>
@@ -61,9 +63,6 @@ const useStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
         borderWidth: 1,
         borderRadius: BorderRadius.medium,
         borderColor: colors.border,
-    },
-    containerPressed: {
-        opacity: 0.7,
     },
     cover: {
         width: 56,

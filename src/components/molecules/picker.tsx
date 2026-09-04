@@ -1,7 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import Chip from '@/components/atoms/chip';
+import Typography from '@/components/atoms/typography';
 import { useTheme } from '@/hooks/use-theme';
 
 // `id` is persisted directly to the database (e.g. `rooms.vibe`) — it must
@@ -41,7 +42,7 @@ const ChipGrid = ({ label, options, value, onChange, twoPerRow }: ChipGridProps)
 
     return (
         <View style={styles.wrapper}>
-            <Text style={styles.label}>{label}</Text>
+            <Typography variant="sectionLabel" color="textSecondary">{label}</Typography>
             <View style={styles.grid}>
                 {options.map(option => (
                     <Chip
@@ -89,13 +90,6 @@ export const DurationPicker = ({ value, onChange }: DurationPickerProps) => {
 const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     wrapper: {
         gap: 6,
-    },
-    label: {
-        fontSize: 12,
-        fontWeight: '600',
-        color: colors.textSecondary,
-        textTransform: 'uppercase',
-        letterSpacing: 0.6,
     },
     grid: {
         flexDirection: 'row',

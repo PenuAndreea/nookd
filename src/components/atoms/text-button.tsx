@@ -1,5 +1,6 @@
 import { StyleProp, StyleSheet, Text, TextStyle, TouchableOpacity } from 'react-native';
 
+import { TypographyStyles } from './typography';
 import { useTheme } from '@/hooks/use-theme';
 
 interface TextButtonProps {
@@ -31,12 +32,11 @@ export default function TextButton({ title, onPress, variant = 'accent', disable
 
 const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     text: {
-        fontSize: 15,
-        fontWeight: '600',
+        ...TypographyStyles.subhead,
         color: colors.accent,
     },
     secondary: {
-        fontWeight: '400',
+        ...TypographyStyles.subtitle,
         color: colors.textSecondary,
         textAlign: 'center',
     },

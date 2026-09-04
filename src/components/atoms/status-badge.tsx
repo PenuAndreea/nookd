@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import { TypographyStyles } from './typography';
 import { BorderRadius } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -74,7 +75,6 @@ const styles = StyleSheet.create({
         fontSize: 11,
     },
     label: {
-        fontSize: 11,
-        fontWeight: '700',
+        ...TypographyStyles.tinyBold,
     },
 });

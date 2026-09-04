@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import logo from '@/assets/images/logo.png';
@@ -91,7 +91,7 @@ export default function AuthForm({
                 onChangeText={setPassword}
             />
 
-            {error ? <Text style={styles.error}>{error}</Text> : null}
+            {error ? <Typography variant="caption" color="error">{error}</Typography> : null}
 
             {loading ? (
                 <ActivityIndicator color={colors.accent} />
@@ -125,10 +125,6 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
     },
     title: {
         alignSelf: 'center',
-    },
-    error: {
-        color: colors.error,
-        fontSize: 13,
     },
     footer: {
         marginTop: Spacing.two,

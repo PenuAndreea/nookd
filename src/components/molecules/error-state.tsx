@@ -1,8 +1,9 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Icon } from '@/components/atoms/icon';
 import Button from '@/components/atoms/button';
+import Typography from '@/components/atoms/typography';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -22,14 +23,17 @@ interface ErrorStateProps {
  */
 export const ErrorState = ({ title, subtitle, retryLabel, onRetry }: ErrorStateProps) => {
     const colors = useTheme();
-    const styles = createStyles(colors);
     const { t } = useTranslation();
 
     return (
         <View style={styles.wrapper}>
             <Icon name="exclamationmark.triangle" size={32} color={colors.error} />
-            <Text style={styles.title}>{title ?? t('common.errorTitle')}</Text>
-            <Text style={styles.subtitle}>{subtitle ?? t('common.errorSubtitle')}</Text>
+            <Typography variant="subhead" color="textSecondary" style={styles.centerText}>
+                {title ?? t('common.errorTitle')}
+            </Typography>
+            <Typography color="textSecondary" style={styles.centerText}>
+                {subtitle ?? t('common.errorSubtitle')}
+            </Typography>
             {onRetry && (
                 <View style={styles.action}>
                     <Button title={retryLabel ?? t('common.tryAgain')} onPress={onRetry} />
@@ -39,22 +43,14 @@ export const ErrorState = ({ title, subtitle, retryLabel, onRetry }: ErrorStateP
     );
 };
 
-const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
+const styles = StyleSheet.create({
     wrapper: {
         alignItems: 'center',
         marginTop: Spacing.six,
         gap: Spacing.two,
         paddingHorizontal: Spacing.four,
     },
-    title: {
-        fontSize: 15,
-        fontWeight: '600',
-        color: colors.textSecondary,
-        textAlign: 'center',
-    },
-    subtitle: {
-        fontSize: 14,
-        color: colors.textSecondary,
+    centerText: {
         textAlign: 'center',
     },
     action: {

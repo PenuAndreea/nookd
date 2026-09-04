@@ -1,6 +1,7 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import Typography from '@/components/atoms/typography';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -26,12 +27,12 @@ export default function BookHero({ book, activeRoomCount }: BookHeroProps) {
                 )}
             </View>
             <View style={styles.info}>
-                <Text style={styles.title}>{book.title}</Text>
-                {book.author && <Text style={styles.author}>{book.author}</Text>}
+                <Typography variant="title3">{book.title}</Typography>
+                {book.author && <Typography color="textSecondary">{book.author}</Typography>}
                 {activeRoomCount > 0 && (
-                    <Text style={styles.activeReaders}>
+                    <Typography variant="small" color="accent" style={styles.activeReaders}>
                         {t('books.activeReaders', { count: activeRoomCount })}
-                    </Text>
+                    </Typography>
                 )}
             </View>
         </View>
@@ -67,18 +68,7 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         justifyContent: 'center',
         gap: 4,
     },
-    title: {
-        fontFamily: 'Lora_700Bold',
-        fontSize: 20,
-        color: colors.text,
-    },
-    author: {
-        fontSize: 14,
-        color: colors.textSecondary,
-    },
     activeReaders: {
-        fontSize: 12,
-        color: colors.accent,
         marginTop: 4,
     },
 });

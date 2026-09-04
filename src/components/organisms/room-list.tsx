@@ -1,4 +1,4 @@
-import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { router } from 'expo-router';
@@ -6,6 +6,7 @@ import { router } from 'expo-router';
 import ReadingNook from '@/assets/images/icons/reading-nook.svg';
 import BookLover from '@/assets/images/illustrations/cuate/book-lover.svg';
 import Button from '@/components/atoms/button';
+import Typography from '@/components/atoms/typography';
 import { EmptyState } from '@/components/molecules/empty-state';
 import { ErrorState } from '@/components/molecules/error-state';
 import { Spacing } from '@/constants/theme';
@@ -34,7 +35,7 @@ export default function RoomList() {
     return (
         <View style={styles.container}>
             {currentRoom && <CurrentRoomBanner room={currentRoom} />}
-            {showOtherRooms && <Text style={styles.sectionLabel}>{t('rooms.sectionLabel')}</Text>}
+            {showOtherRooms && <Typography variant="sectionLabel" color="textSecondary">{t('rooms.sectionLabel')}</Typography>}
             {loading ?
                 <ActivityIndicator size="large" style={{ justifyContent: 'center', alignSelf: 'center', alignItems: 'center', alignContent: 'center', height: '80%' }} color={colors.accent} /> :
                 <FlatList
@@ -85,12 +86,5 @@ const useStyles = (colors: any) => StyleSheet.create({
     },
     listContent: {
         paddingTop: Spacing.three,
-    },
-    sectionLabel: {
-        fontSize: 12,
-        fontWeight: '600',
-        color: colors.textSecondary,
-        textTransform: 'uppercase',
-        letterSpacing: 0.6,
     },
 });

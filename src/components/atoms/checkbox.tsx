@@ -1,5 +1,6 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
+import Typography from './typography';
 import { useTheme } from '@/hooks/use-theme';
 
 interface CheckboxProps {
@@ -24,7 +25,7 @@ export default function Checkbox({ label, checked, onPress, disabled }: Checkbox
             accessibilityState={{ checked }}
         >
             <View style={[styles.box, checked && styles.boxChecked]} />
-            <Text style={styles.label}>{label}</Text>
+            <Typography>{label}</Typography>
         </TouchableOpacity>
     );
 }
@@ -44,9 +45,5 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
     },
     boxChecked: {
         backgroundColor: colors.accent,
-    },
-    label: {
-        fontSize: 14,
-        color: colors.text,
     },
 });

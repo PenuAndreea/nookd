@@ -6,6 +6,7 @@ import Animated from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 
 import Button from '@/components/atoms/button';
+import { TypographyStyles } from '@/components/atoms/typography';
 import { ErrorState } from '@/components/molecules/error-state';
 import { Header } from '@/components/molecules/header';
 import ReadingPickerSheet from '@/components/organisms/reading-picker-sheet';
@@ -165,13 +166,12 @@ export default function SilentRoomScreen() {
 
 const styles = StyleSheet.create({
     presenceWarning: {
+        ...TypographyStyles.smallBold,
         position: 'absolute',
         top: 60,
         left: 0,
         right: 0,
         textAlign: 'center',
-        fontSize: 12,
-        fontWeight: '600',
         paddingVertical: 4,
         zIndex: 1,
     },

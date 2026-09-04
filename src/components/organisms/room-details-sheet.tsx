@@ -5,13 +5,14 @@ import BottomSheet, {
 } from '@gorhom/bottom-sheet';
 import { router } from 'expo-router';
 import { forwardRef, useCallback } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Book, RoomWithBook } from '@/api/rooms';
 import Button from '@/components/atoms/button';
 import StatusBadge from '@/components/atoms/status-badge';
 import TextButton from '@/components/atoms/text-button';
+import Typography from '@/components/atoms/typography';
 import BookRow from '@/components/molecules/book-row';
 import ReaderList from '@/components/molecules/reader-list';
 import { useTheme } from '@/hooks/use-theme';
@@ -69,30 +70,34 @@ const RoomDetailsSheet = forwardRef<BottomSheet, RoomDetailsSheetProps>(
                 handleIndicatorStyle={styles.handleIndicator}
             >
                 <BottomSheetScrollView contentContainerStyle={styles.content}>
-                    <Text style={styles.peekLabel}>{t('rooms.details.peekLabel')}</Text>
+                    <Typography variant="caption" color="sheetTextSecondary" style={styles.peekLabel}>
+                        {t('rooms.details.peekLabel')}
+                    </Typography>
 
                     <View style={styles.titleRow}>
-                        <Text style={styles.title} numberOfLines={1}>
+                        <Typography variant="title2" color="sheetText" style={styles.title} numberOfLines={1}>
                             {room?.name ?? t('rooms.details.fallbackTitle')}
-                        </Text>
+                        </Typography>
                         <StatusBadge memberCount={memberCount} />
                     </View>
                     {room?.description && (
-                        <Text style={styles.description}>{room.description}</Text>
+                        <Typography color="sheetTextSecondary" style={styles.description}>{room.description}</Typography>
                     )}
 
                     <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>{t('rooms.details.readersSectionTitle')}</Text>
-                        <Text style={styles.sectionCount}>{memberCount}</Text>
+                        <Typography variant="sectionHeading" color="sheetText">{t('rooms.details.readersSectionTitle')}</Typography>
+                        <Typography variant="bodyLarge" color="sheetTextSecondary">{memberCount}</Typography>
                     </View>
 
                     {memberCount === 0 ? (
-                        <Text style={styles.emptyHint}>{t('rooms.details.noOneHereYet')}</Text>
+                        <Typography color="sheetTextSecondary">{t('rooms.details.noOneHereYet')}</Typography>
                     ) : (
                         <ReaderList members={members} currentUserId={userId} />
                     )}
 
-                    <Text style={[styles.sectionTitle, styles.readingTitle]}>{t('rooms.details.currentlyReadingSectionTitle')}</Text>
+                    <Typography variant="sectionHeading" color="sheetText" style={styles.readingTitle}>
+                        {t('rooms.details.currentlyReadingSectionTitle')}
+                    </Typography>
 
                     {booksInRoom.map(({ book, count }) => (
                         <View key={book.id} style={styles.bookCardWrapper}>
@@ -102,9 +107,9 @@ const RoomDetailsSheet = forwardRef<BottomSheet, RoomDetailsSheetProps>(
                                 onPress={() => router.push(`/books/${book.id}`)}
                                 belowInfo={
                                     <View style={styles.bookCountPill}>
-                                        <Text style={styles.bookCountText}>
+                                        <Typography variant="smallBold" style={{ color: colors.statusQuietFg }}>
                                             {t('rooms.details.readingThisBook', { count })}
-                                        </Text>
+                                        </Typography>
                                     </View>
                                 }
                             />
@@ -116,7 +121,7 @@ const RoomDetailsSheet = forwardRef<BottomSheet, RoomDetailsSheetProps>(
                     )}
 
                     {!isJoined && booksInRoom.length === 0 && (
-                        <Text style={styles.emptyHint}>{t('rooms.details.nothingYet')}</Text>
+                        <Typography color="sheetTextSecondary">{t('rooms.details.nothingYet')}</Typography>
                     )}
 
                     {isJoined && (
@@ -161,8 +166,6 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
     // The only thing visible at the peek snap point — a hint of what
     // dragging the sheet up reveals.
     peekLabel: {
-        fontSize: 14,
-        color: colors.sheetTextSecondary,
         textAlign: 'center',
         marginBottom: 20,
     },
@@ -174,13 +177,8 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
     },
     title: {
         flexShrink: 1,
-        fontFamily: 'Lora_700Bold',
-        fontSize: 22,
-        color: colors.sheetText,
     },
     description: {
-        fontSize: 14,
-        color: colors.sheetTextSecondary,
         marginTop: 4,
     },
     sectionHeader: {
@@ -189,15 +187,6 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         justifyContent: 'space-between',
         marginTop: 22,
         marginBottom: 12,
-    },
-    sectionTitle: {
-        fontSize: 16,
-        fontWeight: '700',
-        color: colors.sheetText,
-    },
-    sectionCount: {
-        fontSize: 16,
-        color: colors.sheetTextSecondary,
     },
     readingTitle: {
         marginTop: 22,
@@ -214,19 +203,10 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         borderRadius: 999,
         backgroundColor: colors.statusQuietBg,
     },
-    bookCountText: {
-        fontSize: 12,
-        color: colors.statusQuietFg,
-        fontWeight: '600',
-    },
     addBookText: {
         paddingVertical: 12,
     },
     leaveButton: {
         marginTop: 8,
-    },
-    emptyHint: {
-        fontSize: 14,
-        color: colors.sheetTextSecondary,
     },
 });
