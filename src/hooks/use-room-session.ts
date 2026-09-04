@@ -1,13 +1,14 @@
 import type BottomSheet from '@gorhom/bottom-sheet';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert } from 'react-native';
 import type { RefObject } from 'react';
 
 import { UserBookWithBook } from '@/api/books';
-import { Book, forceLeaveRoom, getRoomMembersByRoomId, RoomWithBook, updateRoomMemberBook } from '@/api/rooms';
+import { forceLeaveRoom, getRoomMembersByRoomId, RoomWithBook } from '@/api/rooms';
 import i18n from '@/i18n';
 import { useRooms } from '@/contexts/rooms-context';
 import { useElapsedSeconds } from '@/hooks/use-elapsed-seconds';
+import { useRoomBooks } from '@/hooks/use-room-books';
 import { useRoomPresence } from '@/hooks/use-room-presence';
 
 interface UseRoomSessionParams {
@@ -25,9 +26,9 @@ interface UseRoomSessionParams {
 /**
  * The interactive lifecycle of being in a room: joining (including the
  * "leave your current room?" prompt when you're already in a different
- * one), leaving, and picking which book you're reading here. Room *data*
- * itself (the room row, your library) lives in useRoomData — this hook is
- * everything built on top of it, plus the presence connection itself.
+ * one) and leaving. Room *data* itself lives in useRoomData, and which book
+ * each member is reading lives in useRoomBooks — this hook is the join/leave
+ * lifecycle both sit on top of, plus the presence connection itself.
  */
 export function useRoomSession({
     roomId,
@@ -43,7 +44,6 @@ export function useRoomSession({
         useRoomPresence(roomId, userId)
     const { currentRoom, markJoined, markLeft } = useRooms()
 
-    const [memberBooks, setMemberBooks] = useState<Record<string, Book | null>>({});
     // When *this* user joined, read from the membership row so it survives
     // leaving the screen and coming back.
     const [joinedAt, setJoinedAt] = useState<string | null>(null);
@@ -55,20 +55,6 @@ export function useRoomSession({
     const roomElapsedSeconds = useElapsedSeconds(room?.started_at);
     const sessionElapsedSeconds = useElapsedSeconds(joinedAt);
     const displayedElapsedSeconds = isOpenEnded ? sessionElapsedSeconds : roomElapsedSeconds;
-
-    // One card per distinct book, with how many people are on it.
-    const booksInRoom = useMemo(() => {
-        const byBook = new Map<string, { book: Book; count: number }>()
-        for (const member of members) {
-            const book = memberBooks[member.user_id]
-            if (!book) continue
-            const seen = byBook.get(book.id)
-            if (seen) seen.count += 1
-            else byBook.set(book.id, { book, count: 1 })
-        }
-        return [...byBook.values()].sort((a, b) => b.count - a.count)
-    }, [members, memberBooks]);
-    const selfHasBook = !!(userId && memberBooks[userId]);
 
     const hasAttemptedJoinRef = useRef(false)
     const hasCheckedMembershipRef = useRef(false)
@@ -88,6 +74,16 @@ export function useRoomSession({
             Alert.alert(i18n.t('rooms.joinErrorTitle'), i18n.t('rooms.joinErrorMessage'))
         }
     }, [joinRoom, markJoined, roomId, userId])
+
+    const { booksInRoom, selfHasBook, handleSelectBook, handleSkipBook, openReadingPicker } = useRoomBooks({
+        roomId,
+        userId,
+        members,
+        libraryBooks,
+        isJoined,
+        attemptJoin,
+        readingPickerRef,
+    });
 
     // Silently re-establish presence if the user already joined this room
     // on a previous visit — otherwise leave it to the "Join" button so
@@ -116,7 +112,7 @@ export function useRoomSession({
         if (room?.vibe === 'book_club') {
             attemptJoin()
         } else {
-            readingPickerRef.current?.snapToIndex(0)
+            openReadingPicker()
         }
     }
 
@@ -169,57 +165,6 @@ export function useRoomSession({
         // keeps this to a single run.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [autojoin, hasCheckedMembership, isJoined])
-
-    async function handleSelectBook(bookId: string) {
-        readingPickerRef.current?.close()
-
-        if (!isJoined) {
-            await attemptJoin(bookId)
-            return
-        }
-
-        if (!userId) return
-
-        try {
-            await updateRoomMemberBook(roomId, userId, bookId)
-            const selected = libraryBooks.find((entry) => entry.book_id === bookId)?.book ?? null
-            setMemberBooks((prev) => ({ ...prev, [userId]: selected }))
-        } catch (error) {
-            console.error('Error updating book selection:', error)
-            Alert.alert(i18n.t('rooms.selectBookErrorTitle'), i18n.t('rooms.selectBookErrorMessage'))
-        }
-    }
-
-    async function handleSkipBook() {
-        readingPickerRef.current?.close()
-        if (!isJoined) {
-            await attemptJoin()
-        }
-    }
-
-    function openReadingPicker() {
-        readingPickerRef.current?.snapToIndex(0)
-    }
-
-    useEffect(() => {
-        if (!members.length) return
-
-        let isActive = true
-
-        getRoomMembersByRoomId(roomId)
-            .then((roomMembers) => {
-                if (isActive) {
-                    setMemberBooks(Object.fromEntries(roomMembers.map((m) => [m.user_id, m.book])))
-                }
-            })
-            // Decorative — degrades to no book badges next to readers, not
-            // worth interrupting the room over.
-            .catch((error) => console.error('Error loading member books:', error))
-
-        return () => {
-            isActive = false
-        }
-    }, [members, roomId])
 
     async function handleLeaveRoom() {
         bottomSheetRef.current?.close();
