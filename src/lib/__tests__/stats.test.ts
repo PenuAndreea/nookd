@@ -14,6 +14,7 @@ function session(daysAgo: number, overrides: Partial<StatsSession> = {}): StatsS
         ended_reason: 'left',
         mood: null,
         page_reached: null,
+        pages_read: null,
         thoughts: null,
         room_id: 'room-1',
         room_name: 'Rainy Library',
@@ -79,9 +80,26 @@ describe('summarize', () => {
         expect(summary.moods).toEqual([{ mood: 'focused', count: 1, share: 1 }]);
     });
 
-    it('sizes the day chart to the range being shown', () => {
-        expect(summarize([], 'week', NOW).byDay).toHaveLength(7);
-        expect(summarize([], 'month', NOW).byDay).toHaveLength(30);
+    it('sizes the chart to the range being shown', () => {
+        expect(summarize([], 'week', NOW).series).toHaveLength(7);
+        expect(summarize([], 'month', NOW).series).toHaveLength(30);
+    });
+
+    it('charts a year by month, since 365 daily bars do not fit a screen', () => {
+        const summary = summarize([], 'year', NOW);
+
+        expect(summary.series).toHaveLength(12);
+        expect(summary.seriesUnit).toBe('month');
+        // Oldest first, ending on the current month.
+        expect(summary.series[11].key).toBe('2026-09');
+        expect(summary.series[0].key).toBe('2025-10');
+    });
+
+    it('buckets a session into its calendar month for the year chart', () => {
+        const summary = summarize([session(40, { duration_minutes: 55 })], 'year', NOW);
+        const thisMonth = summary.series.find((bucket) => bucket.key === '2026-07');
+
+        expect(thisMonth?.minutes).toBe(55);
     });
 
     it('returns a complete, zeroed summary for a reader with no sessions', () => {
@@ -110,8 +128,8 @@ describe('summarize', () => {
         };
         const summary = summarize(
             [
-                session(0, { duration_minutes: 40, book_id: 'book-1', book, page_reached: 100, mood: 'focused' }),
-                session(1, { duration_minutes: 20, book_id: 'book-1', book, page_reached: 60 }),
+                session(0, { duration_minutes: 40, book_id: 'book-1', book, page_reached: 100, pages_read: 40, mood: 'focused' }),
+                session(1, { duration_minutes: 20, book_id: 'book-1', book, page_reached: 60, pages_read: 0 }),
                 session(2, { duration_minutes: 25 }),
             ],
             'week',
@@ -120,7 +138,7 @@ describe('summarize', () => {
 
         expect(summary.totalMinutes).toBe(85);
         expect(summary.books[0].minutes).toBe(60);
-        // 60 -> 100 across two sessions on the same book.
+        // Summed from what each reflection recorded, not re-derived.
         expect(summary.pagesRead).toBe(40);
         // The bookless session's time is still real reading time.
         expect(summary.unattributedMinutes).toBe(25);

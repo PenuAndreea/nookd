@@ -1,4 +1,4 @@
-import { splitDuration } from '@/lib/date';
+import { daysBetween, splitDuration } from '@/lib/date';
 
 type Translate = (key: string, options?: Record<string, unknown>) => string;
 
@@ -38,4 +38,30 @@ export function partOfDayKey(hour: number): 'morning' | 'afternoon' | 'evening' 
     if (hour >= 12 && hour < 17) return 'afternoon';
     if (hour >= 17 && hour < 22) return 'evening';
     return 'night';
+}
+
+const MONTH_KEYS = [
+    'jan', 'feb', 'mar', 'apr', 'may', 'jun',
+    'jul', 'aug', 'sep', 'oct', 'nov', 'dec',
+] as const;
+
+/**
+ * A short date like "5 Sep", or "Today" / "Yesterday" for the recent ones.
+ *
+ * Hand-built for the same reason as `partOfDayKey`: Hermes ships a cut-down
+ * Intl, so `toLocaleDateString` is not dependable here. Month names come from
+ * the same i18n group the year chart labels its bars with.
+ */
+export function formatShortDate(date: Date, t: Translate, now: Date = new Date()): string {
+    const days = daysBetween(date, now);
+
+    if (days === 0) return t('you.journal.today');
+    if (days === 1) return t('you.journal.yesterday');
+
+    const month = t(`you.habits.months.${MONTH_KEYS[date.getMonth()]}`);
+    const sameYear = date.getFullYear() === now.getFullYear();
+
+    return sameYear
+        ? t('you.journal.date', { day: date.getDate(), month })
+        : t('you.journal.dateWithYear', { day: date.getDate(), month, year: date.getFullYear() });
 }

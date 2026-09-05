@@ -31,6 +31,15 @@ export function useRoomReflection({
     const router = useRouter();
 
     async function handleReflectionSubmit(data: ReflectionData) {
+        // Pages covered in *this* session. `userBookForRoom.current_page` is
+        // the reader's previous page and is about to be overwritten below, so
+        // this is the only moment the delta is knowable — deriving it later
+        // from consecutive sessions cannot work for the first one on a book.
+        // No library entry yet means they are starting from the beginning.
+        const pagesRead = data.pageReached == null
+            ? null
+            : Math.max(data.pageReached - (userBookForRoom?.current_page ?? 0), 0);
+
         if (lastSessionId) {
             // The session is already closed by end_reading_session, which owns
             // ended_at and the duration derived from it. This write adds only
@@ -39,6 +48,7 @@ export function useRoomReflection({
             await updateReadingSession(lastSessionId, {
                 thoughts: data.thoughts || null,
                 page_reached: data.pageReached,
+                pages_read: pagesRead,
                 mood: data.mood,
                 reflection_prompted_at: new Date().toISOString(),
             });

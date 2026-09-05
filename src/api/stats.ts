@@ -20,6 +20,7 @@ export type StatsSession = Pick<
     | 'ended_reason'
     | 'mood'
     | 'page_reached'
+    | 'pages_read'
     | 'thoughts'
     | 'room_id'
     | 'room_name'
@@ -32,7 +33,7 @@ export type StatsSession = Pick<
 
 const COLUMNS =
     'id, created_at, ended_at, duration_minutes, ended_reason, mood, page_reached, ' +
-    'thoughts, room_id, room_name, room_vibe, book_id, reflection_prompted_at, ' +
+    'pages_read, thoughts, room_id, room_name, room_vibe, book_id, reflection_prompted_at, ' +
     'book:books(id, title, author, cover_url, page_count)';
 
 /**

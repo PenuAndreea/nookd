@@ -1,4 +1,3 @@
-import { parsePgTimestamp } from '@/lib/date';
 import type { SessionLike } from '@/lib/stats-time';
 
 export interface BookSummary {
@@ -11,7 +10,10 @@ export interface BookSummary {
 
 export interface BookSessionLike extends SessionLike {
     book_id: string | null;
+    /** The absolute page the reader reached. Kept for display, not for totals. */
     page_reached: number | null;
+    /** Pages covered in this session, recorded at reflection time. */
+    pages_read: number | null;
     book: BookSummary | null;
 }
 
@@ -73,48 +75,20 @@ export function unattributedMinutes(sessions: BookSessionLike[]): number {
 /**
  * Pages read across every book.
  *
- * `page_reached` is an ABSOLUTE page number, not a per-session count, so the
- * pages read in a session are the *increase* over the previous session on the
- * same book. Summing `page_reached` directly is the obvious wrong version: it
- * produces a large, plausible-looking number that means nothing.
+ * Summed from `pages_read`, which the reflection records against the reader's
+ * previous page for that book. It is stored rather than derived because the
+ * delta between consecutive sessions cannot describe the first session on a
+ * book — that reader would always see zero, however many pages they logged.
  *
- * Only sessions where a page was actually recorded contribute, so this is a
- * floor on pages read, and the UI should say so.
+ * Only sessions where a page was recorded contribute, so this is a floor on
+ * pages read, and the UI says so.
  */
 export function pagesRead(sessions: BookSessionLike[]): number {
-    const bookIds = new Set(
-        sessions.map((session) => session.book_id).filter((id): id is string => !!id)
-    );
-
-    let total = 0;
-    for (const bookId of bookIds) {
-        total += pagesReadForBook(sessions, bookId);
-    }
-
-    return total;
+    return sessions.reduce((sum, session) => sum + (session.pages_read ?? 0), 0);
 }
 
 function pagesReadForBook(sessions: BookSessionLike[], bookId: string): number {
-    const withPages = sessions
-        .filter((session) => session.book_id === bookId && session.page_reached != null)
-        .map((session) => ({
-            at: parsePgTimestamp(session.created_at) ?? 0,
-            page: session.page_reached as number,
-        }))
-        .sort((a, b) => a.at - b.at);
-
-    if (withPages.length === 0) return 0;
-
-    // The first recorded page is where the reader had already got to, not
-    // progress made in that session — counting it would credit the whole book
-    // up to that point to one sitting.
-    let total = 0;
-    for (let i = 1; i < withPages.length; i += 1) {
-        // A drop means a re-read or a typo; it is not negative progress.
-        total += Math.max(withPages[i].page - withPages[i - 1].page, 0);
-    }
-
-    return total;
+    return pagesRead(sessions.filter((session) => session.book_id === bookId));
 }
 
 /** Distinct books with at least one recorded session. */

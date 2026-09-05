@@ -1,5 +1,5 @@
 import i18n from '@/i18n';
-import { formatMinutes, formatPercent, partOfDayKey } from '@/lib/stats-format';
+import { formatMinutes, formatPercent, formatShortDate, partOfDayKey } from '@/lib/stats-format';
 
 // The real i18n instance, so a stale key fails here the way a reader would
 // notice it.
@@ -55,5 +55,23 @@ describe('partOfDayKey', () => {
             const phrase = t(`you.time.partOfDay.${partOfDayKey(hour)}`);
             expect(phrase).not.toContain('you.time');
         }
+    });
+});
+
+describe('formatShortDate', () => {
+    const now = new Date(2026, 8, 5, 18, 0);
+
+    it('names the recent days rather than dating them', () => {
+        expect(formatShortDate(new Date(2026, 8, 5, 9), t, now)).toBe('Today');
+        expect(formatShortDate(new Date(2026, 8, 4, 23), t, now)).toBe('Yesterday');
+    });
+
+    it('uses a short date within the same year', () => {
+        expect(formatShortDate(new Date(2026, 8, 1), t, now)).toBe('1 Sep');
+        expect(formatShortDate(new Date(2026, 0, 14), t, now)).toBe('14 Jan');
+    });
+
+    it('adds the year once it is a different one', () => {
+        expect(formatShortDate(new Date(2025, 11, 20), t, now)).toBe('20 Dec 2025');
     });
 });

@@ -16,11 +16,16 @@ const potter: BookSummary = {
     cover_url: null, page_count: 250,
 };
 
-/** `day` is the day-of-month in September 2026, so ordering is obvious. */
+/**
+ * `day` is the day-of-month in September 2026, so ordering is obvious.
+ * `pagesRead` is what the reflection recorded for this session; `page_reached`
+ * is the absolute page, kept for display only.
+ */
 function session(
     day: number,
     minutes: number,
     book: BookSummary | null,
+    pagesRead: number | null = null,
     pageReached: number | null = null
 ): BookSessionLike {
     return {
@@ -28,75 +33,42 @@ function session(
         duration_minutes: minutes,
         book_id: book?.id ?? null,
         book,
-        page_reached: pageReached,
+        pages_read: pagesRead,
+        page_reached: pageReached ?? pagesRead,
     };
 }
 
 describe('pagesRead', () => {
-    it('counts the increase between sessions, not the sum of page numbers', () => {
-        // Reached page 20, then 60, then 90 — that is 70 pages of progress.
-        // Summing page_reached would say 170, which is the wrong answer that
-        // looks plausible enough to ship.
+    it('sums the pages recorded for each session', () => {
         const sessions = [
             session(1, 30, klara, 20),
-            session(2, 30, klara, 60),
-            session(3, 30, klara, 90),
+            session(2, 30, klara, 40),
+            session(3, 30, klara, 30),
         ];
 
-        expect(pagesRead(sessions)).toBe(70);
+        expect(pagesRead(sessions)).toBe(90);
     });
 
-    it('does not credit the first recorded page as progress', () => {
-        // A reader who joins already 200 pages in has not read 200 pages today.
-        expect(pagesRead([session(1, 30, klara, 200)])).toBe(0);
+    it('counts the very first session on a book', () => {
+        // The bug this replaced: deriving the delta between consecutive
+        // sessions meant a reader's first logged pages always showed as 0.
+        expect(pagesRead([session(1, 30, klara, 20)])).toBe(20);
     });
 
-    it('treats a drop as zero rather than negative progress', () => {
-        // Re-reading, or a typo. Either way it is not -60 pages.
-        const sessions = [
-            session(1, 30, klara, 90),
-            session(2, 30, klara, 30),
-            session(3, 30, klara, 50),
-        ];
+    it('ignores sessions where no page was recorded', () => {
+        const sessions = [session(1, 30, klara, 20), session(2, 30, klara, null)];
 
         expect(pagesRead(sessions)).toBe(20);
     });
 
-    it('keeps two books from contaminating each other', () => {
-        const sessions = [
-            session(1, 30, klara, 10),
-            session(2, 30, potter, 500),
-            session(3, 30, klara, 40),
-            session(4, 30, potter, 540),
-        ];
-
-        // 30 for Klara, 40 for Potter — never 530 from crossing the two.
-        expect(pagesRead(sessions)).toBe(70);
-    });
-
-    it('orders by session time, not array order', () => {
-        const sessions = [
-            session(3, 30, klara, 90),
-            session(1, 30, klara, 20),
-            session(2, 30, klara, 60),
-        ];
+    it('adds up across different books', () => {
+        const sessions = [session(1, 30, klara, 30), session(2, 30, potter, 40)];
 
         expect(pagesRead(sessions)).toBe(70);
     });
 
-    it('ignores sessions where no page was recorded', () => {
-        const sessions = [
-            session(1, 30, klara, 20),
-            session(2, 30, klara, null),
-            session(3, 30, klara, 60),
-        ];
-
-        expect(pagesRead(sessions)).toBe(40);
-    });
-
-    it('is zero for no sessions and for sessions with no book', () => {
+    it('is zero for no sessions', () => {
         expect(pagesRead([])).toBe(0);
-        expect(pagesRead([session(1, 30, null, 40)])).toBe(0);
     });
 });
 
@@ -133,10 +105,17 @@ describe('bookBreakdown', () => {
     it('carries page progress onto each book', () => {
         const stats = bookBreakdown([
             session(1, 30, klara, 20),
-            session(2, 30, klara, 75),
+            session(2, 30, klara, 35),
         ]);
 
         expect(stats[0].pages).toBe(55);
+    });
+
+    it('keeps each book\'s pages to itself', () => {
+        const stats = bookBreakdown([session(1, 30, klara, 20), session(2, 30, potter, 90)]);
+
+        expect(stats.find((stat) => stat.book.id === klara.id)?.pages).toBe(20);
+        expect(stats.find((stat) => stat.book.id === potter.id)?.pages).toBe(90);
     });
 });
 

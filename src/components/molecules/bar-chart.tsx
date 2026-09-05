@@ -47,6 +47,10 @@ export default function BarChart({
     // a flat row of minimum-height bars rather than dividing by zero.
     const peak = Math.max(...data.map((datum) => datum.value), 0);
 
+    // A fixed gap eats the whole width once there are many bars: 30 columns at
+    // 4px already spend a third of a phone's width on empty space.
+    const gap = data.length > 20 ? 1 : data.length > 12 ? 2 : Spacing.one;
+
     return (
         <View
             testID={testID}
@@ -55,7 +59,7 @@ export default function BarChart({
             accessibilityLabel={accessibilityLabel}
             style={styles.chart}
         >
-            <View style={[styles.plot, { height }]}>
+            <View style={[styles.plot, { height, gap }]}>
                 {data.map((datum) => (
                     <View key={datum.key} style={styles.column}>
                         <View
@@ -77,7 +81,7 @@ export default function BarChart({
                 ))}
             </View>
             {showLabels && (
-                <View style={styles.labels}>
+                <View style={[styles.labels, { gap }]}>
                     {data.map((datum) => (
                         <View key={datum.key} style={styles.column}>
                             <Typography variant="tiny" color="textSecondary" numberOfLines={1}>
@@ -98,7 +102,6 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
     plot: {
         flexDirection: 'row',
         alignItems: 'flex-end',
-        gap: Spacing.one,
     },
     column: { flex: 1, alignItems: 'center' },
     bar: {
@@ -106,5 +109,5 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
         borderRadius: BorderRadius.small,
         backgroundColor: colors.accent,
     },
-    labels: { flexDirection: 'row', gap: Spacing.one },
+    labels: { flexDirection: 'row' },
 });

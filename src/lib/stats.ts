@@ -26,6 +26,7 @@ import {
     countsTowardStats,
     longestSessionMinutes,
     minutesByDay,
+    minutesByMonth,
     sessionCount,
     totalMinutes,
     type DayBucket,
@@ -50,7 +51,10 @@ export interface ReadingSummary {
     averageSessionMinutes: number;
     longestSessionMinutes: number;
     busiestHour: number | null;
-    byDay: DayBucket[];
+    /** The bar-chart series for the chosen range. */
+    series: DayBucket[];
+    /** How `series` is bucketed, so the chart labels each bar correctly. */
+    seriesUnit: 'day' | 'month';
 
     books: BookStat[];
     booksReadCount: number;
@@ -111,7 +115,11 @@ export function summarize(
         averageSessionMinutes: averageSessionMinutes(counted),
         longestSessionMinutes: longestSessionMinutes(counted),
         busiestHour: busiestHour(counted),
-        byDay: minutesByDay(counted, RANGE_DAYS[range], now),
+        // A year is charted by month; 365 daily bars do not fit a phone.
+        series: range === 'year'
+            ? minutesByMonth(counted, 12, now)
+            : minutesByDay(counted, RANGE_DAYS[range], now),
+        seriesUnit: range === 'year' ? 'month' : 'day',
 
         books: bookBreakdown(counted),
         booksReadCount: booksReadCount(counted),

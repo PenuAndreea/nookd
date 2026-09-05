@@ -261,6 +261,11 @@ export default {
             streakDays_other: '{{count}} days',
             percentValue: '{{percent}}%',
             byWeekdayChartLabel: 'Minutes read by day of the week',
+            months: {
+                jan: 'Jan', feb: 'Feb', mar: 'Mar', apr: 'Apr',
+                may: 'May', jun: 'Jun', jul: 'Jul', aug: 'Aug',
+                sep: 'Sep', oct: 'Oct', nov: 'Nov', dec: 'Dec',
+            },
             weekdays: {
                 mon: 'Mon',
                 tue: 'Tue',
@@ -273,6 +278,18 @@ export default {
             moodTitle: 'How sessions felt',
             moodEmpty: 'No moods recorded yet.',
             moodShare: '{{percent}}%',
+        },
+        journal: {
+            sectionTitle: 'What you wrote',
+            subtitle: 'Your reflections, newest first.',
+            emptyTitle: 'Nothing written yet',
+            emptySubtitle: 'Add a thought when you finish a session and it shows up here.',
+            today: 'Today',
+            yesterday: 'Yesterday',
+            date: '{{day}} {{month}}',
+            dateWithYear: '{{day}} {{month}} {{year}}',
+            showAll: 'Show all {{count}}',
+            showFewer: 'Show fewer',
         },
     },
     tabs: {

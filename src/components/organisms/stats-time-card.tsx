@@ -14,19 +14,24 @@ interface StatsTimeCardProps {
     range: StatsRange;
 }
 
-/** Weekday initials for a dense series; full labels would overlap past ~10 bars. */
 const WEEKDAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
+const MONTH_KEYS = [
+    'jan', 'feb', 'mar', 'apr', 'may', 'jun',
+    'jul', 'aug', 'sep', 'oct', 'nov', 'dec',
+] as const;
 
 export default function StatsTimeCard({ summary, range }: StatsTimeCardProps) {
     const styles = useStyles();
     const { t } = useTranslation();
 
-    // Past a week, per-day labels stop fitting — the shape carries the story.
-    const showLabels = summary.byDay.length <= 7;
+    // Past ~12 bars the labels stop fitting and the shape carries the story.
+    const showLabels = summary.series.length <= 12;
 
-    const bars: BarDatum[] = summary.byDay.map((bucket) => ({
+    const bars: BarDatum[] = summary.series.map((bucket) => ({
         key: bucket.key,
-        label: t(`you.habits.weekdays.${WEEKDAY_KEYS[bucket.date.getDay()]}`),
+        label: summary.seriesUnit === 'month'
+            ? t(`you.habits.months.${MONTH_KEYS[bucket.date.getMonth()]}`)
+            : t(`you.habits.weekdays.${WEEKDAY_KEYS[bucket.date.getDay()]}`),
         value: bucket.minutes,
     }));
 

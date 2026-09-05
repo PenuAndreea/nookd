@@ -39,6 +39,7 @@ function session(minutes: number, overrides: Record<string, unknown> = {}) {
         ended_reason: 'left',
         mood: null,
         page_reached: null,
+        pages_read: null,
         thoughts: null,
         room_id: 'room-1',
         room_name: 'Rainy Library',

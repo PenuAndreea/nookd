@@ -18,6 +18,7 @@ function session(daysAgo: number, minutes: number) {
         ended_reason: 'left',
         mood: null,
         page_reached: null,
+        pages_read: null,
         thoughts: null,
         room_id: 'room-1',
         room_name: 'Rainy Library',
@@ -91,13 +92,13 @@ describe('useReadingStats', () => {
         const { result } = await renderHook(() => useReadingStats('user-1'));
         await waitFor(() => expect(result.current.loading).toBe(false));
 
-        expect(result.current.summary.byDay).toHaveLength(7);
+        expect(result.current.summary.series).toHaveLength(7);
 
         await act(async () => {
             result.current.setRange('month');
         });
 
-        expect(result.current.summary.byDay).toHaveLength(30);
+        expect(result.current.summary.series).toHaveLength(30);
     });
 
     it('flags an error and keeps the summary empty when the fetch fails', async () => {

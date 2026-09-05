@@ -1,4 +1,11 @@
-import { addDays, localDayKey, parsePgTimestamp, startOfLocalDay } from '@/lib/date';
+import {
+    addDays,
+    localDayKey,
+    localMonthKey,
+    parsePgTimestamp,
+    startOfLocalDay,
+    startOfLocalMonth,
+} from '@/lib/date';
 
 /**
  * The shape the time aggregators need. Kept structural rather than importing
@@ -15,8 +22,9 @@ export interface SessionLike {
 }
 
 export interface DayBucket {
-    /** `YYYY-MM-DD`, local. */
+    /** `YYYY-MM-DD` for a daily bucket, `YYYY-MM` for a monthly one. */
     key: string;
+    /** The first instant of the bucket, for labelling. */
     date: Date;
     minutes: number;
     sessions: number;
@@ -99,6 +107,44 @@ export function minutesByDay(
         const bucket = buckets.get(localDayKey(new Date(ms)));
         // Outside the window entirely — the caller fetched a wider range than
         // it is charting.
+        if (!bucket) continue;
+
+        bucket.minutes += session.duration_minutes ?? 0;
+        bucket.sessions += 1;
+    }
+
+    return [...buckets.values()];
+}
+
+/**
+ * `months` buckets ending this month, oldest first, zero-filled.
+ *
+ * A year cannot be charted a day at a time: 365 bars in a phone's width leaves
+ * each one well under a pixel, so the chart renders as an empty gap. Months
+ * are the readable unit at that range.
+ */
+export function minutesByMonth(
+    sessions: SessionLike[],
+    months: number,
+    now: Date = new Date()
+): DayBucket[] {
+    const buckets = new Map<string, DayBucket>();
+    const first = startOfLocalMonth(now);
+    first.setMonth(first.getMonth() - (months - 1));
+
+    for (let offset = 0; offset < months; offset += 1) {
+        const date = new Date(first);
+        date.setMonth(date.getMonth() + offset);
+        buckets.set(localMonthKey(date), {
+            key: localMonthKey(date), date, minutes: 0, sessions: 0,
+        });
+    }
+
+    for (const session of sessions) {
+        const ms = parsePgTimestamp(session.created_at);
+        if (ms === null) continue;
+
+        const bucket = buckets.get(localMonthKey(new Date(ms)));
         if (!bucket) continue;
 
         bucket.minutes += session.duration_minutes ?? 0;

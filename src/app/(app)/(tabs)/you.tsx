@@ -9,6 +9,7 @@ import { ErrorState } from '@/components/molecules/error-state';
 import { StatsRangeChips } from '@/components/molecules/stats-range-chips';
 import StatsBooksCard from '@/components/organisms/stats-books-card';
 import StatsHabitsCard from '@/components/organisms/stats-habits-card';
+import StatsJournalCard from '@/components/organisms/stats-journal-card';
 import StatsTimeCard from '@/components/organisms/stats-time-card';
 import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
@@ -26,7 +27,7 @@ export default function YouScreen() {
     const userId = session?.user.id;
     const email = session?.user.email;
 
-    const { summary, loading, error, range, setRange, reload } = useReadingStats(userId);
+    const { summary, sessions, loading, error, range, setRange, reload } = useReadingStats(userId);
 
     // `sessionCount` is already past the sub-minute floor, so a reader whose
     // only session was a two-second bounce correctly sees the empty state.
@@ -54,6 +55,7 @@ export default function YouScreen() {
                     <StatsTimeCard summary={summary} range={range} />
                     <StatsBooksCard summary={summary} />
                     <StatsHabitsCard summary={summary} />
+                    <StatsJournalCard sessions={sessions} />
                 </>
             ) : (
                 <EmptyState title={t('you.emptyTitle')} subtitle={t('you.emptySubtitle')} />

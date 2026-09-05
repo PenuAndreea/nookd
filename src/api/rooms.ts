@@ -145,7 +145,7 @@ export async function createRoom(input: RoomInsert): Promise<RoomWithDetails> {
 // `ended_at` -- a client writing it afterwards made the two disagree.
 export async function updateReadingSession(
     id: ReadingSession['id'],
-    patch: Partial<Pick<ReadingSession, 'thoughts' | 'page_reached' | 'mood' | 'reflection_prompted_at'>>
+    patch: Partial<Pick<ReadingSession, 'thoughts' | 'page_reached' | 'mood' | 'pages_read' | 'reflection_prompted_at'>>
 ) {
     const { data, error } = await supabase
         .from('reading_sessions')
