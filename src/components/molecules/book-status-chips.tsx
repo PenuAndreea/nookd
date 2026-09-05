@@ -11,20 +11,19 @@ interface BookStatusChipsProps {
     value: UserBookStatus;
     onChange: (status: UserBookStatus) => void;
     disabled?: boolean;
-    /** Equal-width row (the Books tab's filter) instead of content-sized chips that wrap (a book's own status). */
-    equalWidth?: boolean;
 }
 
 /**
- * The reading-list status picker — three chips shared between "filter my
- * library by status" (Books tab) and "set this book's status" (book detail).
+ * A book's own reading status, on the book detail screen. The Library's
+ * filter row is LibraryFilterChips — it also carries an "All" option, which
+ * is not a status a book can be in.
  */
-export const BookStatusChips = ({ value, onChange, disabled, equalWidth }: BookStatusChipsProps) => {
+export const BookStatusChips = ({ value, onChange, disabled }: BookStatusChipsProps) => {
     const styles = useStyles();
     const { t } = useTranslation();
 
     return (
-        <View style={[styles.row, equalWidth ? styles.equalWidthRow : styles.wrapRow]}>
+        <View style={styles.row}>
             {BOOK_STATUS_IDS.map((id) => (
                 <Chip
                     key={id}
@@ -32,7 +31,6 @@ export const BookStatusChips = ({ value, onChange, disabled, equalWidth }: BookS
                     selected={value === id}
                     onPress={() => onChange(id)}
                     disabled={disabled}
-                    style={equalWidth && styles.equalWidthChip}
                 />
             ))}
         </View>
@@ -42,15 +40,7 @@ export const BookStatusChips = ({ value, onChange, disabled, equalWidth }: BookS
 const useStyles = () => StyleSheet.create({
     row: {
         flexDirection: 'row',
-        gap: 8,
-    },
-    equalWidthRow: {
-        marginBottom: Spacing.three,
-    },
-    wrapRow: {
         flexWrap: 'wrap',
-    },
-    equalWidthChip: {
-        flex: 1,
+        gap: Spacing.two,
     },
 });

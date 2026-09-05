@@ -1,56 +1,49 @@
 import { useTranslation } from 'react-i18next';
-import { SectionList, StyleSheet } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 
 import { UserBookWithBook } from '@/api/books';
-import Button from '@/components/atoms/button';
 import Typography from '@/components/atoms/typography';
 import { EmptyState } from '@/components/molecules/empty-state';
 import { ErrorState } from '@/components/molecules/error-state';
+import { LibraryFilter, LibraryFilterChips } from '@/components/molecules/library-filter-chips';
 import BookItem from '@/components/organisms/book-item';
 import { BottomTabInset, Spacing } from '@/constants/theme';
-import { useContinueReading } from '@/hooks/use-continue-reading';
 
 interface BookLibraryListProps {
-    currentlyReading: UserBookWithBook[];
-    otherBooks: UserBookWithBook[];
+    books: UserBookWithBook[];
+    filter: LibraryFilter;
+    onFilterChange: (filter: LibraryFilter) => void;
     loadingList: boolean;
     listError: boolean;
     onRetry: () => void;
 }
 
 /**
- * The Library tab's default view: everything the reader owns, with the books
- * they're part-way through pulled into their own section on top so the
- * "Continue" action is the first thing on the screen.
+ * Everything the reader owns, filtered by reading status. Lives on the
+ * Library's white panel, so its text uses the fixed `sheet*` tokens.
  */
 export default function BookLibraryList({
-    currentlyReading,
-    otherBooks,
+    books,
+    filter,
+    onFilterChange,
     loadingList,
     listError,
     onRetry,
 }: BookLibraryListProps) {
     const { t } = useTranslation();
-    const continueReading = useContinueReading();
-
-    const sections = [
-        { key: 'currently_reading', title: t('books.continueReadingSection'), data: currentlyReading },
-        { key: 'library', title: t('books.myLibrary'), data: otherBooks },
-        // An empty section still renders its header, which reads as a broken
-        // shelf — the empty state below covers the nothing-at-all case.
-    ].filter((section) => section.data.length > 0);
 
     return (
-        <SectionList
-            sections={sections}
+        <FlatList
+            data={books}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
-            renderSectionHeader={({ section }) => (
-                <Typography variant="sectionLabel" color="textSecondary" style={styles.sectionLabel}>
-                    {section.title}
-                </Typography>
-            )}
+            ListHeaderComponent={
+                <View style={styles.header}>
+                    <Typography variant="title2" color="sheetText">{t('books.myLibrary')}</Typography>
+                    <LibraryFilterChips value={filter} onChange={onFilterChange} />
+                </View>
+            }
             ListEmptyComponent={loadingList ? null : listError ? (
                 <ErrorState
                     title={t('books.listErrorTitle')}
@@ -60,19 +53,7 @@ export default function BookLibraryList({
             ) : (
                 <EmptyState title={t('books.emptyLibraryTitle')} subtitle={t('books.emptyLibrarySubtitle')} />
             )}
-            renderItem={({ item, section }) => (
-                <BookItem
-                    userBook={item}
-                    action={section.key === 'currently_reading' ? (
-                        <Button
-                            size="small"
-                            title={t('books.continueReading')}
-                            accessibilityLabel={t('books.continueReadingAccessibility', { title: item.book.title })}
-                            onPress={() => continueReading(item.book)}
-                        />
-                    ) : undefined}
-                />
-            )}
+            renderItem={({ item }) => <BookItem userBook={item} />}
         />
     );
 }
@@ -81,7 +62,8 @@ const styles = StyleSheet.create({
     listContent: {
         paddingBottom: BottomTabInset + Spacing.four,
     },
-    sectionLabel: {
-        marginBottom: Spacing.two,
+    header: {
+        gap: Spacing.three,
+        paddingBottom: Spacing.two,
     },
 });

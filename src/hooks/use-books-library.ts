@@ -10,6 +10,7 @@ import {
     searchOpenLibrary,
     UserBookWithBook,
 } from '@/api/books';
+import { LibraryFilter } from '@/components/molecules/library-filter-chips';
 import { router } from 'expo-router';
 
 /**
@@ -27,6 +28,7 @@ export function useBooksLibrary(userId: string | undefined) {
     const [searchError, setSearchError] = useState(false);
     const [addingKey, setAddingKey] = useState<string | null>(null);
 
+    const [filter, setFilter] = useState<LibraryFilter>('all');
     const [userBooks, setUserBooks] = useState<UserBookWithBook[]>([]);
     const [loadingList, setLoadingList] = useState(false);
     const [listError, setListError] = useState(false);
@@ -35,9 +37,8 @@ export function useBooksLibrary(userId: string | undefined) {
         if (!userId) return;
         setLoadingList(true);
         try {
-            // Unfiltered: the screen shows the whole library and pulls the
-            // currently-reading books to the top, rather than filtering to one
-            // status at a time.
+            // Fetched unfiltered once; the carousel and the status filter
+            // below both narrow this same list in memory.
             const data = await getUserBooks(userId);
             setUserBooks(data);
             setListError(false);
@@ -117,7 +118,9 @@ export function useBooksLibrary(userId: string | undefined) {
     const isSearching = query.length >= 3;
 
     const currentlyReading = userBooks.filter((userBook) => userBook.status === 'currently_reading');
-    const otherBooks = userBooks.filter((userBook) => userBook.status !== 'currently_reading');
+    const filteredBooks = filter === 'all'
+        ? userBooks
+        : userBooks.filter((userBook) => userBook.status === filter);
 
     return {
         query,
@@ -131,7 +134,9 @@ export function useBooksLibrary(userId: string | undefined) {
         quickAdd,
 
         currentlyReading,
-        otherBooks,
+        filteredBooks,
+        filter,
+        setFilter,
         loadingList,
         listError,
         loadUserBooks,

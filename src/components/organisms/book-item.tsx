@@ -1,33 +1,27 @@
-import { ReactNode } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { UserBookWithBook } from '@/api/books';
 import { createCommonStyles } from '@/constants/common-styles';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { readingProgress } from '@/lib/reading-progress';
 import { router } from 'expo-router';
 
 import Typography from '../atoms/typography';
 
-interface BookItemProps {
-    userBook: UserBookWithBook;
-    /** Rendered to the right of the info column, e.g. a "Continue reading" button. */
-    action?: ReactNode;
-}
-
-export default function BookItem({ userBook, action }: BookItemProps) {
+/**
+ * One book in the Library list. A flat row on the list's white panel — the
+ * divider does the separating, so it carries no card background of its own.
+ */
+export default function BookItem({ userBook }: { userBook: UserBookWithBook }) {
     const colors = useTheme();
     const styles = useStyles(colors);
     const common = createCommonStyles();
+    const { t } = useTranslation();
 
     const { book } = userBook;
-    const hasProgress =
-        userBook.status === 'currently_reading' &&
-        userBook.current_page != null &&
-        !!book.page_count;
-    const progress = hasProgress
-        ? Math.min(userBook.current_page! / book.page_count!, 1)
-        : 0;
+    const progress = readingProgress(userBook);
 
     function navigateToBook() {
         router.navigate(`/books/${book.id}`);
@@ -38,25 +32,29 @@ export default function BookItem({ userBook, action }: BookItemProps) {
             style={({ pressed }) => [styles.container, pressed && common.pressed]}
             onPress={navigateToBook}
         >
-            <View style={[styles.cover, book.cover_url && styles.coverNoBackground]}>
-                {book.cover_url ? (
-                    <Image source={{ uri: book.cover_url }} style={styles.coverImage} resizeMode="contain" />
-                ) : (
-                    <Typography color="sheetText" style={{ fontSize: 24 }}>📖</Typography>
-                )}
-            </View>
+            {book.cover_url ? (
+                <Image source={{ uri: book.cover_url }} style={styles.cover} resizeMode="cover" />
+            ) : (
+                <View style={[styles.cover, styles.coverEmpty]}>
+                    <Typography color="sheetText" style={styles.coverEmoji}>📖</Typography>
+                </View>
+            )}
             <View style={styles.info}>
-                <Typography variant="h2" color="sheetText" numberOfLines={1}>{book.title}</Typography>
+                <Typography variant="cardTitle" color="sheetText" numberOfLines={1}>{book.title}</Typography>
                 {book.author && (
-                    <Typography numberOfLines={1} color="sheetTextSecondary">{book.author}</Typography>
+                    <Typography variant="caption" numberOfLines={1} color="sheetTextSecondary">{book.author}</Typography>
                 )}
-                {hasProgress && (
-                    <View testID="book-item-progress" style={styles.progressTrack}>
-                        <View style={[styles.progressFill, { width: `${Math.round(progress * 100)}%` }]} />
-                    </View>
+                {progress && (
+                    <>
+                        <Typography variant="caption" color="sheetTextSecondary" style={styles.progressLabel}>
+                            {t('books.progressLabel', { percent: progress.percent, count: progress.pagesLeft })}
+                        </Typography>
+                        <View testID="book-item-progress" style={styles.progressTrack}>
+                            <View style={[styles.progressFill, { width: `${progress.percent}%` }]} />
+                        </View>
+                    </>
                 )}
             </View>
-            {action}
         </Pressable>
     )
 }
@@ -65,44 +63,42 @@ const useStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     container: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: Spacing.three,
-        marginBottom: Spacing.two,
-        backgroundColor: colors.white,
-        borderWidth: 1,
-        borderRadius: BorderRadius.medium,
-        borderColor: colors.border,
+        paddingVertical: Spacing.three,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        // Fixed, like the panel it sits on — `border` flips and would go
+        // invisible against white in dark mode.
+        borderBottomColor: colors.progressTrack,
     },
     cover: {
-        width: 56,
-        height: 76,
+        width: 48,
+        height: 70,
         borderRadius: BorderRadius.small,
-        backgroundColor: colors.backgroundElement,
+    },
+    coverEmpty: {
+        backgroundColor: colors.progressTrack,
         alignItems: 'center',
         justifyContent: 'center',
-        overflow: 'hidden',
     },
-    coverNoBackground: {
-        backgroundColor: 'transparent',
-    },
-    coverImage: {
-        width: '100%',
-        height: '100%',
+    coverEmoji: {
+        fontSize: 20,
     },
     info: {
         flex: 1,
         marginLeft: Spacing.three,
-        marginRight: Spacing.two,
+    },
+    progressLabel: {
+        marginTop: Spacing.two,
     },
     progressTrack: {
         height: 4,
-        borderRadius: 2,
-        backgroundColor: colors.backgroundElement,
-        marginTop: 6,
+        borderRadius: BorderRadius.small,
+        backgroundColor: colors.progressTrack,
+        marginTop: Spacing.one,
         overflow: 'hidden',
     },
     progressFill: {
         height: '100%',
-        borderRadius: 2,
-        backgroundColor: colors.accent,
+        borderRadius: BorderRadius.small,
+        backgroundColor: colors.accentStrong,
     },
 });

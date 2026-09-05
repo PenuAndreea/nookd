@@ -1,5 +1,4 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Text } from 'react-native';
 import { router } from 'expo-router';
 import BookItem from '@/components/organisms/book-item';
 
@@ -30,14 +29,14 @@ describe('BookItem', () => {
         expect(router.navigate).toHaveBeenCalledWith('/books/book-1');
     });
 
-    it('shows a progress bar for a book currently being read with a known page count', async () => {
+    it('shows a progress bar when the reader has recorded a page', async () => {
         await render(<BookItem userBook={userBook} />);
 
         expect(screen.getByTestId('book-item-progress')).toBeVisible();
     });
 
-    it('shows no progress bar for a book that is not currently being read', async () => {
-        await render(<BookItem userBook={{ ...userBook, status: 'want_to_read' }} />);
+    it('shows no progress bar for a book with no recorded page', async () => {
+        await render(<BookItem userBook={{ ...userBook, current_page: null }} />);
 
         expect(screen.queryByTestId('book-item-progress')).toBeNull();
     });
@@ -48,15 +47,16 @@ describe('BookItem', () => {
         expect(screen.queryByTestId('book-item-progress')).toBeNull();
     });
 
-    it('renders a trailing action when given one', async () => {
-        await render(<BookItem userBook={userBook} action={<Text>Continue reading</Text>} />);
-
-        expect(screen.getByText('Continue reading')).toBeVisible();
-    });
-
-    it('renders no action by default', async () => {
+    it('shows how far through the book the reader is', async () => {
         await render(<BookItem userBook={userBook} />);
 
-        expect(screen.queryByText('Continue reading')).toBeNull();
+        // 150 of 412 pages.
+        expect(screen.getByText('36% \u00b7 262 pages left')).toBeVisible();
+    });
+
+    it('shows no progress label when the page count is unknown', async () => {
+        await render(<BookItem userBook={{ ...userBook, book: { ...userBook.book, page_count: null } }} />);
+
+        expect(screen.queryByText(/pages left/)).toBeNull();
     });
 });

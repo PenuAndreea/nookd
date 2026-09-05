@@ -11,8 +11,18 @@ type TypographyProps = TextProps & {
      * literally white regardless of theme (a card, a sheet) — unlike "text"/
      * "textSecondary", they do not flip to near-white in dark mode, so they
      * stay readable on that surface instead of disappearing into it.
+     * "inkText"/"inkTextSecondary" are the same idea inverted: text on a
+     * surface that stays literally navy in both modes (the Library header).
      */
-    color?: "text" | "textSecondary" | "accent" | "sheetText" | "sheetTextSecondary" | "error";
+    color?:
+        | "text"
+        | "textSecondary"
+        | "accent"
+        | "sheetText"
+        | "sheetTextSecondary"
+        | "inkText"
+        | "inkTextSecondary"
+        | "error";
     style?: StyleProp<TextStyle>;
 };
 

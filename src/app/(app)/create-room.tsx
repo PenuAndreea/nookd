@@ -141,6 +141,7 @@ export default function CreateRoomScreen() {
                     // Fixed rather than searchable: the reader picked this book
                     // in their library, so there is nothing to look up.
                     <BookRow
+                        surface
                         size="medium"
                         book={{
                             title: bookTitle ?? t('common.book'),

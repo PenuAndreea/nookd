@@ -15,6 +15,12 @@ interface BookRowProps {
     book: { title: string; author?: string | null; cover_url?: string | null };
     /** Navigates (e.g. to the book's page) when pressed; renders as a plain row without one. */
     onPress?: () => void;
+    /**
+     * Force the white card treatment on a row that isn't pressable. The row's
+     * text is fixed-dark `sheetText`, so a row placed straight onto the page
+     * background needs this or it goes dark-on-dark in dark mode.
+     */
+    surface?: boolean;
     disabled?: boolean;
     /** small = a compact search-result row, medium = a fuller book card. */
     size?: 'small' | 'medium';
@@ -28,7 +34,7 @@ interface BookRowProps {
  * A book's cover, title and author in a row — the shared shape behind the
  * Books search results and the "currently reading" cards in a room's sheet.
  */
-export default function BookRow({ book, onPress, disabled, size = 'small', trailing, belowInfo }: BookRowProps) {
+export default function BookRow({ book, onPress, disabled, size = 'small', surface, trailing, belowInfo }: BookRowProps) {
     const colors = useTheme();
     const styles = createStyles(colors, size);
     const common = createCommonStyles();
@@ -61,12 +67,12 @@ export default function BookRow({ book, onPress, disabled, size = 'small', trail
     );
 
     if (!onPress) {
-        return <View style={styles.row}>{content}</View>;
+        return <View style={[styles.row, surface && styles.card]}>{content}</View>;
     }
 
     return (
         <Pressable
-            style={({ pressed }) => [styles.row, styles.pressable, pressed && common.pressed]}
+            style={({ pressed }) => [styles.row, styles.card, pressed && common.pressed]}
             onPress={onPress}
             disabled={disabled}
         >
@@ -81,7 +87,7 @@ const createStyles = (colors: ReturnType<typeof useTheme>, size: 'small' | 'medi
         alignItems: size === 'small' ? 'center' : 'flex-start',
         gap: 12,
     },
-    pressable: {
+    card: {
         backgroundColor: colors.white,
         borderRadius: BorderRadius.medium,
         borderWidth: 0.5,

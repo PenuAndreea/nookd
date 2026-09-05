@@ -74,6 +74,27 @@ export const Colors = {
     // since pairing those with the flipping `text` token would turn them
     // near-white-on-yellow or near-white-on-white in dark mode.
     ink: '#1A1D2E',
+
+    // Text on a surface that is always literally `ink` regardless of theme
+    // (the Library header's navy band) — the mirror of the sheetText pair
+    // above. `text` cannot be used there: it is near-black in light mode,
+    // which would print navy on navy.
+    inkText: '#F5F5F7',
+    inkTextSecondary: '#A9AEC0',
+
+    // Reading-progress bars. The fill is the palette's accent orange, which
+    // reads far better than `accent` yellow in a 4px bar. Both tracks are
+    // fixed for the same reason as their surfaces: `progressTrack` sits on
+    // `white`, `progressTrackOnInk` on `ink`.
+    accentStrong: '#FF8A00',
+    progressTrack: '#E6E1D9',
+    progressTrackOnInk: '#31364A',
+
+    // A selected chip on an always-white surface (the Library's filter row).
+    // The `chipSelected*` family above flips to a dark navy fill, which reads
+    // as an inverted chip once the surface under it no longer flips too.
+    chipOnWhiteSelectedBackground: '#FFF3D6',
+    chipOnWhiteSelectedText: '#5a3a00',
   },
   dark: {
     text: '#F5F5F7',
@@ -122,6 +143,13 @@ export const Colors = {
     presenceOnline: '#3BB273',
 
     ink: '#1A1D2E',
+    inkText: '#F5F5F7',
+    inkTextSecondary: '#A9AEC0',
+    accentStrong: '#FF8A00',
+    progressTrack: '#E6E1D9',
+    progressTrackOnInk: '#31364A',
+    chipOnWhiteSelectedBackground: '#FFF3D6',
+    chipOnWhiteSelectedText: '#5a3a00',
   },
 } as const;
 
@@ -167,6 +195,9 @@ export const BorderRadius = {
   small: 4,
   medium: 8,
   large: 16,
+  // The Library's white panel, whose top corners curve away from the navy
+  // header above it.
+  xlarge: 24,
   full: 9999,
 } as const;
 

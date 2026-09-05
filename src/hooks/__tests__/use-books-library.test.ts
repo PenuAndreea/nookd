@@ -16,6 +16,12 @@ jest.mock('@/api/books', () => ({
     searchOpenLibrary: jest.fn(),
 }));
 
+const library = [
+    { id: 'e1', status: 'currently_reading', book: { id: 'b1', title: 'Dune' } },
+    { id: 'e2', status: 'want_to_read', book: { id: 'b2', title: 'Circe' } },
+    { id: 'e3', status: 'finished', book: { id: 'b3', title: 'Piranesi' } },
+];
+
 beforeEach(() => {
     jest.clearAllMocks();
     (getUserBooks as jest.Mock).mockResolvedValue([]);
@@ -29,17 +35,34 @@ describe('useBooksLibrary', () => {
         expect(result.current.loadingList).toBe(false);
     });
 
-    it('splits the library into currently-reading and everything else', async () => {
-        (getUserBooks as jest.Mock).mockResolvedValue([
-            { id: 'e1', status: 'currently_reading', book: { id: 'b1', title: 'Dune' } },
-            { id: 'e2', status: 'want_to_read', book: { id: 'b2', title: 'Circe' } },
-            { id: 'e3', status: 'finished', book: { id: 'b3', title: 'Piranesi' } },
-        ]);
+    it('picks out the currently-reading books for the carousel', async () => {
+        (getUserBooks as jest.Mock).mockResolvedValue(library);
         const { result } = await renderHook(() => useBooksLibrary('user-1'));
 
         await waitFor(() => expect(result.current.currentlyReading).toHaveLength(1));
         expect(result.current.currentlyReading[0].id).toBe('e1');
-        expect(result.current.otherBooks.map((entry) => entry.id)).toEqual(['e2', 'e3']);
+    });
+
+    it('shows the whole library under the default "all" filter', async () => {
+        (getUserBooks as jest.Mock).mockResolvedValue(library);
+        const { result } = await renderHook(() => useBooksLibrary('user-1'));
+
+        await waitFor(() => expect(result.current.filteredBooks).toHaveLength(3));
+        expect(result.current.filter).toBe('all');
+    });
+
+    it('narrows the list to one status without refetching', async () => {
+        (getUserBooks as jest.Mock).mockResolvedValue(library);
+        const { result } = await renderHook(() => useBooksLibrary('user-1'));
+        await waitFor(() => expect(getUserBooks).toHaveBeenCalledTimes(1));
+
+        await act(async () => {
+            result.current.setFilter('finished');
+        });
+
+        expect(result.current.filteredBooks.map((entry) => entry.id)).toEqual(['e3']);
+        // Filtering is in-memory over the single fetch.
+        expect(getUserBooks).toHaveBeenCalledTimes(1);
     });
 
     it('does not query the library without a signed-in user', async () => {

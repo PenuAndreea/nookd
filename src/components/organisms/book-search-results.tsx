@@ -6,7 +6,7 @@ import Typography from '@/components/atoms/typography';
 import { EmptyState } from '@/components/molecules/empty-state';
 import { ErrorState } from '@/components/molecules/error-state';
 import BookRow from '@/components/molecules/book-row';
-import { BorderRadius, Spacing } from '@/constants/theme';
+import { BorderRadius, BottomTabInset, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 interface BookSearchResultsProps {
@@ -63,7 +63,7 @@ export default function BookSearchResults({
                                 disabled={addingKey === item.openLibraryKey}
                                 hitSlop={8}
                             >
-                                <Typography variant="smallBold">
+                                <Typography variant="smallBold" color="sheetText">
                                     {addingKey === item.openLibraryKey ? t('books.adding') : t('books.addChip')}
                                 </Typography>
                             </Pressable>
@@ -77,13 +77,13 @@ export default function BookSearchResults({
 
 const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     listContent: {
-        paddingBottom: Spacing.five,
+        paddingBottom: BottomTabInset + Spacing.four,
     },
     searchResultSpacing: {
         marginBottom: Spacing.two,
     },
     addChip: {
-        backgroundColor: colors.backgroundElement,
+        backgroundColor: colors.progressTrack,
         borderRadius: BorderRadius.full,
         paddingHorizontal: 10,
         paddingVertical: 6,

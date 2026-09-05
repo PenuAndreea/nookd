@@ -27,7 +27,8 @@ beforeEach(() => {
         {
             id: 'entry-2',
             status: 'currently_reading',
-            book: { id: 'book-2', title: 'Dune', author: 'Frank Herbert', cover_url: null },
+            current_page: 150,
+            book: { id: 'book-2', title: 'Dune', author: 'Frank Herbert', cover_url: null, page_count: 412 },
         },
     ]);
 });
@@ -39,26 +40,52 @@ describe('LibraryScreen', () => {
         await waitFor(() => expect(screen.getByText('Harry Potter')).toBeVisible());
     });
 
-    it('splits the library into a continue-reading section and the rest', async () => {
+    it('puts only the currently-reading books in the header carousel', async () => {
         await render(<LibraryScreen />);
+        await waitFor(() => expect(screen.getByText('My Library')).toBeVisible());
 
-        await waitFor(() => expect(screen.getByText('Continue reading')).toBeVisible());
-        expect(screen.getByText('My Library')).toBeVisible();
-    });
-
-    it('shows a compact Continue button on each currently-reading book', async () => {
-        await render(<LibraryScreen />);
-
-        await waitFor(() => expect(screen.getByText('Continue')).toBeVisible());
-    });
-
-    it('offers Continue reading only on the books being read right now', async () => {
-        await render(<LibraryScreen />);
-        await waitFor(() => expect(screen.getByText('Dune')).toBeVisible());
-
-        // One button, for the one currently-reading book.
         expect(screen.getByLabelText('Continue reading Dune')).toBeVisible();
         expect(screen.queryByLabelText('Continue reading Harry Potter')).toBeNull();
+    });
+
+    it('lists the whole library under the default filter', async () => {
+        await render(<LibraryScreen />);
+
+        await waitFor(() => expect(screen.getByText('Harry Potter')).toBeVisible());
+        // Dune is in the carousel above and in the list under "All".
+        expect(screen.getAllByText('Dune')).toHaveLength(2);
+    });
+
+    it('narrows the list when a status filter is chosen', async () => {
+        await render(<LibraryScreen />);
+        await waitFor(() => expect(screen.getByText('Harry Potter')).toBeVisible());
+
+        await fireEvent.press(screen.getByText('Finished'));
+
+        expect(screen.queryByText('Harry Potter')).toBeNull();
+    });
+
+    it('hides the carousel and shows the field when search is opened', async () => {
+        await render(<LibraryScreen />);
+        await waitFor(() => expect(screen.getByText('My Library')).toBeVisible());
+        expect(screen.queryByPlaceholderText('Search by title or author')).toBeNull();
+
+        await fireEvent.press(screen.getByLabelText('Search books'));
+
+        expect(screen.getByPlaceholderText('Search by title or author')).toBeVisible();
+        expect(screen.queryByLabelText('Continue reading Dune')).toBeNull();
+    });
+
+    it('clears the query and restores the carousel when search is closed', async () => {
+        await render(<LibraryScreen />);
+        await waitFor(() => expect(screen.getByText('My Library')).toBeVisible());
+        await fireEvent.press(screen.getByLabelText('Search books'));
+        await fireEvent.changeText(screen.getByPlaceholderText('Search by title or author'), 'pir');
+
+        await fireEvent.press(screen.getByLabelText('Close search'));
+
+        expect(screen.getByLabelText('Continue reading Dune')).toBeVisible();
+        expect(screen.queryByPlaceholderText('Search by title or author')).toBeNull();
     });
 
     it('switches to search results once the query is 3+ characters', async () => {
@@ -67,6 +94,7 @@ describe('LibraryScreen', () => {
         ]);
         await render(<LibraryScreen />);
         await waitFor(() => expect(screen.getByText('Harry Potter')).toBeVisible());
+        await fireEvent.press(screen.getByLabelText('Search books'));
 
         await fireEvent.changeText(screen.getByPlaceholderText('Search by title or author'), 'pir');
 
@@ -77,6 +105,7 @@ describe('LibraryScreen', () => {
     it('goes back to the library view once the query is cleared', async () => {
         await render(<LibraryScreen />);
         await waitFor(() => expect(screen.getByText('Harry Potter')).toBeVisible());
+        await fireEvent.press(screen.getByLabelText('Search books'));
 
         const field = screen.getByPlaceholderText('Search by title or author');
         await fireEvent.changeText(field, 'pir');
