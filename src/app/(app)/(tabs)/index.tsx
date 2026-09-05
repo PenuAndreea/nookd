@@ -11,6 +11,7 @@ import { BorderRadius, Spacing } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useRooms } from '@/contexts/rooms-context';
 import { useTheme } from '@/hooks/use-theme';
+import { parsePgTimestamp } from '@/lib/date';
 
 export { default as ErrorBoundary } from '@/components/organisms/route-error-boundary';
 
@@ -28,8 +29,11 @@ const DISPLAY_NAME = 'Mira';
 // "…, 40 minutes in." — only once there is enough elapsed to be worth saying.
 function timeInRoom(joinedAt: string | null | undefined, t: (key: string, options?: Record<string, unknown>) => string) {
   if (!joinedAt) return null;
-  const minutes = Math.floor((Date.now() - Date.parse(joinedAt.replace(/(\.\d{3})\d+/, '$1'))) / 60000);
-  if (!Number.isFinite(minutes) || minutes < 1) return null;
+  const joinedAtMs = parsePgTimestamp(joinedAt);
+  if (joinedAtMs === null) return null;
+
+  const minutes = Math.floor((Date.now() - joinedAtMs) / 60000);
+  if (minutes < 1) return null;
   return minutes < 60
     ? t('home.minutesIn', { count: minutes })
     : t('home.hoursIn', { count: Math.floor(minutes / 60) });

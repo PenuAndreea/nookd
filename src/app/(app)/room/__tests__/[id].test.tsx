@@ -14,6 +14,9 @@ jest.mock('@/contexts/auth-context', () => ({ useAuth: jest.fn() }));
 jest.mock('@/hooks/use-room-data', () => ({ useRoomData: jest.fn() }));
 jest.mock('@/hooks/use-room-session', () => ({ useRoomSession: jest.fn() }));
 jest.mock('@/hooks/use-room-reflection', () => ({ useRoomReflection: jest.fn() }));
+// Reaches into navigation context via usePreventRemove, which has no container
+// in a bare render. Covered on its own in use-leave-room-guard.test.ts.
+jest.mock('@/hooks/use-leave-room-guard', () => ({ useLeaveRoomGuard: jest.fn() }));
 
 const room = { id: 'room-1', name: 'Rainy Library', description: null, duration_minutes: 60, book: null };
 const theme = { source: 1, background: '#F7ECE1' };

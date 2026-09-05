@@ -75,7 +75,7 @@ export function useRoomSession({
         }
     }, [joinRoom, markJoined, roomId, userId])
 
-    const { booksInRoom, selfHasBook, handleSelectBook, handleSkipBook, openReadingPicker } = useRoomBooks({
+    const { booksInRoom, selfBook, selfHasBook, handleSelectBook, handleSkipBook, openReadingPicker } = useRoomBooks({
         roomId,
         userId,
         members,
@@ -166,6 +166,25 @@ export function useRoomSession({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [autojoin, hasCheckedMembership, isJoined])
 
+    // A timed room ends on schedule whether or not anyone is watching. For the
+    // reader who *is*, close the session the moment the clock runs out instead
+    // of leaving them sitting in a finished room until the reaper notices a
+    // minute later. Both paths produce the same row: the server derives
+    // ended_reason = 'completed' from the room's own scheduled end rather than
+    // trusting whatever the client calls it.
+    const hasExpiredRef = useRef(false)
+    useEffect(() => {
+        if (hasExpiredRef.current || !isJoined) return
+        if (room?.duration_minutes == null) return
+        if (displayedElapsedSeconds < room.duration_minutes * 60) return
+
+        hasExpiredRef.current = true
+        handleLeaveRoom()
+        // handleLeaveRoom is re-created every render; the ref above is what
+        // keeps this to a single run.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isJoined, room, displayedElapsedSeconds])
+
     async function handleLeaveRoom() {
         bottomSheetRef.current?.close();
         try {
@@ -189,6 +208,7 @@ export function useRoomSession({
         hasCheckedMembership,
         displayedElapsedSeconds,
         booksInRoom,
+        selfBook,
         selfHasBook,
         handleJoinPress,
         handleLeaveRoom,

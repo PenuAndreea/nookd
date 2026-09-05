@@ -2,6 +2,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { Pressable, StyleSheet, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Icon } from "../atoms/icon";
+import ProgressBar from '@/components/atoms/progress-bar';
 import Typography from "../atoms/typography";
 
 const MAX_MEMBERS = 10;
@@ -34,9 +35,12 @@ export default function TimerCard({ elapsedSeconds, duration, memberCount, onPre
             {isOpenEnded ? (
                 <View style={styles.openSpacer} />
             ) : (
-                <View style={styles.progressTrack}>
-                    <View style={[styles.progressFill, { width: `${Math.round(progress * 100)}%` }]} />
-                </View>
+                <ProgressBar
+                    progress={progress}
+                    height={7}
+                    trackColor="timerCardTrack"
+                    style={styles.progress}
+                />
             )}
             <View style={styles.timerFooterRow}>
                 <Typography variant="captionSemibold" style={styles.timerFooterText}>
@@ -73,9 +77,8 @@ const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create(
     },
     timerValue: { color: colors.timerCardText, textAlign: 'center' },
     timerLabel: { color: colors.timerCardText, textAlign: 'center', marginTop: 5 },
-    progressTrack: { height: 7, borderRadius: 4, backgroundColor: colors.timerCardTrack, marginVertical: 16, overflow: 'hidden' },
+    progress: { marginVertical: 16 },
     openSpacer: { height: 7, marginVertical: 16 },
-    progressFill: { height: '100%', borderRadius: 4, backgroundColor: colors.accent },
     timerFooterRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     timerFooterRight: { flexDirection: 'row', alignItems: 'center', gap: 5 },
     timerFooterText: { color: colors.timerCardText },

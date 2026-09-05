@@ -44,18 +44,32 @@ function setup(overrides: {
     );
 }
 
-beforeEach(() => {
-    jest.clearAllMocks();
-    (getRoomMembersByRoomId as jest.Mock).mockResolvedValue([]);
+function mockPresence(isJoined: boolean) {
     (useRoomPresence as jest.Mock).mockReturnValue({
         members: [],
         memberCount: 0,
         lastSessionId: null,
-        isJoined: false,
+        isJoined,
         presenceError: false,
         joinRoom,
         leaveRoom,
     });
+}
+
+/** A timed room whose scheduled end is `minutesAgo` minutes in the past. */
+function timedRoom(durationMinutes: number, startedMinutesAgo: number) {
+    return {
+        id: 'room-1',
+        vibe: 'quiet_company',
+        duration_minutes: durationMinutes,
+        started_at: new Date(Date.now() - startedMinutesAgo * 60_000).toISOString(),
+    };
+}
+
+beforeEach(() => {
+    jest.clearAllMocks();
+    (getRoomMembersByRoomId as jest.Mock).mockResolvedValue([]);
+    mockPresence(false);
     (useRoomBooks as jest.Mock).mockReturnValue({
         booksInRoom: [],
         selfHasBook: false,
@@ -200,5 +214,42 @@ describe('useRoomSession', () => {
         expect(leaveRoom).toHaveBeenCalled();
         expect(markLeft).toHaveBeenCalledWith('room-1', 'user-1');
         expect(reflectionSheetRef.current.snapToIndex).toHaveBeenCalledWith(0);
+    });
+
+    it('ends the session when a timed room\'s clock has run out', async () => {
+        mockPresence(true);
+        // A 60-minute room that started 90 minutes ago: already over.
+        const { result } = await setup({ room: timedRoom(60, 90) });
+
+        await waitFor(() => expect(leaveRoom).toHaveBeenCalled());
+        // Same path as pressing Leave, so the reflection sheet still opens.
+        expect(reflectionSheetRef.current.snapToIndex).toHaveBeenCalledWith(0);
+        expect(result.current).toBeTruthy();
+    });
+
+    it('leaves a timed room alone while time remains', async () => {
+        mockPresence(true);
+        const { result } = await setup({ room: timedRoom(60, 5) });
+        await waitFor(() => expect(result.current.hasCheckedMembership).toBe(true));
+
+        expect(leaveRoom).not.toHaveBeenCalled();
+    });
+
+    it('never expires an open-ended house room', async () => {
+        mockPresence(true);
+        const { result } = await setup({
+            room: { id: 'room-1', vibe: 'quiet_company', duration_minutes: null, started_at: new Date(0).toISOString() },
+        });
+        await waitFor(() => expect(result.current.hasCheckedMembership).toBe(true));
+
+        expect(leaveRoom).not.toHaveBeenCalled();
+    });
+
+    it('does not end an expired room the reader never joined', async () => {
+        mockPresence(false);
+        const { result } = await setup({ room: timedRoom(60, 90) });
+        await waitFor(() => expect(result.current.hasCheckedMembership).toBe(true));
+
+        expect(leaveRoom).not.toHaveBeenCalled();
     });
 });

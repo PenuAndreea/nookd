@@ -90,8 +90,16 @@ describe('forceLeaveRoom', () => {
         await forceLeaveRoom('room-1', 'user-1');
 
         expect(rpc).toHaveBeenCalledTimes(2);
-        expect(rpc).toHaveBeenNthCalledWith(1, 'end_reading_session', { p_session_id: 'session-1' });
-        expect(rpc).toHaveBeenNthCalledWith(2, 'end_reading_session', { p_session_id: 'session-2' });
+        // 'switched' rather than 'left': this path is only reached by joining a
+        // different room, and the distinction is recorded for stats.
+        expect(rpc).toHaveBeenNthCalledWith(1, 'end_reading_session', {
+            p_session_id: 'session-1',
+            p_reason: 'switched',
+        });
+        expect(rpc).toHaveBeenNthCalledWith(2, 'end_reading_session', {
+            p_session_id: 'session-2',
+            p_reason: 'switched',
+        });
         expect(deleteBuilder.delete).toHaveBeenCalled();
     });
 

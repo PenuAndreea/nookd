@@ -1,6 +1,6 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useLocalSearchParams } from 'expo-router';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
@@ -15,6 +15,7 @@ import RoomDetailsSheet from '@/components/organisms/room-details-sheet';
 import TimerCard from '@/components/organisms/timer-card';
 import { useAuth } from '@/contexts/auth-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useLeaveRoomGuard } from '@/hooks/use-leave-room-guard';
 import { useRoomData } from '@/hooks/use-room-data';
 import { useRoomReflection } from '@/hooks/use-room-reflection';
 import { useRoomSession } from '@/hooks/use-room-session';
@@ -46,6 +47,7 @@ export default function SilentRoomScreen() {
         hasCheckedMembership,
         displayedElapsedSeconds,
         booksInRoom,
+        selfBook,
         selfHasBook,
         handleJoinPress,
         handleLeaveRoom,
@@ -63,13 +65,30 @@ export default function SilentRoomScreen() {
         readingPickerRef,
     });
 
+    // What the reader actually spent the session on: their own pick in a house
+    // room, otherwise the room's pinned book. `userBookForRoom` is only ever
+    // loaded for the room's book, so a self-picked book's existing library entry
+    // is found in the library we already have rather than fetched again.
+    const effectiveBook = selfBook ?? room?.book ?? null;
+    const effectiveUserBook = useMemo(() => {
+        if (userBookForRoom) return userBookForRoom;
+        if (!effectiveBook) return null;
+        return libraryBooks.find((entry) => entry.book_id === effectiveBook.id) ?? null;
+    }, [userBookForRoom, effectiveBook, libraryBooks]);
+
     const { handleReflectionSubmit, handleReflectionSkip } = useRoomReflection({
-        room,
-        userBookForRoom,
+        bookId: effectiveBook?.id ?? null,
+        userBookForRoom: effectiveUserBook,
         lastSessionId,
         userId,
         reflectionSheetRef,
     });
+
+    // Leaving the screen is leaving the room, so back (button or swipe) has to
+    // confirm first. handleLeaveRoom ends the session and opens the reflection
+    // sheet, which navigates back itself once it is done — and by then isJoined
+    // is false, so this guard is disarmed and that pop goes through.
+    useLeaveRoomGuard(isJoined, handleLeaveRoom);
 
     const openDetails = () => {
         bottomSheetRef.current?.snapToIndex(1);
@@ -146,8 +165,8 @@ export default function SilentRoomScreen() {
 
             <ReflectionSheet
                 ref={reflectionSheetRef}
-                book={room?.book ?? null}
-                initialPage={userBookForRoom?.current_page}
+                book={effectiveBook}
+                initialPage={effectiveUserBook?.current_page}
                 onSubmit={handleReflectionSubmit}
                 onSkip={handleReflectionSkip}
             />

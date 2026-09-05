@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { parsePgTimestamp } from '@/lib/date';
+
 /**
  * Seconds elapsed since `startedAt`, ticking once a second.
  *
@@ -23,15 +25,18 @@ export function useElapsedSeconds(startedAt: string | null | undefined): number 
             return;
         }
 
-        const startedAtMs = Date.parse(startedAt.replace(/(\.\d{3})\d+/, '$1'));
-        if (Number.isNaN(startedAtMs)) {
+        const startedAtMs = parsePgTimestamp(startedAt);
+        if (startedAtMs === null) {
             reset();
             return;
         }
 
-        function tick() {
+        // An arrow const rather than a function declaration: a hoisted
+        // declaration is visible before the null check above, so TypeScript
+        // cannot narrow startedAtMs inside it.
+        const tick = () => {
             setElapsedSeconds(Math.max(Math.floor((Date.now() - startedAtMs) / 1000), 0));
-        }
+        };
 
         tick();
         const interval = setInterval(tick, 1000);

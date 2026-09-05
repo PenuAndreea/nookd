@@ -11,7 +11,7 @@ jest.mock('@/api/books', () => ({
 }));
 jest.mock('@/api/rooms', () => ({ updateReadingSession: jest.fn() }));
 
-const room = { id: 'room-1', book_id: 'book-1' } as any;
+const BOOK_ID = 'book-1';
 const reflectionSheetRef = { current: { close: jest.fn() } } as any;
 const back = jest.fn();
 
@@ -24,7 +24,7 @@ describe('useRoomReflection', () => {
     it('ends the reading session and creates a new library entry when there was none', async () => {
         const { result } = await renderHook(() =>
             useRoomReflection({
-                room,
+                bookId: BOOK_ID,
                 userBookForRoom: null,
                 lastSessionId: 'session-1',
                 userId: 'user-1',
@@ -41,7 +41,18 @@ describe('useRoomReflection', () => {
 
         expect(updateReadingSession).toHaveBeenCalledWith(
             'session-1',
-            expect.objectContaining({ thoughts: 'Great chapter', page_reached: 120, completed: true })
+            expect.objectContaining({
+                thoughts: 'Great chapter',
+                page_reached: 120,
+                mood: 'focused',
+                reflection_prompted_at: expect.any(String),
+            })
+        );
+        // The RPC owns the lifecycle; writing these here made ended_at and the
+        // duration derived from it disagree.
+        expect(updateReadingSession).not.toHaveBeenCalledWith(
+            'session-1',
+            expect.objectContaining({ ended_at: expect.anything() })
         );
         expect(addToReadingList).toHaveBeenCalledWith('user-1', 'book-1', 'currently_reading');
         expect(updateReadingListEntry).not.toHaveBeenCalled();
@@ -52,7 +63,7 @@ describe('useRoomReflection', () => {
     it('updates the existing library entry instead of creating a new one', async () => {
         const { result } = await renderHook(() =>
             useRoomReflection({
-                room,
+                bookId: BOOK_ID,
                 userBookForRoom: { id: 'entry-1' } as any,
                 lastSessionId: 'session-1',
                 userId: 'user-1',
@@ -77,7 +88,7 @@ describe('useRoomReflection', () => {
     it('skips the session update when there was no session to end', async () => {
         const { result } = await renderHook(() =>
             useRoomReflection({
-                room,
+                bookId: BOOK_ID,
                 userBookForRoom: null,
                 lastSessionId: null,
                 userId: 'user-1',
@@ -90,10 +101,10 @@ describe('useRoomReflection', () => {
         expect(updateReadingSession).not.toHaveBeenCalled();
     });
 
-    it('closes the sheet and navigates back without saving anything on skip', async () => {
+    it('marks the session as prompted on skip so it is not offered again', async () => {
         const { result } = await renderHook(() =>
             useRoomReflection({
-                room,
+                bookId: BOOK_ID,
                 userBookForRoom: null,
                 lastSessionId: 'session-1',
                 userId: 'user-1',
@@ -101,9 +112,34 @@ describe('useRoomReflection', () => {
             })
         );
 
-        result.current.handleReflectionSkip();
+        await result.current.handleReflectionSkip();
 
-        expect(updateReadingSession).not.toHaveBeenCalled();
+        expect(updateReadingSession).toHaveBeenCalledWith(
+            'session-1',
+            { reflection_prompted_at: expect.any(String) }
+        );
+        // Skipping records nothing the reader did not say.
+        expect(addToReadingList).not.toHaveBeenCalled();
+        expect(updateReadingListEntry).not.toHaveBeenCalled();
+        expect(reflectionSheetRef.current.close).toHaveBeenCalled();
+        expect(back).toHaveBeenCalled();
+    });
+
+    it('still closes the sheet when stamping the skip fails', async () => {
+        (updateReadingSession as jest.Mock).mockRejectedValueOnce(new Error('offline'));
+
+        const { result } = await renderHook(() =>
+            useRoomReflection({
+                bookId: BOOK_ID,
+                userBookForRoom: null,
+                lastSessionId: 'session-1',
+                userId: 'user-1',
+                reflectionSheetRef,
+            })
+        );
+
+        await result.current.handleReflectionSkip();
+
         expect(reflectionSheetRef.current.close).toHaveBeenCalled();
         expect(back).toHaveBeenCalled();
     });

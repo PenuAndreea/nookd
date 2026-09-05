@@ -8,6 +8,7 @@ import { useTheme } from '@/hooks/use-theme';
 import { readingProgress } from '@/lib/reading-progress';
 import { router } from 'expo-router';
 
+import ProgressBar from '@/components/atoms/progress-bar';
 import Typography from '../atoms/typography';
 
 /**
@@ -49,9 +50,11 @@ export default function BookItem({ userBook }: { userBook: UserBookWithBook }) {
                         <Typography variant="caption" color="sheetTextSecondary" style={styles.progressLabel}>
                             {t('books.progressLabel', { percent: progress.percent, count: progress.pagesLeft })}
                         </Typography>
-                        <View testID="book-item-progress" style={styles.progressTrack}>
-                            <View style={[styles.progressFill, { width: `${progress.percent}%` }]} />
-                        </View>
+                        <ProgressBar
+                            testID="book-item-progress"
+                            progress={progress.ratio}
+                            style={styles.progress}
+                        />
                     </>
                 )}
             </View>
@@ -89,16 +92,7 @@ const useStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     progressLabel: {
         marginTop: Spacing.two,
     },
-    progressTrack: {
-        height: 4,
-        borderRadius: BorderRadius.small,
-        backgroundColor: colors.progressTrack,
+    progress: {
         marginTop: Spacing.one,
-        overflow: 'hidden',
-    },
-    progressFill: {
-        height: '100%',
-        borderRadius: BorderRadius.small,
-        backgroundColor: colors.accentStrong,
     },
 });

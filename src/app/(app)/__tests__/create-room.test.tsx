@@ -8,7 +8,7 @@ import { useRooms } from '@/contexts/rooms-context';
 import CreateRoomScreen from '@/app/(app)/create-room';
 
 jest.mock('expo-router', () => ({
-    router: { back: jest.fn() },
+    router: { back: jest.fn(), replace: jest.fn() },
     useRouter: jest.fn(() => ({ back: jest.fn() })),
     useLocalSearchParams: jest.fn(() => ({})),
 }));
@@ -49,7 +49,9 @@ describe('CreateRoomScreen', () => {
             )
         );
         expect(addRoom).toHaveBeenCalledWith({ id: 'room-1', name: 'Sunday deep work' });
-        expect(router.back).toHaveBeenCalled();
+        // Creating a room puts the host in it, rather than dropping them back
+        // on the list to join their own room by hand.
+        expect(router.replace).toHaveBeenCalledWith('/room/room-1?autojoin=1');
     });
 
     it('blocks creation and warns when signed out', async () => {

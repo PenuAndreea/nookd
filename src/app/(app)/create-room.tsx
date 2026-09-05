@@ -95,7 +95,12 @@ export default function CreateRoomScreen() {
         try {
             const room = await createRoom(input)
             addRoom(room)
-            router.back()
+            // Creating a room puts you in it. `replace` rather than back-then-push
+            // so the create form is not left on the stack behind the room, and
+            // autojoin=1 reuses the room screen's own join path -- including the
+            // "you're already in another room" prompt -- instead of duplicating
+            // the join logic here.
+            router.replace(`/room/${room.id}?autojoin=1`)
         } catch (error) {
             console.error('Error creating room:', error, input)
             Alert.alert(t('rooms.create.notCreatedTitle'), t('rooms.create.notCreatedError'));

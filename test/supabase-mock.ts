@@ -13,7 +13,7 @@ export function queryResult<T>(result: { data: T; error: null } | { data: null; 
 
     const chainMethods = [
         'select', 'insert', 'upsert', 'update', 'delete',
-        'eq', 'neq', 'not', 'in', 'is', 'order', 'limit',
+        'eq', 'neq', 'not', 'in', 'is', 'gte', 'lte', 'order', 'limit',
     ];
     for (const method of chainMethods) {
         builder[method] = jest.fn(() => builder);

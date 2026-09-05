@@ -103,12 +103,18 @@ export async function forceLeaveRoom(roomId: Room['id'], userId: string): Promis
     }
 
     for (const session of sessions ?? []) {
-        const { error: endError } = await supabase.rpc('end_reading_session', { p_session_id: session.id })
+        const { error: endError } = await supabase.rpc('end_reading_session', {
+            p_session_id: session.id,
+            p_reason: 'switched',
+        })
         if (endError) {
             throw endError
         }
     }
 
+    // Must stay after the session is ended: close_reading_session reads
+    // room_members.book_id to record what was being read, so deleting the
+    // membership first would silently drop that from every session.
     const { error: deleteError } = await supabase
         .from('room_members')
         .delete()
@@ -134,9 +140,12 @@ export async function createRoom(input: RoomInsert): Promise<RoomWithDetails> {
     return data as unknown as RoomWithDetails
 }
 
+// Reflection fields only. `ended_at` / `duration_minutes` / `ended_reason` are
+// owned by the end_reading_session RPC, which derives the duration from
+// `ended_at` -- a client writing it afterwards made the two disagree.
 export async function updateReadingSession(
     id: ReadingSession['id'],
-    patch: Partial<Pick<ReadingSession, 'thoughts' | 'page_reached' | 'mood' | 'ended_at' | 'completed'>>
+    patch: Partial<Pick<ReadingSession, 'thoughts' | 'page_reached' | 'mood' | 'reflection_prompted_at'>>
 ) {
     const { data, error } = await supabase
         .from('reading_sessions')

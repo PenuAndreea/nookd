@@ -48,7 +48,12 @@ export function useRoomBooks({
         }
         return [...byBook.values()].sort((a, b) => b.count - a.count)
     }, [members, memberBooks]);
-    const selfHasBook = !!(userId && memberBooks[userId]);
+    // The book *this* reader picked. `selfHasBook` used to be all the caller
+    // needed, but the reflection sheet has to gate its page field on the book
+    // actually being read, which in a house room is this one rather than the
+    // room's.
+    const selfBook = userId ? memberBooks[userId] ?? null : null;
+    const selfHasBook = !!selfBook;
 
     useEffect(() => {
         if (!members.length) return
@@ -101,5 +106,5 @@ export function useRoomBooks({
         readingPickerRef.current?.snapToIndex(0)
     }
 
-    return { booksInRoom, selfHasBook, handleSelectBook, handleSkipBook, openReadingPicker };
+    return { booksInRoom, selfBook, selfHasBook, handleSelectBook, handleSkipBook, openReadingPicker };
 }
