@@ -4,25 +4,19 @@ import { useTranslation } from 'react-i18next';
 
 import {
     addToReadingList,
-    getActivelyReadBooks,
     getOrCreateBook,
-    getPopularBooks,
     getUserBooks,
     OpenLibraryResult,
-    PopularBook,
-    RoomWithBook,
     searchOpenLibrary,
-    UserBookStatus,
     UserBookWithBook,
 } from '@/api/books';
-import { BookCarouselItem } from '@/components/molecules/book-carousel';
 import { router } from 'expo-router';
 
 /**
- * All state and Supabase/Open Library calls behind the Books tab: the
- * search-as-you-type flow, and the status-filtered personal library plus its
- * two decorative discovery shelves. The screen itself only renders what this
- * returns.
+ * All state and Supabase/Open Library calls behind the Library tab: the
+ * search-as-you-type flow, and the reader's own books split into what they're
+ * reading right now and everything else. The screen only renders what this
+ * returns. Discovery lives on the Explore tab (see use-explore).
  */
 export function useBooksLibrary(userId: string | undefined) {
     const { t } = useTranslation();
@@ -33,19 +27,18 @@ export function useBooksLibrary(userId: string | undefined) {
     const [searchError, setSearchError] = useState(false);
     const [addingKey, setAddingKey] = useState<string | null>(null);
 
-    const [status, setStatus] = useState<UserBookStatus>('currently_reading');
     const [userBooks, setUserBooks] = useState<UserBookWithBook[]>([]);
     const [loadingList, setLoadingList] = useState(false);
     const [listError, setListError] = useState(false);
-
-    const [activelyRead, setActivelyRead] = useState<RoomWithBook[]>([]);
-    const [popularBooks, setPopularBooks] = useState<PopularBook[]>([]);
 
     const loadUserBooks = useCallback(async () => {
         if (!userId) return;
         setLoadingList(true);
         try {
-            const data = await getUserBooks(userId, status);
+            // Unfiltered: the screen shows the whole library and pulls the
+            // currently-reading books to the top, rather than filtering to one
+            // status at a time.
+            const data = await getUserBooks(userId);
             setUserBooks(data);
             setListError(false);
         } catch (error) {
@@ -54,7 +47,7 @@ export function useBooksLibrary(userId: string | undefined) {
         } finally {
             setLoadingList(false);
         }
-    }, [userId, status]);
+    }, [userId]);
 
     useEffect(() => {
         // Calling the memoized loader through a local wrapper (rather than as
@@ -66,19 +59,6 @@ export function useBooksLibrary(userId: string | undefined) {
         }
         run();
     }, [loadUserBooks]);
-
-    useEffect(() => {
-        // Decorative secondary shelves — a failure here just means the
-        // carousel stays hidden (BookCarousel renders nothing for an empty
-        // list), which is a reasonable degrade for content that isn't the
-        // point of this screen. The primary list below has its own error UI.
-        getActivelyReadBooks().then(setActivelyRead).catch((error) => {
-            console.error('Error loading what others are reading:', error);
-        });
-        getPopularBooks().then(setPopularBooks).catch((error) => {
-            console.error('Error loading popular books:', error);
-        });
-    }, []);
 
     async function search(text: string) {
         setQuery(text);
@@ -125,7 +105,7 @@ export function useBooksLibrary(userId: string | undefined) {
             await addToReadingList(userId, book.id, 'want_to_read');
             setQuery('');
             setSearchResults([]);
-            if (status === 'want_to_read') await loadUserBooks();
+            await loadUserBooks();
         } catch (error) {
             console.error('Error adding book to reading list:', error);
             Alert.alert(t('books.addToListErrorTitle'), t('common.genericErrorMessage'));
@@ -136,12 +116,8 @@ export function useBooksLibrary(userId: string | undefined) {
 
     const isSearching = query.length >= 3;
 
-    const activelyReadItems: BookCarouselItem[] = activelyRead.map(({ id, book }) => ({ key: id, book }));
-    const popularBookItems: BookCarouselItem[] = popularBooks.map(({ book, roomCount }) => ({
-        key: book.id,
-        book,
-        subtitle: t('books.popularBooksCount', { count: roomCount }),
-    }));
+    const currentlyReading = userBooks.filter((userBook) => userBook.status === 'currently_reading');
+    const otherBooks = userBooks.filter((userBook) => userBook.status !== 'currently_reading');
 
     return {
         query,
@@ -154,14 +130,10 @@ export function useBooksLibrary(userId: string | undefined) {
         openResult,
         quickAdd,
 
-        status,
-        setStatus,
-        userBooks,
+        currentlyReading,
+        otherBooks,
         loadingList,
         listError,
         loadUserBooks,
-
-        activelyReadItems,
-        popularBookItems,
     };
 }

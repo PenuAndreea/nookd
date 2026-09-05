@@ -1,65 +1,56 @@
-import { FlatList, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { SectionList, StyleSheet } from 'react-native';
 
-import { UserBookStatus, UserBookWithBook } from '@/api/books';
+import { UserBookWithBook } from '@/api/books';
+import Button from '@/components/atoms/button';
 import Typography from '@/components/atoms/typography';
-import BookCarousel, { BookCarouselItem } from '@/components/molecules/book-carousel';
-import { BookStatusChips } from '@/components/molecules/book-status-chips';
 import { EmptyState } from '@/components/molecules/empty-state';
 import { ErrorState } from '@/components/molecules/error-state';
 import BookItem from '@/components/organisms/book-item';
-import { Spacing } from '@/constants/theme';
-import { router } from 'expo-router';
+import { BottomTabInset, Spacing } from '@/constants/theme';
+import { useContinueReading } from '@/hooks/use-continue-reading';
 
 interface BookLibraryListProps {
-    activelyReadItems: BookCarouselItem[];
-    popularBookItems: BookCarouselItem[];
-    status: UserBookStatus;
-    onStatusChange: (status: UserBookStatus) => void;
-    userBooks: UserBookWithBook[];
+    currentlyReading: UserBookWithBook[];
+    otherBooks: UserBookWithBook[];
     loadingList: boolean;
     listError: boolean;
     onRetry: () => void;
 }
 
-/** The Books tab's default view: discovery shelves above the user's own status-filtered library. */
+/**
+ * The Library tab's default view: everything the reader owns, with the books
+ * they're part-way through pulled into their own section on top so the
+ * "Continue" action is the first thing on the screen.
+ */
 export default function BookLibraryList({
-    activelyReadItems,
-    popularBookItems,
-    status,
-    onStatusChange,
-    userBooks,
+    currentlyReading,
+    otherBooks,
     loadingList,
     listError,
     onRetry,
 }: BookLibraryListProps) {
     const { t } = useTranslation();
+    const continueReading = useContinueReading();
+
+    const sections = [
+        { key: 'currently_reading', title: t('books.continueReadingSection'), data: currentlyReading },
+        { key: 'library', title: t('books.myLibrary'), data: otherBooks },
+        // An empty section still renders its header, which reads as a broken
+        // shelf — the empty state below covers the nothing-at-all case.
+    ].filter((section) => section.data.length > 0);
 
     return (
-        <FlatList
-            data={userBooks}
+        <SectionList
+            sections={sections}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.listContent}
-            ListHeaderComponent={
-                <View>
-                    <BookCarousel
-                        title={t('books.othersReading')}
-                        items={activelyReadItems}
-                        onPressItem={(bookId) => router.navigate(`/books/${bookId}`)}
-                    />
-                    <BookCarousel
-                        title={t('books.popularBooks')}
-                        items={popularBookItems}
-                        onPressItem={(bookId) => router.navigate(`/books/${bookId}`)}
-                    />
-
-                    <Typography variant="sectionLabel" color="textSecondary" style={styles.libraryLabel}>
-                        {t('books.myLibrary')}
-                    </Typography>
-
-                    <BookStatusChips value={status} onChange={onStatusChange} equalWidth />
-                </View>
-            }
+            showsVerticalScrollIndicator={false}
+            renderSectionHeader={({ section }) => (
+                <Typography variant="sectionLabel" color="textSecondary" style={styles.sectionLabel}>
+                    {section.title}
+                </Typography>
+            )}
             ListEmptyComponent={loadingList ? null : listError ? (
                 <ErrorState
                     title={t('books.listErrorTitle')}
@@ -69,16 +60,28 @@ export default function BookLibraryList({
             ) : (
                 <EmptyState title={t('books.emptyLibraryTitle')} subtitle={t('books.emptyLibrarySubtitle')} />
             )}
-            renderItem={({ item }) => <BookItem userBook={item} />}
+            renderItem={({ item, section }) => (
+                <BookItem
+                    userBook={item}
+                    action={section.key === 'currently_reading' ? (
+                        <Button
+                            size="small"
+                            title={t('books.continueReading')}
+                            accessibilityLabel={t('books.continueReadingAccessibility', { title: item.book.title })}
+                            onPress={() => continueReading(item.book)}
+                        />
+                    ) : undefined}
+                />
+            )}
         />
     );
 }
 
 const styles = StyleSheet.create({
     listContent: {
-        paddingBottom: Spacing.five,
+        paddingBottom: BottomTabInset + Spacing.four,
     },
-    libraryLabel: {
+    sectionLabel: {
         marginBottom: Spacing.two,
     },
 });

@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 
 import { UserBookWithBook } from '@/api/books';
@@ -8,7 +9,13 @@ import { router } from 'expo-router';
 
 import Typography from '../atoms/typography';
 
-export default function BookItem({ userBook }: { userBook: UserBookWithBook }) {
+interface BookItemProps {
+    userBook: UserBookWithBook;
+    /** Rendered to the right of the info column, e.g. a "Continue reading" button. */
+    action?: ReactNode;
+}
+
+export default function BookItem({ userBook, action }: BookItemProps) {
     const colors = useTheme();
     const styles = useStyles(colors);
     const common = createCommonStyles();
@@ -49,6 +56,7 @@ export default function BookItem({ userBook }: { userBook: UserBookWithBook }) {
                     </View>
                 )}
             </View>
+            {action}
         </Pressable>
     )
 }
@@ -83,6 +91,7 @@ const useStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     info: {
         flex: 1,
         marginLeft: Spacing.three,
+        marginRight: Spacing.two,
     },
     progressTrack: {
         height: 4,

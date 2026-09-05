@@ -1,10 +1,10 @@
-import { KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 
 import Typography from '@/components/atoms/typography';
+import { SearchField } from '@/components/molecules/search-field';
 import BookLibraryList from '@/components/organisms/book-library-list';
 import BookSearchResults from '@/components/organisms/book-search-results';
-import { SearchField } from '@/components/molecules/search-field';
 import { Spacing } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useBooksLibrary } from '@/hooks/use-books-library';
@@ -12,7 +12,7 @@ import { useTheme } from '@/hooks/use-theme';
 
 export { default as ErrorBoundary } from '@/components/organisms/route-error-boundary';
 
-export default function BooksScreen() {
+export default function LibraryScreen() {
     const { session } = useAuth();
     const userId = session?.user?.id;
     const colors = useTheme();
@@ -29,14 +29,11 @@ export default function BooksScreen() {
         isSearching,
         openResult,
         quickAdd,
-        status,
-        setStatus,
-        userBooks,
+        currentlyReading,
+        otherBooks,
         loadingList,
         listError,
         loadUserBooks,
-        activelyReadItems,
-        popularBookItems,
     } = useBooksLibrary(userId);
 
     return (
@@ -44,8 +41,7 @@ export default function BooksScreen() {
             style={styles.container}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-            <Typography variant="title1">{t('books.title')}</Typography>
-
+            <Typography variant="title1">{t('tabs.library')}</Typography>
             <SearchField
                 placeholder={t('books.searchPlaceholder')}
                 value={query}
@@ -66,11 +62,8 @@ export default function BooksScreen() {
                 />
             ) : (
                 <BookLibraryList
-                    activelyReadItems={activelyReadItems}
-                    popularBookItems={popularBookItems}
-                    status={status}
-                    onStatusChange={setStatus}
-                    userBooks={userBooks}
+                    currentlyReading={currentlyReading}
+                    otherBooks={otherBooks}
                     loadingList={loadingList}
                     listError={listError}
                     onRetry={loadUserBooks}
@@ -83,8 +76,8 @@ export default function BooksScreen() {
 const createStyles = (colors: ReturnType<typeof useTheme>) => StyleSheet.create({
     container: {
         flex: 1,
-        marginTop: Spacing.six,
-        marginHorizontal: Spacing.three,
+        paddingTop: Spacing.six,
+        paddingHorizontal: Spacing.three,
         backgroundColor: colors.background,
         gap: Spacing.three,
     },

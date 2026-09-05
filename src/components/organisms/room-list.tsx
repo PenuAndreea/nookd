@@ -1,9 +1,8 @@
-import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 
 import { router } from 'expo-router';
 
-import ReadingNook from '@/assets/images/icons/reading-nook.svg';
 import BookLover from '@/assets/images/illustrations/cuate/book-lover.svg';
 import Button from '@/components/atoms/button';
 import Typography from '@/components/atoms/typography';
@@ -34,7 +33,15 @@ export default function RoomList() {
 
     return (
         <View style={styles.container}>
-            {currentRoom && <CurrentRoomBanner room={currentRoom} />}
+            {currentRoom ? (
+                <CurrentRoomBanner room={currentRoom} />
+            ) : (
+                // Takes the banner's slot: you only need a way to start a room
+                // when you aren't already sitting in one.
+                <View style={styles.newRoom}>
+                    <Button size="medium" title={t('rooms.newRoom')} onPress={createRoom} />
+                </View>
+            )}
             {showOtherRooms && <Typography variant="sectionLabel" color="textSecondary">{t('rooms.sectionLabel')}</Typography>}
             {loading ?
                 <ActivityIndicator size="large" style={{ justifyContent: 'center', alignSelf: 'center', alignItems: 'center', alignContent: 'center', height: '80%' }} color={colors.accent} /> :
@@ -59,17 +66,13 @@ export default function RoomList() {
                                 onRetry={refresh}
                             />
                         ) : (
+                            // No action here: "+ New room" is already sitting
+                            // directly above this, since an empty list can only
+                            // happen when there is no current room.
                             <EmptyState
                                 illustration={<BookLover width={200} height={200} />}
                                 title={t('rooms.emptyTitle')}
                                 subtitle={t('rooms.emptySubtitle')}
-                                action={
-                                    <Button
-                                        round
-                                        iconNode={<ReadingNook width={26} height={26} color={colors.accent} />}
-                                        onPress={createRoom}
-                                    />
-                                }
                             />
                         )
                     }
@@ -86,5 +89,12 @@ const useStyles = (colors: any) => StyleSheet.create({
     },
     listContent: {
         paddingTop: Spacing.three,
+    },
+    // Matches CurrentRoomBanner's own bottom margin, so the "Rooms" label sits
+    // in the same place whichever of the two is showing.
+    newRoom: {
+        marginBottom: Spacing.three,
+        width: '100%',
+        alignSelf: 'center',
     },
 });

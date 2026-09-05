@@ -13,12 +13,15 @@ export interface BookCarouselItem {
 
 interface BookCarouselProps {
     title: string;
+    /** Optional line under the section label. */
+    subtitle?: string;
     items: BookCarouselItem[];
-    onPressItem: (bookId: string) => void;
+    /** Given the whole item, since `key` and `book.id` differ for room-keyed shelves. */
+    onPressItem: (item: BookCarouselItem) => void;
 }
 
 /** A labeled horizontal shelf of book covers — "What others are reading", "Popular books". */
-export default function BookCarousel({ title, items, onPressItem }: BookCarouselProps) {
+export default function BookCarousel({ title, subtitle, items, onPressItem }: BookCarouselProps) {
     const colors = useTheme();
     const styles = createStyles(colors);
 
@@ -27,23 +30,24 @@ export default function BookCarousel({ title, items, onPressItem }: BookCarousel
     return (
         <View style={styles.section}>
             <Typography variant="sectionLabel" color="textSecondary">{title}</Typography>
+            {subtitle && <Typography variant="caption" color="textSecondary">{subtitle}</Typography>}
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {items.map(({ key, book, subtitle }) => (
+                {items.map((item) => (
                     <TouchableOpacity
-                        key={key}
+                        key={item.key}
                         style={styles.card}
-                        onPress={() => onPressItem(book.id)}
+                        onPress={() => onPressItem(item)}
                         activeOpacity={0.7}
                     >
-                        {book.cover_url ? (
-                            <Image source={{ uri: book.cover_url }} style={styles.cover} resizeMode="contain" />
+                        {item.book.cover_url ? (
+                            <Image source={{ uri: item.book.cover_url }} style={styles.cover} resizeMode="contain" />
                         ) : (
                             <View style={[styles.cover, styles.coverEmpty]}>
                                 <Text style={{ fontSize: 20 }}>📖</Text>
                             </View>
                         )}
-                        <Typography variant="small" style={styles.title} numberOfLines={2}>{book.title}</Typography>
-                        {subtitle && <Typography variant="tiny" color="textSecondary" style={styles.subtitle}>{subtitle}</Typography>}
+                        <Typography variant="small" style={styles.title} numberOfLines={2}>{item.book.title}</Typography>
+                        {item.subtitle && <Typography variant="tiny" color="textSecondary" style={styles.subtitle}>{item.subtitle}</Typography>}
                     </TouchableOpacity>
                 ))}
             </ScrollView>

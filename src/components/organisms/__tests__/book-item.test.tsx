@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { Text } from 'react-native';
 import { router } from 'expo-router';
 import BookItem from '@/components/organisms/book-item';
 
@@ -45,5 +46,17 @@ describe('BookItem', () => {
         await render(<BookItem userBook={{ ...userBook, book: { ...userBook.book, page_count: null } }} />);
 
         expect(screen.queryByTestId('book-item-progress')).toBeNull();
+    });
+
+    it('renders a trailing action when given one', async () => {
+        await render(<BookItem userBook={userBook} action={<Text>Continue reading</Text>} />);
+
+        expect(screen.getByText('Continue reading')).toBeVisible();
+    });
+
+    it('renders no action by default', async () => {
+        await render(<BookItem userBook={userBook} />);
+
+        expect(screen.queryByText('Continue reading')).toBeNull();
     });
 });

@@ -1,8 +1,10 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { router } from 'expo-router';
 import { useAuth } from '@/contexts/auth-context';
 import { useRooms } from '@/contexts/rooms-context';
-import HomeScreen from '@/app/(app)/(tabs)/index';
+import RoomsScreen from '@/app/(app)/(tabs)/index';
 
+jest.mock('expo-router', () => ({ router: { push: jest.fn(), navigate: jest.fn() } }));
 jest.mock('@/contexts/auth-context', () => ({ useAuth: jest.fn() }));
 jest.mock('@/contexts/rooms-context', () => ({ useRooms: jest.fn() }));
 
@@ -30,17 +32,17 @@ afterEach(() => {
     jest.restoreAllMocks();
 });
 
-describe('HomeScreen', () => {
+describe('RoomsScreen', () => {
     it('greets the user based on the time of day', async () => {
         mockHour(9);
-        await render(<HomeScreen />);
+        await render(<RoomsScreen />);
 
         expect(screen.getByText('Good morning, Mira')).toBeVisible();
     });
 
     it('shows a generic subtitle with no current room', async () => {
         mockHour(9);
-        await render(<HomeScreen />);
+        await render(<RoomsScreen />);
 
         expect(screen.getByText('Find your quiet place to read.')).toBeVisible();
     });
@@ -60,25 +62,17 @@ describe('HomeScreen', () => {
             refresh: jest.fn(),
         });
 
-        await render(<HomeScreen />);
+        await render(<RoomsScreen />);
 
         expect(screen.getByText('You left off in Rainy Library, 1 minute in.')).toBeVisible();
     });
 
-    it('wires the signed-in user into the profile sheet', async () => {
+    it('opens the You tab from the avatar', async () => {
         mockHour(9);
-        await render(<HomeScreen />);
+        await render(<RoomsScreen />);
 
-        // The mocked BottomSheet always renders its content regardless of
-        // open/closed state, so this checks the sheet receives the right
-        // user rather than that tapping visually opens it.
-        expect(screen.getByText('me@example.com')).toBeVisible();
-    });
+        await fireEvent.press(screen.getByLabelText('You'));
 
-    it('does not crash when the avatar is tapped', async () => {
-        mockHour(9);
-        await render(<HomeScreen />);
-
-        await fireEvent.press(screen.getByLabelText('Open profile'));
+        expect(router.navigate).toHaveBeenCalledWith('/you');
     });
 });

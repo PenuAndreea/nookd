@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { getOrCreateBook, searchOpenLibrary } from '@/api/books';
 import { createRoom } from '@/api/rooms';
 import { useAuth } from '@/contexts/auth-context';
@@ -10,6 +10,7 @@ import CreateRoomScreen from '@/app/(app)/create-room';
 jest.mock('expo-router', () => ({
     router: { back: jest.fn() },
     useRouter: jest.fn(() => ({ back: jest.fn() })),
+    useLocalSearchParams: jest.fn(() => ({})),
 }));
 jest.mock('@/contexts/auth-context', () => ({ useAuth: jest.fn() }));
 jest.mock('@/contexts/rooms-context', () => ({ useRooms: jest.fn() }));
@@ -34,7 +35,7 @@ describe('CreateRoomScreen', () => {
         await render(<CreateRoomScreen />);
 
         await fireEvent.changeText(screen.getByPlaceholderText('e.g. Sunday deep work'), 'Sunday deep work');
-        await fireEvent.press(screen.getByText('Create room'));
+        await fireEvent.press(screen.getByText('Start silent room'));
 
         await waitFor(() =>
             expect(createRoom).toHaveBeenCalledWith(
@@ -55,7 +56,7 @@ describe('CreateRoomScreen', () => {
         (useAuth as jest.Mock).mockReturnValue({ session: null });
         await render(<CreateRoomScreen />);
 
-        await fireEvent.press(screen.getByText('Create room'));
+        await fireEvent.press(screen.getByText('Start silent room'));
 
         expect(Alert.alert).toHaveBeenCalledWith('Room not created', 'You need to be signed in to create a room.');
         expect(createRoom).not.toHaveBeenCalled();
@@ -65,7 +66,7 @@ describe('CreateRoomScreen', () => {
         (createRoom as jest.Mock).mockRejectedValue(new Error('offline'));
         await render(<CreateRoomScreen />);
 
-        await fireEvent.press(screen.getByText('Create room'));
+        await fireEvent.press(screen.getByText('Start silent room'));
 
         await waitFor(() =>
             expect(Alert.alert).toHaveBeenCalledWith('Room not created', 'Something went wrong while creating the room.')
@@ -88,7 +89,7 @@ describe('CreateRoomScreen', () => {
         await fireEvent.press(screen.getByText('Dune'));
 
         await act(async () => {
-            await fireEvent.press(screen.getByText('Create room'));
+            await fireEvent.press(screen.getByText('Start silent room'));
         });
 
         expect(getOrCreateBook).toHaveBeenCalledWith(
@@ -113,7 +114,7 @@ describe('CreateRoomScreen', () => {
         await fireEvent.press(screen.getByText('Dune'));
 
         await act(async () => {
-            await fireEvent.press(screen.getByText('Create room'));
+            await fireEvent.press(screen.getByText('Start silent room'));
         });
 
         await waitFor(() =>
@@ -131,5 +132,41 @@ describe('CreateRoomScreen', () => {
         await fireEvent.press(screen.getByText('Fantasy'));
 
         expect(screen.queryByPlaceholderText('Search by title or author')).toBeNull();
+    });
+
+    describe('with a book preselected from the library', () => {
+        beforeEach(() => {
+            (useLocalSearchParams as jest.Mock).mockReturnValue({
+                bookId: 'book-1',
+                bookTitle: 'Dune',
+                bookAuthor: 'Frank Herbert',
+            });
+        });
+
+        it('shows the chosen book instead of the search field', async () => {
+            await render(<CreateRoomScreen />);
+
+            expect(screen.getByText('Dune')).toBeVisible();
+            expect(screen.getByText('Frank Herbert')).toBeVisible();
+            expect(screen.queryByPlaceholderText('Search by title or author')).toBeNull();
+        });
+
+        it('attaches the book without a second Open Library lookup', async () => {
+            (createRoom as jest.Mock).mockResolvedValue({ id: 'room-1' });
+            await render(<CreateRoomScreen />);
+
+            await act(async () => {
+                await fireEvent.press(screen.getByText('Start silent room'));
+            });
+
+            // The book is already a `books` row — nothing to cache.
+            expect(getOrCreateBook).not.toHaveBeenCalled();
+            await waitFor(() =>
+                expect(createRoom).toHaveBeenCalledWith(expect.objectContaining({
+                    book_id: 'book-1',
+                    vibe: 'book_club',
+                }))
+            );
+        });
     });
 });

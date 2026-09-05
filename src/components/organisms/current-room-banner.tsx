@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { RoomWithDetails } from '@/api/rooms';
 import Button from '@/components/atoms/button';
@@ -40,7 +40,7 @@ export default function CurrentRoomBanner({ room }: { room: RoomWithDetails }) {
                 <View style={styles.info}>
                     <StatusBadge memberCount={count} />
 
-                    <Typography variant="h1" numberOfLines={1} style={styles.name}>
+                    <Typography variant="h2" numberOfLines={1} style={styles.name}>
                         {room.name}
                     </Typography>
 
@@ -54,7 +54,7 @@ export default function CurrentRoomBanner({ room }: { room: RoomWithDetails }) {
                 title={t('rooms.returnToRoom')}
                 variant="surface"
                 fullWidth
-                size="large"
+                size="medium"
                 onPress={openRoom}
             />
         </Pressable>

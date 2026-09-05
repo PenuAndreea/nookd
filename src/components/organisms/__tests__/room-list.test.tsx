@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { router } from 'expo-router';
 import { useRooms } from '@/contexts/rooms-context';
 import { useAuth } from '@/contexts/auth-context';
 import RoomList from '@/components/organisms/room-list';
@@ -43,7 +44,39 @@ describe('RoomList', () => {
         expect(screen.getByText('Sunlit Corner')).toBeVisible();
     });
 
-    it('shows an empty state with a create-room action when there are no rooms at all', async () => {
+    it('hides the create button while the user is already in a room', async () => {
+        (useRooms as jest.Mock).mockReturnValue({
+            rooms: [currentRoom, otherRoom],
+            currentRoom,
+            loading: false,
+            refreshing: false,
+            error: false,
+            refresh: jest.fn(),
+        });
+
+        await render(<RoomList />);
+
+        expect(screen.queryByText('Create room')).toBeNull();
+    });
+
+    it('offers a create button where the banner would be when the user is in no room', async () => {
+        (useRooms as jest.Mock).mockReturnValue({
+            rooms: [otherRoom],
+            currentRoom: null,
+            loading: false,
+            refreshing: false,
+            error: false,
+            refresh: jest.fn(),
+        });
+
+        await render(<RoomList />);
+
+        await fireEvent.press(screen.getByText('Create room'));
+
+        expect(router.push).toHaveBeenCalledWith('/create-room');
+    });
+
+    it('shows an empty state when there are no rooms at all', async () => {
         (useRooms as jest.Mock).mockReturnValue({
             rooms: [],
             currentRoom: null,
@@ -56,6 +89,9 @@ describe('RoomList', () => {
         await render(<RoomList />);
 
         expect(screen.getByText('No silent rooms yet')).toBeVisible();
+        // The single "+ New room" above is the only create action — the empty
+        // state doesn't repeat it.
+        expect(screen.getAllByText('Create room')).toHaveLength(1);
     });
 
     it('shows an error state with retry when loading rooms failed', async () => {

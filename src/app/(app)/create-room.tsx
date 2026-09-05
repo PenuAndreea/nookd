@@ -8,12 +8,13 @@ import Button from '@/components/atoms/button';
 import { Header } from '@/components/molecules/header';
 import { LabeledInput } from '@/components/molecules/labeled-input';
 import { DurationPicker, VibePicker } from '@/components/molecules/picker';
+import BookRow from '@/components/molecules/book-row';
 import { Book, BookSearch } from '@/components/molecules/search-input';
 import { Spacing } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useRooms } from '@/contexts/rooms-context';
 import { useTheme } from '@/hooks/use-theme';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 
 export { default as ErrorBoundary } from '@/components/organisms/route-error-boundary';
 
@@ -22,10 +23,20 @@ export default function CreateRoomScreen() {
     const styles = createStyles(colors);
     const { t } = useTranslation();
 
+    // Set when arriving from a book — "Continue reading" in the library, where
+    // the book is already a row in `books` rather than an Open Library result.
+    const { bookId, bookTitle, bookAuthor, bookCoverUrl } = useLocalSearchParams<{
+        bookId?: string;
+        bookTitle?: string;
+        bookAuthor?: string;
+        bookCoverUrl?: string;
+    }>();
+    const hasPresetBook = !!bookId;
+
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [vibe, setVibe] = useState<string | null>(null);
+    const [vibe, setVibe] = useState<string | null>(hasPresetBook ? 'book_club' : null);
     const [duration, setDuration] = useState<string | null>('60');
     const [book, setBook] = useState<Book | null>(null);
 
@@ -47,8 +58,10 @@ export default function CreateRoomScreen() {
 
         const isBookClub = vibe === 'book_club';
 
-        let bookId: string | null = null;
-        if (isBookClub && book) {
+        // A preset book is already a `books` row, so it skips the Open Library
+        // round-trip entirely.
+        let selectedBookId: string | null = hasPresetBook ? bookId : null;
+        if (!hasPresetBook && isBookClub && book) {
             try {
                 const cachedBook = await getOrCreateBook({
                     openLibraryKey: book.openLibraryKey,
@@ -57,7 +70,7 @@ export default function CreateRoomScreen() {
                     coverUrl: book.thumbnail,
                     pageCount: book.pageCount,
                 });
-                bookId = cachedBook.id;
+                selectedBookId = cachedBook.id;
             } catch (error) {
                 // Don't block room creation on a flaky book cache — the room
                 // doesn't strictly need a book attached.
@@ -66,7 +79,7 @@ export default function CreateRoomScreen() {
         }
 
         await create({
-            book_id: bookId,
+            book_id: selectedBookId,
             description: description.trim() || null,
             duration_minutes: Number(duration) || null,
             host_id: hostId,
@@ -124,7 +137,22 @@ export default function CreateRoomScreen() {
                     }}
                 />
                 <DurationPicker value={duration} onChange={setDuration} />
-                {vibe === 'book_club' && <BookSearch value={book} onChange={setBook} />}
+                {hasPresetBook ? (
+                    // Fixed rather than searchable: the reader picked this book
+                    // in their library, so there is nothing to look up.
+                    <BookRow
+                        size="medium"
+                        book={{
+                            title: bookTitle ?? t('common.book'),
+                            author: bookAuthor,
+                            // Empty string means "the book has no cover", so
+                            // normalize it back to null for BookRow's fallback.
+                            cover_url: bookCoverUrl || null,
+                        }}
+                    />
+                ) : (
+                    vibe === 'book_club' && <BookSearch value={book} onChange={setBook} />
+                )}
                 <Button
                     size='medium'
                     title={isSubmitting ? t('rooms.create.submitting') : t('rooms.create.submit')}

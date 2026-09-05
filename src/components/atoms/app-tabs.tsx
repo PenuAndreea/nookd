@@ -1,15 +1,13 @@
 
 import { BlurView } from 'expo-blur';
-import { router, Stack } from 'expo-router';
-import { BottomTabBar, BottomTabBarProps, Tabs } from 'expo-router/tabs';
+import { Stack } from 'expo-router';
+import { Tabs } from 'expo-router/tabs';
 import { SymbolView } from 'expo-symbols';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import ReadingNook from '../../../assets/images/icons/reading-nook.svg';
 import { useColorScheme } from '../../hooks/use-color-scheme';
 import { useTheme } from '../../hooks/use-theme';
-import Button from './button';
 import { Icon } from './icon';
 
 type Route = {
@@ -22,35 +20,25 @@ type Route = {
 const routes: Route[] = [
   {
     name: 'index',
-    titleKey: 'tabs.home',
+    titleKey: 'tabs.rooms',
     icon: 'house',
   },
   {
     name: 'books',
-    titleKey: 'tabs.books',
-    icon: 'book.closed',
+    titleKey: 'tabs.library',
+    icon: 'books.vertical',
+  },
+  {
+    name: 'explore',
+    titleKey: 'tabs.explore',
+    icon: 'sparkles',
+  },
+  {
+    name: 'you',
+    titleKey: 'tabs.you',
+    icon: 'person',
   },
 ]
-
-function TabBarWithCreateButton(props: BottomTabBarProps) {
-  const colors = useTheme();
-
-  return (
-    <View>
-      <BottomTabBar {...props} />
-      <Button
-        floating
-        iconNode={<ReadingNook width={27} height={27} color={colors.accent} />}
-        size="medium"
-        // create-room is a root-level modal (sibling to the tabs group, see
-        // app/(app)/_layout.tsx), not nested inside any one tab's stack —
-        // so it overlays whatever tab/screen is currently showing, and
-        // dismissing it (swipe or back) always returns there.
-        onPress={() => router.push('/create-room')}
-      />
-    </View>
-  );
-}
 
 export default function AppTabs() {
   const colors = useTheme();
@@ -60,8 +48,10 @@ export default function AppTabs() {
   const { t } = useTranslation();
 
   return (
+    // Creating a room is not a global action: from Library and Explore the
+    // useful create is "a room with *this* book", so each tab offers its own
+    // entry point and the Rooms tab owns the blank one. Hence no custom tabBar.
     <Tabs
-      tabBar={(props) => <TabBarWithCreateButton {...props} />}
       screenOptions={{
         tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.text,
