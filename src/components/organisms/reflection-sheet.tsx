@@ -8,7 +8,7 @@ import { forwardRef, useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { Book } from '@/api/books';
+
 import Button from '@/components/atoms/button';
 import Checkbox from '@/components/atoms/checkbox';
 import TextButton from '@/components/atoms/text-button';
@@ -24,7 +24,12 @@ export interface ReflectionData {
 }
 
 interface ReflectionSheetProps {
-    book: Book | null;
+    /**
+     * Only what the sheet actually shows. Narrower than a full `books` row so
+     * a caller holding a trimmed projection — the You tab fetches only the
+     * columns it needs — can pass it straight in.
+     */
+    book: { title: string; page_count: number | null } | null;
     initialPage?: number | null;
     onSubmit: (data: ReflectionData) => Promise<void>;
     onSkip: () => void;

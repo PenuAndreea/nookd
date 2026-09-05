@@ -2,11 +2,13 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import YouScreen from '@/app/(app)/(tabs)/you';
 import { useAuth } from '@/contexts/auth-context';
+import { usePendingReflection } from '@/hooks/use-pending-reflection';
 import { useReadingStats } from '@/hooks/use-reading-stats';
 import { summarize } from '@/lib/stats';
 
 jest.mock('@/contexts/auth-context', () => ({ useAuth: jest.fn() }));
 jest.mock('@/hooks/use-reading-stats', () => ({ useReadingStats: jest.fn() }));
+jest.mock('@/hooks/use-pending-reflection', () => ({ usePendingReflection: jest.fn() }));
 
 const signOut = jest.fn();
 const setRange = jest.fn();
@@ -51,8 +53,18 @@ function session(minutes: number, overrides: Record<string, unknown> = {}) {
     } as unknown as Parameters<typeof summarize>[0][number];
 }
 
+function mockPending(pending: unknown = null) {
+    (usePendingReflection as jest.Mock).mockReturnValue({
+        pending,
+        userBook: null,
+        submit: jest.fn(),
+        dismiss: jest.fn(),
+    });
+}
+
 beforeEach(() => {
     jest.clearAllMocks();
+    mockPending();
     (useAuth as jest.Mock).mockReturnValue({
         session: { user: { id: 'user-1', email: 'me@example.com' } },
         signOut,
@@ -166,5 +178,28 @@ describe('YouScreen', () => {
 
         expect(screen.getByText('Time & sessions')).toBeVisible();
         expect(screen.queryByText("Couldn't load your stats")).toBeNull();
+    });
+
+    it('offers a reflection for a session that was never asked about', async () => {
+        mockPending({
+            id: 'session-1',
+            created_at: new Date().toISOString(),
+            ended_at: new Date().toISOString(),
+            duration_minutes: 42,
+            room_name: 'Rainy Library',
+            book_id: null,
+            book: null,
+        });
+
+        await render(<YouScreen />);
+
+        expect(screen.getByText('One session to reflect on')).toBeVisible();
+        expect(screen.getByText(/42m in Rainy Library/)).toBeVisible();
+    });
+
+    it('shows nothing when no session is owed a reflection', async () => {
+        await render(<YouScreen />);
+
+        expect(screen.queryByText('One session to reflect on')).toBeNull();
     });
 });

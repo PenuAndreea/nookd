@@ -1,5 +1,11 @@
 import i18n from '@/i18n';
-import { formatMinutes, formatPercent, formatShortDate, partOfDayKey } from '@/lib/stats-format';
+import {
+    formatMinutes,
+    formatPercent,
+    formatShortDate,
+    formatWhen,
+    partOfDayKey,
+} from '@/lib/stats-format';
 
 // The real i18n instance, so a stale key fails here the way a reader would
 // notice it.
@@ -73,5 +79,21 @@ describe('formatShortDate', () => {
 
     it('adds the year once it is a different one', () => {
         expect(formatShortDate(new Date(2025, 11, 20), t, now)).toBe('20 Dec 2025');
+    });
+});
+
+describe('formatWhen', () => {
+    const now = new Date(2026, 8, 5, 18, 0);
+
+    it('reads as a phrase inside a sentence', () => {
+        // "on today" is not English — the preposition has to belong to the
+        // phrase, not the template around it.
+        expect(formatWhen(new Date(2026, 8, 5, 9), t, now)).toBe('today');
+        expect(formatWhen(new Date(2026, 8, 4), t, now)).toBe('yesterday');
+        expect(formatWhen(new Date(2026, 8, 1), t, now)).toBe('on 1 Sep');
+    });
+
+    it('carries the year through for an older session', () => {
+        expect(formatWhen(new Date(2025, 11, 20), t, now)).toBe('on 20 Dec 2025');
     });
 });

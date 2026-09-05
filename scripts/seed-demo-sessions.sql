@@ -162,6 +162,14 @@ begin
       and v_n % 2 = 0;
   end loop;
 
+  -- Everything seeded above has already been through the reflection flow --
+  -- a mood or a note means the reader was asked. Without this stamp every
+  -- demo session counts as "still owed a reflection" and the You tab offers
+  -- the newest one back forever.
+  update reading_sessions
+  set reflection_prompted_at = ended_at
+  where id::text like 'dddddddd-%';
+
   -- Keep the library consistent with the reading above: the finished books
   -- marked finished, the current one in progress at the page last reached.
   insert into user_books (user_id, book_id, status, current_page, started_at, finished_at)

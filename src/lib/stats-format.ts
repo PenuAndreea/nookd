@@ -65,3 +65,17 @@ export function formatShortDate(date: Date, t: Translate, now: Date = new Date()
         ? t('you.journal.date', { day: date.getDate(), month })
         : t('you.journal.dateWithYear', { day: date.getDate(), month, year: date.getFullYear() });
 }
+
+/**
+ * The same instant as a phrase that can sit inside a sentence: "today",
+ * "yesterday", "on 5 Sep". `formatShortDate` is the standalone label for a
+ * list; this is the one to interpolate.
+ */
+export function formatWhen(date: Date, t: Translate, now: Date = new Date()): string {
+    const days = daysBetween(date, now);
+
+    if (days === 0) return t('you.pendingReflection.whenToday');
+    if (days === 1) return t('you.pendingReflection.whenYesterday');
+
+    return t('you.pendingReflection.whenOn', { date: formatShortDate(date, t, now) });
+}

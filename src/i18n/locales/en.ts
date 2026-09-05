@@ -279,6 +279,19 @@ export default {
             moodEmpty: 'No moods recorded yet.',
             moodShare: '{{percent}}%',
         },
+        pendingReflection: {
+            title: 'One session to reflect on',
+            body: 'You read for {{duration}} in {{roomName}} {{when}}.',
+            bodyNoRoom: 'You read for {{duration}} {{when}}.',
+            // "on today" is not English, so the preposition belongs with the
+            // phrase rather than the sentence template.
+            whenToday: 'today',
+            whenYesterday: 'yesterday',
+            whenOn: 'on {{date}}',
+            action: 'Add a reflection',
+            dismiss: 'Not now',
+            fallbackRoomName: 'a room',
+        },
         journal: {
             sectionTitle: 'What you wrote',
             subtitle: 'Your reflections, newest first.',
